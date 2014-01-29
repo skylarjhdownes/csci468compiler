@@ -27,7 +27,7 @@ public class microPascalScanner {
 	    //Errors:
 	    MP_RUN_COMMENT, MP_RUN_STRING, MP_ERROR
 	}
-	Scanner scanner;
+	Scanner fileScanner;
 	String lexeme;
 	int lineNumber;
 	int columnNumber;
@@ -36,7 +36,7 @@ public class microPascalScanner {
 	{
 		try
 		{
-			scanner = new Scanner(new BufferedReader(new FileReader("source-code-file.pas")));
+			fileScanner = new Scanner(new BufferedReader(new FileReader("source-code-file.pas")));
 		}
 		catch(FileNotFoundException e)
 		{
@@ -45,7 +45,8 @@ public class microPascalScanner {
 	}
 	public String getToken()
 	{
-		return scanner.next();
+		return fileScanner.next();
+//		scanner.skip(pattern) for comment checking?;
 	}
 	public String getLexeme(String token)
 	{
