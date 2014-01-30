@@ -27,17 +27,20 @@ public class microPascalScanner {
 	    //Errors:
 	    MP_RUN_COMMENT, MP_RUN_STRING, MP_ERROR
 	}
-	Scanner fileScanner;
-	public static Token currentToken;
+	BufferedReader fileReader; 
+	public static Token currentToken;  //I'm going to build this using public stuff to get it off the ground
 	public static String lexeme;
-	public static int lineNumber;
-	public static int columnNumber;
-	
+	public static int lineNumber = 0;
+	public static int columnNumber = 0;
+	public static int currentFilePosition = 0;
+	public static char lookaheadCharacter;
+
+
 	public void openFile() throws FileNotFoundException
 	{
 		try
 		{
-			fileScanner = new Scanner(new BufferedReader(new FileReader("source-code-file.pas")));
+			fileReader = new BufferedReader(new FileReader("source-code-file.pas"));
 		}
 		catch(FileNotFoundException e)
 		{
@@ -47,7 +50,6 @@ public class microPascalScanner {
 	public Token getToken()
 	{
 		return currentToken;
-//		scanner.skip(pattern) for comment checking?;
 	}
 	public String getLexeme(String token)
 	{
@@ -61,6 +63,16 @@ public class microPascalScanner {
 	public int getColumnNumber(String token)
 	{
 		return columnNumber;
+	}
+	
+	private void nextCharacter() {
+		try {
+			lookaheadCharacter = (char)fileReader.read(); columnNumber++; currentFilePosition++;
+			if (lookaheadCharacter == '\n') {lineNumber++; columnNumber = 0;}
+			else if (lookaheadCharacter == '\uffff') lookaheadCharacter = '\u0080';
+		} catch (IOException e) {
+			lookaheadCharacter = '\u0080';
+		}
 	}
 	
 	
