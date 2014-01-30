@@ -75,6 +75,19 @@ public class microPascalScanner {
 		}
 	}
 	
+	private static void markReturnSpot()
+	{
+		try
+		{
+		fileReader.mark(1000);	//This is for going back when the FSA finds out it needs to.  
+								//The 1000 isn't going to cut it, since Pascal can have variables of 
+								//infinite length (I think.  Didn't Rocky say that in class?).
+		} catch (IOException e) 
+		{
+			System.out.print("The fileReader is confused about marking where to jump back to.");
+		}
+	}
+	
 	public static void dispatcher()
 	{
 		lexeme = "";  //Make lexeme string blank since we're about to write a new one.  We may want to move this later.
@@ -99,15 +112,7 @@ public class microPascalScanner {
 	
 	public static Token isNumericToken()
 	{
-		try
-		{
-		fileReader.mark(1000);	//This is for going back when the FSA finds out it needs to.  
-								//The 1000 isn't going to cut it, since Pascal can have variables of 
-								//infinite length (I think).
-		} catch (IOException e) 
-		{
-			System.out.print("The fileReader is confused about marking where to jump back to.");
-		}
+		markReturnSpot();
 		Token returnToken;
 		char currentChar = 'd';
 		if (Character.isDigit(currentChar))
@@ -135,12 +140,17 @@ public class microPascalScanner {
 		}
 		if (currentChar == '.')
 		{
+			
 			nextCharacter();
 			if (Character.isDigit(currentChar))
 			{
 				lexeme.concat("."); 
 				lexeme.concat(Character.toString(currentChar)); 
 				returnToken = Token.MP_INTEGER_LIT; 			
+			}
+			else
+			{
+				//Stuff and things.  Sleep time now.
 			}
 		}
 		
