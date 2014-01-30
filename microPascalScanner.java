@@ -27,13 +27,13 @@ public class microPascalScanner {
 	    //Errors:
 	    MP_RUN_COMMENT, MP_RUN_STRING, MP_ERROR
 	}
-	BufferedReader fileReader; 
-	public static Token currentToken;  //I'm going to build this using public stuff to get it off the ground
-	public static String lexeme = "";
-	public static int lineNumber = 0;
-	public static int columnNumber = 0;
-	public static int currentFilePosition = 0;
-	public static char lookaheadCharacter;
+	private static BufferedReader fileReader; 
+	private static Token currentToken;  //I'm going to build this using public stuff to get it off the ground
+	private static String lexeme = "";
+	private static int lineNumber = 0;
+	private static int columnNumber = 0;
+	private static int currentFilePosition = 0;
+	private static char lookaheadCharacter;
 
 
 	public void openFile() throws FileNotFoundException
@@ -64,12 +64,13 @@ public class microPascalScanner {
 		return columnNumber;
 	}
 	
-	private void nextCharacter() {
+	private static void nextCharacter() {
 		try {
 			lookaheadCharacter = (char)fileReader.read(); columnNumber++; currentFilePosition++;
 			if (lookaheadCharacter == '\n') {lineNumber++; columnNumber = 0;}
 			else if (lookaheadCharacter == '\uffff') lookaheadCharacter = '\u0080';
-		} catch (IOException e) {
+		} catch (IOException e) 
+		{
 			lookaheadCharacter = '\u0080';
 		}
 	}
@@ -77,7 +78,7 @@ public class microPascalScanner {
 	public static void dispatcher()
 	{
 		lexeme = "";  //Make lexeme string blank since we're about to write a new one.  We may want to move this later.
-		if (Character.isLetter(microPascalScanner.lookaheadCharacter))
+		if (Character.isLetter(microPascalScanner.lookaheadCharacter)) //These are just a vague framework for now
 		{
 			
 		}
@@ -98,19 +99,52 @@ public class microPascalScanner {
 	
 	public static Token isNumericToken()
 	{
+		try
+		{
+		fileReader.mark(1000);	//This is for going back when the FSA finds out it needs to.  
+								//The 1000 isn't going to cut it, since Pascal can have variables of 
+								//infinite length (I think).
+		} catch (IOException e) 
+		{
+			System.out.print("The fileReader is confused about marking where to jump back to.");
+		}
 		Token returnToken;
 		char currentChar = 'd';
 		if (Character.isDigit(currentChar))
 		{
-			lexeme.concat(Character.toString(currentChar)); //I'm ending up casting between char and String a lot, 
-			returnToken = MP_INTEGER_LIT; 					//hopefully I'll be able to make it work as one or the other eventually.
+			lexeme.concat(Character.toString(currentChar)); 
+			returnToken = Token.MP_INTEGER_LIT; 			
 		}
 		else
 		{
+			try
+			{
+			fileReader.reset();	
+			} catch (IOException e) 
+			{
+				System.out.print("The fileReader is confused about jumping back to the mark.");
+			}
+			nextCharacter();
 			return Token.MP_ERROR;
 		}
+		nextCharacter();
+		while (Character.isDigit(currentChar))
+		{
+			lexeme.concat(Character.toString(currentChar));
+			nextCharacter();
+		}
+		if (currentChar == '.')
+		{
+			nextCharacter();
+			if (Character.isDigit(currentChar))
+			{
+				lexeme.concat("."); 
+				lexeme.concat(Character.toString(currentChar)); 
+				returnToken = Token.MP_INTEGER_LIT; 			
+			}
+		}
 		
-		while
+		return returnToken;
 		
 	}
 	
