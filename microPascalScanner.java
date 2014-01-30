@@ -29,7 +29,7 @@ public class microPascalScanner {
 	}
 	BufferedReader fileReader; 
 	public static Token currentToken;  //I'm going to build this using public stuff to get it off the ground
-	public static String lexeme;
+	public static String lexeme = "";
 	public static int lineNumber = 0;
 	public static int columnNumber = 0;
 	public static int currentFilePosition = 0;
@@ -53,7 +53,6 @@ public class microPascalScanner {
 	}
 	public String getLexeme(String token)
 	{
-		
 		return lexeme;
 	}
 	public int getLineNumber(String token)
@@ -73,6 +72,51 @@ public class microPascalScanner {
 		} catch (IOException e) {
 			lookaheadCharacter = '\u0080';
 		}
+	}
+	
+	public static void dispatcher()
+	{
+		lexeme = "";  //Make lexeme string blank since we're about to write a new one.  We may want to move this later.
+		if (Character.isLetter(microPascalScanner.lookaheadCharacter))
+		{
+			
+		}
+		else if (Character.isDigit(microPascalScanner.lookaheadCharacter))
+		{
+			isNumericToken();
+		}
+		else if (Character.isDigit(microPascalScanner.lookaheadCharacter))
+		{
+			
+		}
+	}
+	
+	public static void isIdentifierOrReservedToken()
+	{
+		//TODO 
+	}
+	
+	public static Token isNumericToken()
+	{
+		Token returnToken;
+		char currentChar = 'd';
+		if (Character.isDigit(currentChar))
+		{
+			lexeme.concat(Character.toString(currentChar)); //I'm ending up casting between char and String a lot, 
+			returnToken = MP_INTEGER_LIT; 					//hopefully I'll be able to make it work as one or the other eventually.
+		}
+		else
+		{
+			return Token.MP_ERROR;
+		}
+		
+		while
+		
+	}
+	
+	public static void isSymbolToken()
+	{
+		//TODO
 	}
 	
 	
