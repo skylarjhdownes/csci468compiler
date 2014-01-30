@@ -28,9 +28,10 @@ public class microPascalScanner {
 	    MP_RUN_COMMENT, MP_RUN_STRING, MP_ERROR
 	}
 	Scanner fileScanner;
-	String lexeme;
-	int lineNumber;
-	int columnNumber;
+	public static Token currentToken;
+	public static String lexeme;
+	public static int lineNumber;
+	public static int columnNumber;
 	
 	public void openFile() throws FileNotFoundException
 	{
@@ -43,9 +44,9 @@ public class microPascalScanner {
 			System.out.println("File doesn't seem to exist.  Wacky.");
 		}
 	}
-	public String getToken()
+	public Token getToken()
 	{
-		return fileScanner.next();
+		return currentToken;
 //		scanner.skip(pattern) for comment checking?;
 	}
 	public String getLexeme(String token)
