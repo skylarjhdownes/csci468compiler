@@ -7,7 +7,12 @@ public class testDriver {
 	public static void main(String[] args) {
 		File testFile;
 		
-		testFile = new File("C:\\Users\\Stephen Bush\\Documents\\Test.txt");
+		if(args[0].isEmpty()
+		{
+			System.out.println("No input file give, ALL IS LOST. ABANDON SHIP!!!!!!!!!!!!!!!!");
+		}
+		else{
+		testFile = new File(args[0]);
 		
 		Scanner sc = new Scanner(testFile);
 		
@@ -15,6 +20,7 @@ public class testDriver {
 		while ( sc.hasNextToken() ) {
 			current = sc.getToken();
 			System.out.println("Token>>  "+"Ln:   "+current.getLineNumber()+"\tCl: "+current.getColumnNumber()+"\t\tType:  "+current.getToken()+"\t\tLex:  "+current.getLexeme());
+		}
 		}
 	}
 
