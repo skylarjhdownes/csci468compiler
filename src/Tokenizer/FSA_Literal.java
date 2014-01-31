@@ -1,4 +1,4 @@
-package csci468compiler;
+package Tokenizer;
 
 public class FSA_Literal extends Tokenizer {
 	
@@ -8,7 +8,7 @@ public class FSA_Literal extends Tokenizer {
 	private Scanner myScanner;
 	*/
 	
-	public FSA_Identifier(MicroPascalScanner in) {
+	public FSA_Literal(MicroPascalScanner in) {
 		super(in);
 	}
 	
@@ -193,7 +193,5 @@ public class FSA_Literal extends Tokenizer {
 			if ( myScanner.hasNextToken() ) nextChar = myScanner.getNextChar();
 			else t = State.RETURN;
 		}
-		System.out.println("If we reach here, something has gone wrong, and we are unable to parse a token.");
 	}
-
 }

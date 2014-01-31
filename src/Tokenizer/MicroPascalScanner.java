@@ -41,7 +41,7 @@ public class MicroPascalScanner implements I_Tokenizer {
 		char nextChar = peekNextChar();
 		Token tok;
 		if ( Character.isLetter(nextChar) || nextChar == '_' ) tok = iden.getToken();
-		else if ( Character.isdigit(nextChar) ) tok = lit.getToken();
+		else if ( Character.isDigit(nextChar) ) tok = lit.getToken();
 		else tok = strSym.getToken();
 		
 		
@@ -50,8 +50,8 @@ public class MicroPascalScanner implements I_Tokenizer {
 		
 		
 		// Update the column numbers
-		colNum += tok.getLexeme().length();
-		if ( tok.getLexeme().length() == 0 ) colNum += 1;
+		colNum += tok.getLex().length();
+		if ( tok.getLex().length() == 0 ) colNum += 1;
 		tempColNum = 0;
 
 		// Update the Line buffer.
