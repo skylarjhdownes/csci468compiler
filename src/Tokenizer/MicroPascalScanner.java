@@ -38,7 +38,10 @@ public class MicroPascalScanner implements I_Tokenizer {
 		
 		
 		// Dispatch the token FSA's
+		
 		char nextChar = peekNextChar();
+		
+		
 		Token tok;
 		if ( Character.isLetter(nextChar) || nextChar == '_' ) tok = iden.getToken();
 		else if ( Character.isDigit(nextChar) ) tok = lit.getToken();
@@ -55,12 +58,33 @@ public class MicroPascalScanner implements I_Tokenizer {
 		tempColNum = 0;
 
 		// Update the Line buffer.
-		if ( buffer.length() == 0 || colNum+tempColNum == buffer.length() ) {
-			buffer = getNextLine();
-		}
-		if ( buffer == null ) {
-			hasNextChar = false;
-		}
+		do {
+			 if ( !hasNextToken() ) break;
+			 nextChar = peekNextChar();
+			// Eat up whitespace
+			 if ( nextChar == ' ' ) {
+				 colNum++;
+			 }
+			 else if ( nextChar == '	' ) {
+				 colNum++;
+			 }
+			 else if ( nextChar == '\r' ) {
+				 colNum++;
+			 }
+			 else if ( nextChar == '\n' ) {
+				 colNum++;
+			 }
+			 else break;
+
+			 if ( buffer.length() == 0 || colNum+tempColNum == buffer.length() ) {
+				 buffer = getNextLine();
+			 }
+			 if ( buffer == null ) {
+				 hasNextChar = false;
+			 }
+
+
+		} while (true);
 
 		return tok;
 	}
@@ -74,7 +98,7 @@ public class MicroPascalScanner implements I_Tokenizer {
 	}
 	
 	public char getNextChar() {
-		if ( colNum+tempColNum == buffer.length() ) { return (char)(-1); }
+		if ( buffer == null || colNum+tempColNum == buffer.length() ) { return (char)(-1); }
 		char nextChar = buffer.charAt(colNum+tempColNum);
 		tempColNum++;
 		return nextChar;

@@ -25,7 +25,7 @@ public class FSA_Identifier extends Tokenizer {
 		
 		String lexeme = "";
 		String lastAcceptableLexeme = "";
-		String token = "Identifier";
+		String token = "MP_IDENTIFIER";
 		String errorMsg = "";
 		State t = State.firstChar;
 		int lineNum = myScanner.getLineNum();
@@ -125,6 +125,10 @@ public class FSA_Identifier extends Tokenizer {
 			}
 
 			if ( t == State.RETURN ) {
+				
+				if ( lastAcceptableLexeme.length() == 0 ) {
+					myScanner.throwError("Invalid Identifier Syntax: "+'"'+lexeme+'"');
+				}
 				
 				// Check this token against a list of known strings
 				if ( lastAcceptableLexeme.equals("begin") ) token = "MP_BEGIN";
