@@ -25,19 +25,19 @@ public class Token {
         colNum = 0;
     }
     
-    public String getLex(){
+    public String getLexeme(){
         return lexeme;
     }
     
-    public String getTok(){
+    public String getToken(){
         return token;
     }
     
-    public int getLine(){
+    public int getLineNumber(){
         return lineNum;
     }
     
-    public int getCol(){
+    public int getColumnNumber(){
         return colNum;
     }
 }

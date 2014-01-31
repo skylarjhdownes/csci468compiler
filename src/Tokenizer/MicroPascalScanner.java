@@ -50,8 +50,8 @@ public class MicroPascalScanner implements I_Tokenizer {
 		
 		
 		// Update the column numbers
-		colNum += tok.getLex().length();
-		if ( tok.getLex().length() == 0 ) colNum += 1;
+		colNum += tok.getLexeme().length();
+		if ( tok.getLexeme().length() == 0 ) colNum += 1;
 		tempColNum = 0;
 
 		// Update the Line buffer.
