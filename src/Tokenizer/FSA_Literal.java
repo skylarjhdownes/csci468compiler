@@ -13,10 +13,13 @@ public class FSA_Literal extends Tokenizer {
 	}
 	
 	public enum State {
-		firstDigitState,
-		secondDigitState,
-		nextChar,
-		not,
+		firstDigit,
+		secondAndOnDigit,
+		justPassedDecimal,
+		fixedOrFloat,
+		justPassedExponent,
+		justPassedPlusOrMinus,
+		finalDigits,
 		
 		RETURN,
 		ERROR
@@ -28,7 +31,7 @@ public class FSA_Literal extends Tokenizer {
 		String lastAcceptableLexeme = "";
 		String token = "Not yet determined";
 		String errorMsg = "";
-		State t = State.firstDigitState;
+		State t = State.firstDigit;
 		int lineNum = myScanner.getLineNum();
 		int colNum = myScanner.getColNum();
 		
@@ -40,12 +43,12 @@ public class FSA_Literal extends Tokenizer {
 		{
 			switch(t)
 			{
-			case firstDigitState:
+			case firstDigit:
 				
 				if (Character.isDigit(nextChar)) 
 				{	//if the next char is a digit, record it and change states.
 					lexeme = lexeme + nextChar;
-					t = State.secondDigitState;
+					t = State.secondAndOnDigit;
 					break;
 				}
 				else 
@@ -54,19 +57,60 @@ public class FSA_Literal extends Tokenizer {
 					// Invalid character
 					break;
 				}
-			case secondDigitState:
+			case secondAndOnDigit:
 				// This state is a valid accept state;
 				lastAcceptableLexeme = lexeme;
 				
 				if (Character.isDigit(nextChar)) 
 				{	//if the next char is a digit, record it and stay in this state.
 					lexeme = lexeme + nextChar;
-					t = State.secondDigitState;
+					t = State.secondAndOnDigit;
 					break;
 				}
-				else if ()
+				else if (nextChar == '.')
 				{
 					
+				}
+				else if (nextChar == e ||nextChar == E)
+				{
+					
+				}
+
+			case justPassedDecimal:
+				if()
+				{
+					
+				}
+			case fixedOrFloat:
+				if()
+				{
+					
+				}
+			case justPassedExponent:
+				if()
+				{
+					
+				}
+			case justPassedPlusOrMinus:
+				if()
+				{
+					
+				}
+			case finalDigits:
+				// This state is a valid accept state;
+				lastAcceptableLexeme = lexeme;
+				
+				if (Character.isDigit(nextChar)) 
+				{	//if the next char is a digit, record it and stay in this state.
+					lexeme = lexeme + nextChar;
+					t = State.finalDigits;
+					break;
+				}
+				else 
+				{
+					t = State.RETURN;
+					// Invalid character
+					break;
 				}
 			}
 			
