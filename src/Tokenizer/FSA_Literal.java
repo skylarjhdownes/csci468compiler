@@ -46,7 +46,8 @@ public class FSA_Literal extends Tokenizer {
 			case firstDigit:
 				
 				if (Character.isDigit(nextChar)) 
-				{	//if the next char is a digit, record it and change states.
+				{	
+					//If the next char is a digit, record it and change to secondAndOnDigit.
 					lexeme = lexeme + nextChar;
 					t = State.secondAndOnDigit;
 					break;
@@ -62,48 +63,112 @@ public class FSA_Literal extends Tokenizer {
 				lastAcceptableLexeme = lexeme;
 				
 				if (Character.isDigit(nextChar)) 
-				{	//if the next char is a digit, record it and stay in this state.
+				{	//If the next char is a digit, record it and stay in this state.
 					lexeme = lexeme + nextChar;
-					t = State.secondAndOnDigit;
 					break;
 				}
 				else if (nextChar == '.')
 				{
-					
+					//If the next char is a decimal point/period record it and change to justPassedDecimal.
+					lexeme = lexeme + nextChar;
+					t = State.justPassedDecimal;
+					break;
 				}
-				else if (nextChar == e ||nextChar == E)
+				else if (nextChar == 'e' || nextChar == 'E')
 				{
-					
+					//If the next char is an e|E, record it and change to justPassedExponent.
+					lexeme = lexeme + nextChar;
+					t = State.justPassedExponent;
+					break;
+				}
+				else 
+				{
+					t = State.RETURN;
+					// Invalid character
+					break;
 				}
 
 			case justPassedDecimal:
-				if()
-				{
-					
+				
+				if (Character.isDigit(nextChar)) 
+				{	
+					//If the next char is a digit, record it and change to fixedOrFloat.
+					lexeme = lexeme + nextChar;
+					t = State.secondAndOnDigit;
+					break;
 				}
-			case fixedOrFloat:
-				if()
+				else 
 				{
-					
+					t = State.RETURN;
+					// Invalid character
+					break;					
+				}
+				
+			case fixedOrFloat:
+				// This state is a valid accept state;
+				lastAcceptableLexeme = lexeme;
+				
+				if (Character.isDigit(nextChar)) 
+				{	
+					//If the next char is a digit, record it and stay in this state.
+					lexeme = lexeme + nextChar;
+					break;
+				}
+				else if (nextChar == 'e' || nextChar == 'E')
+				{
+					//If the next char is an e|E, record it and change to justPassedExponent.
+					lexeme = lexeme + nextChar;
+					t = State.justPassedExponent;
+					break;
+				}
+				else 
+				{
+					t = State.RETURN;
+					// Invalid character
+					break;
 				}
 			case justPassedExponent:
-				if()
+				if (Character.isDigit(nextChar)) 
+				{	
+					//If the next char is a digit, record it and stay change to finalDigits.
+					lexeme = lexeme + nextChar;
+					t = State.finalDigits;
+					break;
+				}
+				else if (nextChar == '+'|| nextChar == '-')
 				{
-					
+					//If the next char is a +|-, record it and change to justPassedPlusOrMinus.
+					lexeme = lexeme + nextChar;
+					t = State.justPassedPlusOrMinus;
+					break;
+				}
+				else 
+				{
+					t = State.RETURN;
+					// Invalid character
+					break;
 				}
 			case justPassedPlusOrMinus:
-				if()
+				if (Character.isDigit(nextChar)) 
+				{	
+					//If the next char is a digit, record it and stay change to finalDigits.
+					lexeme = lexeme + nextChar;
+					t = State.finalDigits;
+					break;
+				}
+				else 
 				{
-					
+					t = State.RETURN;
+					// Invalid character
+					break;
 				}
 			case finalDigits:
 				// This state is a valid accept state;
 				lastAcceptableLexeme = lexeme;
 				
 				if (Character.isDigit(nextChar)) 
-				{	//if the next char is a digit, record it and stay in this state.
+				{	//If the next char is a digit, record it and stay in this state.
 					lexeme = lexeme + nextChar;
-					t = State.finalDigits;
 					break;
 				}
 				else 
@@ -128,49 +193,7 @@ public class FSA_Literal extends Tokenizer {
 			if ( myScanner.hasNextToken() ) nextChar = myScanner.getNextChar();
 			else t = State.RETURN;
 		}
-		
+		System.out.println("If we reach here, something has gone wrong, and we are unable to parse a token.");
 	}
-//	markReturnSpot();
-//	Token returnToken;
-//	char currentChar = 'd';
-//	if (Character.isDigit(currentChar))
-//	{
-//		lexeme.concat(Character.toString(currentChar)); 
-//		returnToken = Token.MP_INTEGER_LIT; 			
-//	}
-//	else
-//	{
-//		try
-//		{
-//		fileReader.reset();	
-//		} catch (IOException e) 
-//		{
-//			System.out.print("The fileReader is confused about jumping back to the mark.");
-//		}
-//		nextCharacter();
-//		return Token.MP_ERROR;
-//	}
-//	nextCharacter();
-//	while (Character.isDigit(currentChar))
-//	{
-//		lexeme.concat(Character.toString(currentChar));
-//		nextCharacter();
-//	}
-//	if (currentChar == '.')
-//	{
-//		
-//		nextCharacter();
-//		if (Character.isDigit(currentChar))
-//		{
-//			lexeme.concat("."); 
-//			lexeme.concat(Character.toString(currentChar)); 
-//			returnToken = Token.MP_INTEGER_LIT; 			
-//		}
-//		else
-//		{
-//			//Stuff and things.  Sleep time now.
-//		}
-//	}
-//	
-//	return returnToken;
+
 }
