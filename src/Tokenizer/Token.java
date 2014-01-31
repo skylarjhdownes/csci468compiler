@@ -1,34 +1,43 @@
 package Tokenizer;
 
+/**
+ *
+ * @author Jon Koenes
+ */
 public class Token {
-
-	private String lexeme;
-	private String token;
-	private int lineNum;
-	private int colNum;
-	
-	public Token() { }
-	public Token(String l, String t) {
-		lexeme = l;
-		token = t;
-	}
-	public Token(String l, String t,int lN, int cN) {
-		lexeme = l;
-		token = t;
-		lineNum = lN;
-		colNum = cN;
-	}
-	
-	public void setLexeme(String in) { lexeme = in; }
-	public void setToken(String in) { token = in; }
-	public void setLineNumber(int in) { lineNum = in; }
-	public void setColumnNumber(int in) { colNum = in; }
-
-	public String getLexeme() { return lexeme; }
-	public String getToken() { return token; }
-	public int getLineNumber() { return lineNum; }
-	public int getColumnNumber() { return colNum; }
-
-	
-
+    
+    protected String lexeme;
+    protected String token;
+    protected int lineNum;
+    protected int colNum;
+    
+    public Token(String in_lex, String in_token, int lnum, int colnum){
+        lexeme = in_lex;
+        token = in_token;
+        lineNum = lnum;
+        colNum = colnum;
+    }
+    
+    public Token(){
+        lexeme = "";
+        token = "EMPTY_TOKEN";
+        lineNum = 0;
+        colNum = 0;
+    }
+    
+    public String getLexeme(){
+        return lexeme;
+    }
+    
+    public String getToken(){
+        return token;
+    }
+    
+    public int getLineNumber(){
+        return lineNum;
+    }
+    
+    public int getColumnNumber(){
+        return colNum;
+    }
 }
