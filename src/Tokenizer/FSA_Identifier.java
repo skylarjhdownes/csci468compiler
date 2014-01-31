@@ -7,7 +7,7 @@ public class FSA_Identifier extends Tokenizer {
 	private Scanner myScanner;
      		*/
 	
-	public FSA_Identifier(Scanner in) {
+	public FSA_Identifier(MicroPascalScanner in) {
 		super(in);
 	}
 

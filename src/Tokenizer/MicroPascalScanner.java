@@ -6,7 +6,7 @@ import java.io.FileReader;
 import java.io.IOException;
 
 
-public class Scanner implements I_Tokenizer {
+public class MicroPascalScanner implements I_Tokenizer {
 	
 	private File input;
 	private int colNum = 0;
@@ -18,7 +18,7 @@ public class Scanner implements I_Tokenizer {
 	Tokenizer iden = new FSA_Identifier(this);
 	Tokenizer strSym = new FSA_StrSymbol(this);
 
-	public Scanner(File in) {
+	public MicroPascalScanner(File in) {
 		input = in;
 		try {
 			fr = new FileReader(input);
