@@ -16,6 +16,7 @@ public class Scanner implements I_Tokenizer {
 	private boolean hasNextChar = true;
 	private FileReader fr;
 	Tokenizer iden = new FSA_Identifier(this);
+	Tokenizer strSym = new FSA_StrSymbol(this);
 
 	public Scanner(File in) {
 		input = in;
@@ -36,7 +37,11 @@ public class Scanner implements I_Tokenizer {
 		
 		
 		// Dispatch the token FSA's
-		Token tok = iden.getToken();
+		char nextChar = peekNextChar();
+		Token tok;
+		if ( Character.isLetter(nextChar) || nextChar == '_' ) tok = iden.getToken();
+		else tok = strSym.getToken();
+		
 		
 		
 		

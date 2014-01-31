@@ -7,9 +7,6 @@ public class FSA_Identifier extends Tokenizer {
 	private Scanner myScanner;
      		*/
 	
-	
-
-	
 	public FSA_Identifier(Scanner in) {
 		super(in);
 	}
@@ -19,6 +16,7 @@ public class FSA_Identifier extends Tokenizer {
 		firstChar,
 		nextChar,
 		nonUnderscore,
+		
 		RETURN,
 		ERROR
 	}
