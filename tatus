@@ -1,0 +1,128 @@
+commit e5db1e354efd054b6bfcead8d4f6e6c580641fea
+Merge: 9292eed c2bf650
+Author: skylarjhdownes <skylarjhdownes@gmail.com>
+Date:   Thu Jan 30 16:39:30 2014 -0800
+
+    Merge pull request #3 from JonKoenes/master
+    
+    Changed driver and StringFSA
+
+commit c2bf6505c96d67fbc7b3dcb615f966ea1b137564
+Author: unknown <jonathan.koenes@cslab3.coe.montana.edu>
+Date:   Thu Jan 30 17:29:53 2014 -0700
+
+    Changed driver and StringFSA
+
+commit 9292eed04fc3994cd8d56e7ea764ae53741eba05
+Merge: ba2b213 27c8f75
+Author: skylarjhdownes <skylarjhdownes@gmail.com>
+Date:   Thu Jan 30 16:03:14 2014 -0800
+
+    Merge pull request #2 from darkshark007/master
+    
+    PRQ!!!!!!!!!!
+
+commit 27c8f756caab41df3e242dd7ad7669d4735aec6f
+Author: darkshark007 <darkshark_007@yahoo.com>
+Date:   Thu Jan 30 17:01:30 2014 -0700
+
+    StrSymbol_FSA Commit
+
+commit ba2b213b10c006afb33b98aa4dfc39ccab91b022
+Merge: 7285d5b 59f4204
+Author: skylarjhdownes <skylarjhdownes@gmail.com>
+Date:   Thu Jan 30 15:43:32 2014 -0800
+
+    Merge pull request #1 from JonKoenes/master
+    
+    This is my java files for symbol fsa and token class
+
+commit 59f4204f4061c4d8a3f65a68991257c7d810df7d
+Author: unknown <jonathan.koenes@cslab3.coe.montana.edu>
+Date:   Thu Jan 30 16:39:13 2014 -0700
+
+    This is my java files for symbol fsa and token class
+
+commit 172ece6a5a654b5cf3d2fd9c5590f181508d5de7
+Author: darkshark007 <darkshark_007@yahoo.com>
+Date:   Thu Jan 30 15:46:46 2014 -0700
+
+    Identifier_FSA Commit
+
+commit 7285d5bc6c35beecf95c1a59fda9a88f4d3d4ec7
+Author: skylarjhdownes <skylarjhdownes@gmail.com>
+Date:   Thu Jan 30 00:24:51 2014 -0700
+
+    Couple last changes before bed.
+
+commit 0d103f369b1f01e81ad7887445e2398c738e029b
+Author: skylarjhdownes <skylarjhdownes@gmail.com>
+Date:   Wed Jan 29 23:50:14 2014 -0700
+
+    Working on didgit FSA shenanigans.
+
+commit 31a396eca3350d6054d42bbd722f8327d9bbe65f
+Author: skylarjhdownes <skylarjhdownes@gmail.com>
+Date:   Wed Jan 29 23:17:08 2014 -0700
+
+    Removed the fsa section till things are more figured out, worked on digit FSAs.
+
+commit eb80b84b296924b3eacea4a9a4ecd4173fae98cd
+Author: skylarjhdownes <skylarjhdownes@gmail.com>
+Date:   Wed Jan 29 22:11:29 2014 -0700
+
+    Starting to get some kind of structure.
+
+commit 984d75b900a4b7fdf153fea1d075bc89c3d0a376
+Author: skylarjhdownes <skylarjhdownes@gmail.com>
+Date:   Wed Jan 29 20:10:40 2014 -0700
+
+    Changed to BufferedReader instead of Scanner.
+
+commit 6950d3f467e187894cebdb00ba939163b10d0fd4
+Author: skylarjhdownes <skylarjhdownes@gmail.com>
+Date:   Wed Jan 29 19:51:21 2014 -0700
+
+    Added class for FSAs
+
+commit 0e378b75dd1f78d9a26310aed9afd8cae4ddf884
+Author: skylarjhdownes <skylarjhdownes@gmail.com>
+Date:   Wed Jan 29 11:49:20 2014 -0700
+
+    Variable name edit.
+
+commit c46f273cda4a189756c5104c504feddacce8b4a2
+Author: skylarjhdownes <skylarjhdownes@gmail.com>
+Date:   Wed Jan 29 11:39:09 2014 -0700
+
+    Added Token enum.
+
+commit 068eee7ba728505083ea7e4430666a236b80048f
+Author: skylarjhdownes <skylarjhdownes@gmail.com>
+Date:   Tue Jan 28 23:20:01 2014 -0700
+
+    Preliminary start on the scanner, method framework.
+
+commit 364cce47bae56c0ada1a8bf0a8fd7946924c568e
+Author: darkshark007 <darkshark_007@yahoo.com>
+Date:   Fri Jan 24 17:59:20 2014 -0700
+
+    Milestone Two
+
+commit dd311f2f385d13c5fd7f8f748605f5b095720a5f
+Author: darkshark007 <darkshark_007@yahoo.com>
+Date:   Fri Jan 24 16:09:55 2014 -0700
+
+    Milestone Two
+
+commit 43ed64fdb1600b6dbc7be173f3d0aeb366194f3b
+Author: darkshark007 <darkshark_007@yahoo.com>
+Date:   Fri Jan 24 09:35:14 2014 -0700
+
+    Java-Project Creation
+
+commit dc18279aaf0dc7afaf273d7d22efc5d50cc00fac
+Author: skylarjhdownes <skylarjhdownes@gmail.com>
+Date:   Wed Jan 22 15:32:35 2014 -0800
+
+    Initial commit

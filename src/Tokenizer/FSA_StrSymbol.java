@@ -2,7 +2,7 @@ package Tokenizer;
 
 public class FSA_StrSymbol extends Tokenizer {
 
-	public FSA_StrSymbol(Scanner in) {
+	public FSA_StrSymbol(MicroPascalScanner in) {
 		super(in);
 	}
 
