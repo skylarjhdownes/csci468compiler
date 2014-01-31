@@ -13,15 +13,79 @@ public class FSA_Literal extends Tokenizer {
 	}
 	
 	public enum State {
-		firstChar,
+		firstDigitState,
+		secondDigitState,
 		nextChar,
-		nonUnderscore,
+		not,
 		
 		RETURN,
 		ERROR
 	}
 	
 	public Token getToken()
+	{
+		String lexeme = "";
+		String lastAcceptableLexeme = "";
+		String token = "Not yet determined";
+		String errorMsg = "";
+		State t = State.firstDigitState;
+		int lineNum = myScanner.getLineNum();
+		int colNum = myScanner.getColNum();
+		
+		char nextChar = '0';
+		if ( myScanner.hasNextToken() ) nextChar = myScanner.getNextChar();
+		else t = State.RETURN;
+		
+		while(true)
+		{
+			switch(t)
+			{
+			case firstDigitState:
+				
+				if (Character.isDigit(nextChar)) 
+				{	//if the next char is a digit, record it and change states.
+					lexeme = lexeme + nextChar;
+					t = State.secondDigitState;
+					break;
+				}
+				else 
+				{
+					t = State.RETURN;
+					// Invalid character
+					break;
+				}
+			case secondDigitState:
+				// This state is a valid accept state;
+				lastAcceptableLexeme = lexeme;
+				
+				if (Character.isDigit(nextChar)) 
+				{	//if the next char is a digit, record it and stay in this state.
+					lexeme = lexeme + nextChar;
+					t = State.secondDigitState;
+					break;
+				}
+				else if ()
+				{
+					
+				}
+			}
+			
+			if ( t == State.ERROR ) 
+			{
+				myScanner.throwError(errorMsg);
+				t = State.RETURN;
+			}
+
+			if ( t == State.RETURN ) 
+			{
+				return new Token(lastAcceptableLexeme,token,lineNum,colNum);
+			}
+			
+			if ( myScanner.hasNextToken() ) nextChar = myScanner.getNextChar();
+			else t = State.RETURN;
+		}
+		
+	}
 //	markReturnSpot();
 //	Token returnToken;
 //	char currentChar = 'd';
