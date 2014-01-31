@@ -37,7 +37,7 @@ public class FSA_Identifier extends Tokenizer {
 		else t = State.RETURN;
 		
 		while (true) {
-			// Process this character depending on what state im in
+			// Process this character depending on what state i'm in
 			switch(t) {
 			case firstChar:
 				// In this state, i am only able to accept a LETTER or an UNDERSCORE
