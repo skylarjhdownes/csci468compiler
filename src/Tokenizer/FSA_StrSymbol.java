@@ -148,7 +148,7 @@ public class FSA_StrSymbol extends Tokenizer {
 				break;
 
 			default:
-				System.out.println("StrSymFSA asked to scan for item that was not string or symbol");
+				System.out.println("StrSymFSA asked to scan for item that was not string or symbol:\t"+nextChar+" == "+(int)nextChar);
 				foundToken = true;
 				retTok = new Token("","MP_ERROR_GOVT_TAKING_JOBS", line, col);
 			}//end switch
