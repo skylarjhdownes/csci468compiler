@@ -17,7 +17,8 @@ public class MicroPascalScanner implements I_Tokenizer {
 	private FileReader fr;
 	Tokenizer iden = new FSA_Identifier(this);
 	Tokenizer strSym = new FSA_StrSymbol(this);
-
+	Tokenizer lit = new FSA_Literal(this);
+	
 	public MicroPascalScanner(File in) {
 		input = in;
 		try {
@@ -40,6 +41,7 @@ public class MicroPascalScanner implements I_Tokenizer {
 		char nextChar = peekNextChar();
 		Token tok;
 		if ( Character.isLetter(nextChar) || nextChar == '_' ) tok = iden.getToken();
+		else if ( Character.isdigit(nextChar) ) tok = lit.getToken();
 		else tok = strSym.getToken();
 		
 		
