@@ -59,6 +59,13 @@ public class MicroPascalScanner implements I_Tokenizer {
 
 		// Update the Line buffer.
 		do {
+			 if ( buffer.length() == 0 || colNum+tempColNum >= buffer.length() ) {
+				 buffer = getNextLine();
+			 }
+			 if ( buffer == null ) {
+				 hasNextChar = false;
+			 }
+
 			 if ( !hasNextToken() ) break;
 			 nextChar = peekNextChar();
 			// Eat up whitespace
@@ -74,14 +81,26 @@ public class MicroPascalScanner implements I_Tokenizer {
 			 else if ( nextChar == '\n' ) {
 				 colNum++;
 			 }
+			 else if ( nextChar == '{' ) {
+					do {
+						 if ( buffer.length() == 0 || colNum+tempColNum >= buffer.length() ) {
+							 buffer = getNextLine();
+						 }
+						 if ( buffer == null ) {
+							 hasNextChar = false;
+						 }
+
+						 if ( !hasNextToken() ) {
+							 // TODO RUN ON COMMENT ERROR
+							 break;
+						 }
+						 nextChar = peekNextChar();
+						 colNum++;
+					} while (nextChar != '}');
+
+			 }
 			 else break;
 
-			 if ( buffer.length() == 0 || colNum+tempColNum == buffer.length() ) {
-				 buffer = getNextLine();
-			 }
-			 if ( buffer == null ) {
-				 hasNextChar = false;
-			 }
 
 
 		} while (true);
@@ -98,7 +117,7 @@ public class MicroPascalScanner implements I_Tokenizer {
 	}
 	
 	public char getNextChar() {
-		if ( buffer == null || colNum+tempColNum == buffer.length() ) { return (char)(-1); }
+		if ( buffer == null || colNum+tempColNum == buffer.length() ) { return '\n'; }
 		char nextChar = buffer.charAt(colNum+tempColNum);
 		tempColNum++;
 		return nextChar;
