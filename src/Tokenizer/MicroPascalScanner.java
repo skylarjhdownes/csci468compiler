@@ -38,7 +38,10 @@ public class MicroPascalScanner implements I_Tokenizer {
 		
 		
 		// Dispatch the token FSA's
+		
 		char nextChar = peekNextChar();
+		
+		
 		Token tok;
 		if ( Character.isLetter(nextChar) || nextChar == '_' ) 
 		{
@@ -64,12 +67,52 @@ public class MicroPascalScanner implements I_Tokenizer {
 		tempColNum = 0;
 
 		// Update the Line buffer.
-		if ( buffer.length() == 0 || colNum+tempColNum == buffer.length() ) {
-			buffer = getNextLine();
-		}
-		if ( buffer == null ) {
-			hasNextChar = false;
-		}
+		do {
+			 if ( buffer.length() == 0 || colNum+tempColNum >= buffer.length() ) {
+				 buffer = getNextLine();
+			 }
+			 if ( buffer == null ) {
+				 hasNextChar = false;
+			 }
+
+			 if ( !hasNextToken() ) break;
+			 nextChar = peekNextChar();
+			// Eat up whitespace
+			 if ( nextChar == ' ' ) {
+				 colNum++;
+			 }
+			 else if ( nextChar == '	' ) {
+				 colNum++;
+			 }
+			 else if ( nextChar == '\r' ) {
+				 colNum++;
+			 }
+			 else if ( nextChar == '\n' ) {
+				 colNum++;
+			 }
+			 else if ( nextChar == '{' ) {
+					do {
+						 if ( buffer.length() == 0 || colNum+tempColNum >= buffer.length() ) {
+							 buffer = getNextLine();
+						 }
+						 if ( buffer == null ) {
+							 hasNextChar = false;
+						 }
+
+						 if ( !hasNextToken() ) {
+							 // TODO RUN ON COMMENT ERROR
+							 break;
+						 }
+						 nextChar = peekNextChar();
+						 colNum++;
+					} while (nextChar != '}');
+
+			 }
+			 else break;
+
+
+
+		} while (true);
 
 		return tok;
 	}
@@ -83,7 +126,7 @@ public class MicroPascalScanner implements I_Tokenizer {
 	}
 	
 	public char getNextChar() {
-		if ( colNum+tempColNum == buffer.length() ) { return (char)(-1); }
+		if ( buffer == null || colNum+tempColNum == buffer.length() ) { return '\n'; }
 		char nextChar = buffer.charAt(colNum+tempColNum);
 		tempColNum++;
 		return nextChar;

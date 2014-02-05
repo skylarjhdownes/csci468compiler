@@ -130,6 +130,9 @@ public class FSA_StrSymbol extends Tokenizer {
 						if(nextChar == '\''){//contains apostrophe
 							throw new ApoExc();
 						}
+						if (nextChar == '\r' || nextChar == '\n' ) {
+							throw new IndexOutOfBoundsException();
+						}
 						lex+=nextChar;
 						nextChar = myScanner.getNextChar();
 					}
@@ -138,7 +141,7 @@ public class FSA_StrSymbol extends Tokenizer {
 					foundToken = true;
 				}
 				catch(IndexOutOfBoundsException e){//if hit end of line while looking for string
-					retTok = new Token("", "MP_RUN_STRING", line, col);
+					retTok = new Token(lex, "MP_RUN_STRING", line, col);
 					foundToken = true;
 				}
 				catch(ApoExc e){
@@ -148,7 +151,7 @@ public class FSA_StrSymbol extends Tokenizer {
 				break;
 
 			default:
-				System.out.println("StrSymFSA asked to scan for item that was not string or symbol");
+				System.out.println("StrSymFSA asked to scan for item that was not string or symbol:\t"+nextChar+" == "+(int)nextChar);
 				foundToken = true;
 				retTok = new Token("","MP_ERROR_GOVT_TAKING_JOBS", line, col);
 			}//end switch
