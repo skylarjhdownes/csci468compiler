@@ -40,9 +40,18 @@ public class MicroPascalScanner implements I_Tokenizer {
 		// Dispatch the token FSA's
 		char nextChar = peekNextChar();
 		Token tok;
-		if ( Character.isLetter(nextChar) || nextChar == '_' ) tok = iden.getToken();
-		else if ( Character.isDigit(nextChar) ) tok = lit.getToken();
-		else tok = strSym.getToken();
+		if ( Character.isLetter(nextChar) || nextChar == '_' ) 
+		{
+			tok = iden.getToken();
+		}
+		else if ( Character.isDigit(nextChar) ) 
+		{
+			tok = lit.getToken();
+		}
+		else 
+		{
+			tok = strSym.getToken();
+		}
 		
 		
 		
