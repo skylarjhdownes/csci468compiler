@@ -133,6 +133,7 @@ public class FSA_Identifier extends Tokenizer {
 				// Check this token against a list of known strings
 				if ( lastAcceptableLexeme.equals("begin") ) token = "MP_BEGIN";
 				else if ( lastAcceptableLexeme.equals("Boolean") ) token = "MP_BOOLEAN";
+				else if ( lastAcceptableLexeme.equals("and") ) token = "MP_AND";
 				else if ( lastAcceptableLexeme.equals("div") ) token = "MP_DIV";
 				else if ( lastAcceptableLexeme.equals("do") ) token = "MP_DO";
 				else if ( lastAcceptableLexeme.equals("downto") ) token = "MP_DOWNTO";
