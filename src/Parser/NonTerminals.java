@@ -78,8 +78,17 @@ public class NonTerminals
 	public static void block() {
 		switch (Lookahead)
 		{
-		case "":
+		case "something":
 			match(Lookahead);
+			variableDeclarationPart();
+			break;
+		case "something":
+			match(Lookahead);
+			procedureAndFunctionDeclarationPart();
+			break;
+		case "something":
+			match(Lookahead);
+			statementPart();
 			break;
 			
 		default: // error
@@ -90,11 +99,21 @@ public class NonTerminals
 	public static void variableDeclarationPart() {
 		switch (Lookahead)
 		{
-		case "":
+		case "var":
 			match(Lookahead);
 			break;
-			
-		default: // error
+		case "something":
+			match(Lookahead);
+			variableDeclaration();
+			break;
+		case ";":
+			match(Lookahead);
+			break;
+		case "something":
+			match(Lookahead);
+			variableDeclarationTail();
+			break;
+		default: // End thingy?
 			break;
 		}
 	}
@@ -102,11 +121,18 @@ public class NonTerminals
 	public static void variableDeclarationTail() {
 		switch (Lookahead)
 		{
-		case "":
+		case "something":
+			match(Lookahead);
+			variableDeclaration();
+			break;
+		case ";":
 			match(Lookahead);
 			break;
-			
-		default: // error
+		case "":
+			match(Lookahead);
+			variableDeclarationTail();
+			break;
+		default: // End thingy?
 			break;
 		}
 	}
@@ -114,10 +140,17 @@ public class NonTerminals
 	public static void variableDeclaration() {
 		switch (Lookahead)
 		{
-		case "":
+		case "something":
+			match(Lookahead);
+			identifierList();
+			break;
+		case ":":
 			match(Lookahead);
 			break;
-			
+		case "":
+			match(Lookahead);
+			type();
+			break;
 		default: // error
 			error();
 			break;
@@ -129,9 +162,17 @@ public class NonTerminals
 		switch (Lookahead)
 		{
 		case "integer":
+			match(Lookahead);
+			break;
 		case "float":
+			match(Lookahead);
+			break;
 		case "string":
+			match(Lookahead);
+			break;
 		case "boolean":
+			match(Lookahead);
+			break;
 		default: // error
 			error();
 			break;
