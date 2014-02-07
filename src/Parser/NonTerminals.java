@@ -18,44 +18,16 @@ public class NonTerminals
 		return;
 	}
         
-        public static void ActualParameterTail(){
-            switch (Lookahead){
-                case ",":
-                    ActualParameter();
-                    ActualParameterTail();
-                    break;
-                default:
-                
-            }
-            
-        }
-        
-        public static void ActualParameter(){
-            switch(Lookahead){
-                case "something": 
-                    OrdinalExpression();
-                    break;
-                
-            }
-            
-        }
-        
-        public static void Expression(){
-            switch(Lookahead){
-                case "something":
-                    SimpleExpression();
-                    OptionalRelationalPart();
-                    break;
-            }
-        }
-
+       
 	
 	
 	public static void systemGoal() {
 		switch (Lookahead)
 		{
-		case "":
+		case "something":
 			match(Lookahead);
+			program();
+			//EOF thing?
 			break;
 			
 		default: // error
@@ -66,10 +38,23 @@ public class NonTerminals
 	public static void program() {
 		switch (Lookahead)
 		{
-		case "":
+		case "something":
 			match(Lookahead);
-			break;
+			programHeading();
 			
+			break;
+		case ";":
+			match(Lookahead);
+			
+			break;
+		case "something":
+			match(Lookahead);
+			block();
+			break;
+		case ".":
+			match(Lookahead);
+			
+			break;
 		default: // error
 			break;
 		}
@@ -78,10 +63,13 @@ public class NonTerminals
 	public static void programHeading() {
 		switch (Lookahead)
 		{
-		case "":
+		case "program":
 			match(Lookahead);
 			break;
-			
+		case "something":
+			match(Lookahead);
+			programIdentifier();
+			break;
 		default: // error
 			break;
 		}
@@ -131,6 +119,7 @@ public class NonTerminals
 			break;
 			
 		default: // error
+			error();
 			break;
 		}
 	}
@@ -143,7 +132,9 @@ public class NonTerminals
 		case "float":
 		case "string":
 		case "boolean":
-		default:
+		default: // error
+			error();
+			break;
 		}
 	
 	}
@@ -156,6 +147,7 @@ public class NonTerminals
 			break;
 			
 		default: // error
+			error();
 			break;
 		}
 	}
@@ -168,6 +160,7 @@ public class NonTerminals
 			break;
 			
 		default: // error
+			error();
 			break;
 		}
 	}
@@ -180,6 +173,7 @@ public class NonTerminals
 			break;
 			
 		default: // error
+			error();
 			break;
 		}
 	}
@@ -192,6 +186,7 @@ public class NonTerminals
 			break;
 			
 		default: // error
+			error();
 			break;
 		}
 	}
@@ -204,6 +199,7 @@ public class NonTerminals
 			break;
 			
 		default: // error
+			error();
 			break;
 		}
 	}
@@ -216,6 +212,7 @@ public class NonTerminals
 			break;
 			
 		default: // error
+			error();
 			break;
 		}
 	}
@@ -228,6 +225,7 @@ public class NonTerminals
 			break;
 			
 		default: // error
+			error();
 			break;
 		}
 	}
@@ -240,6 +238,7 @@ public class NonTerminals
 			break;
 			
 		default: // error
+			error();
 			break;
 		}
 	}
@@ -252,6 +251,7 @@ public class NonTerminals
 			break;
 			
 		default: // error
+			error();
 			break;
 		}
 	}
@@ -264,6 +264,7 @@ public class NonTerminals
 			break;
 			
 		default: // error
+			error();
 			break;
 		}
 	}
@@ -276,11 +277,12 @@ public class NonTerminals
 			break;
 			
 		default: // error
+			error();
 			break;
 		}
 	}
 	
-	public static void compundStatement() {
+	public static void compoundStatement() {
 		switch (Lookahead)
 		{
 		case "":
@@ -288,6 +290,7 @@ public class NonTerminals
 			break;
 			
 		default: // error
+			error();
 			break;
 		}
 	}
@@ -300,11 +303,12 @@ public class NonTerminals
 			break;
 			
 		default: // error
+			error();
 			break;
 		}
 	}
 	
-	public static void StatementTail() {
+	public static void statementTail() {
 		switch (Lookahead)
 		{
 		case ";":
@@ -312,11 +316,12 @@ public class NonTerminals
 			break;
 			
 		default: // error
+			error();
 			break;
 		}
 	}
 			
-	public static void Statement() {
+	public static void statement() {
 		// TODO
 		// Fix the default case.  Should not be EmptyString(), suppose a non-empty but not matching 
 		// string was encountered next, it should throw an error, but how to handle EmptyStatement()???
@@ -325,50 +330,50 @@ public class NonTerminals
 		case "MP_Identifier":
 			switch (Lookahead) {
 			case ":=":
-				AssignmentStatement();
+				assignmentStatement();
 				break;
 				
 			case "(":
-				ProcedureStatement();
+				procedureStatement();
 				break;
 			}
 			break;
 
 		case "begin":
-			CompoundStatement();
+			compoundStatement();
 			break;
 			
 		case "read":
-			ReadStatement();
+			readStatement();
 			break;
 			
 		case "write":
-			WriteStatement();
+			writeStatement();
 			break;
 			
 		case "if":
-			IfStatement();
+			ifStatement();
 			break;
 			
 		case "while":
-			WhileStatement();
+			whileStatement();
 			break;
 			
 		case "repeat":
-			RepeatStatement();
+			repeatStatement();
 			break;
 			
 		case "for":
-			ForStatement();
+			forStatement();
 			break;
 			
 		default: // error OR Empty-String
-			EmptyStatement();
+			emptyStatement();
 			break;
 		}
 	}
 	
-	public static void EmptyStatement() {
+	public static void emptyStatement() {
 		// TODO Lolwtf is this right?
 		
 		switch (Lookahead)
@@ -378,15 +383,15 @@ public class NonTerminals
 		}
 	}
 
-	public static void ReadStatement() {
+	public static void readStatement() {
 		switch (Lookahead)
 		{
 		case "read":
 			match(Lookahead);
 			if (Lookahead.equals("(")) {
 				match(Lookahead);
-				ReadParameter();
-				ReadParameterTail();
+				readParameter();
+				readParameterTail();
 				if (Lookahead.equals(")")) {
 					match(Lookahead);
 				}
@@ -400,13 +405,13 @@ public class NonTerminals
 		}
 	}
 	
-	public static void ReadParameterTail() {
+	public static void readParameterTail() {
 		switch (Lookahead)
 		{
 		case ",":
 			match(Lookahead);
-			ReadParameter();
-			ReadParameterTail();
+			readParameter();
+			readParameterTail();
 			break;
 			
 		default: // error OR Empty-String
@@ -414,11 +419,11 @@ public class NonTerminals
 		}
 	}
 
-	public static void ReadParameter() {
+	public static void readParameter() {
 		switch (Lookahead)
 		{
 		case "MP_Identifier":
-			VariableIdentifier();
+			variableIdentifier();
 			break;
 			
 		default: // error OR Empty-String
@@ -427,7 +432,7 @@ public class NonTerminals
 		}
 	}
 
-	public static void WriteStatement() {
+	public static void writeStatement() {
 		switch (Lookahead)
 		{
 		case "write":
@@ -435,8 +440,8 @@ public class NonTerminals
 			match(Lookahead);
 			if ( Lookahead.equals("(")) {
 				match(Lookahead);
-				WriteParameter();
-				WriteParameterTail();
+				writeParameter();
+				writeParameterTail();
 				if ( Lookahead.equals(")") ) {
 					match(Lookahead);
 				}
@@ -451,13 +456,13 @@ public class NonTerminals
 		}
 	}
 	
-	public static void WriteParameterTail() {
+	public static void writeParameterTail() {
 		switch (Lookahead)
 		{
 		case ",":
 			match(Lookahead);
-			WriteParameter();
-			WriteParameterTail();
+			writeParameter();
+			writeParameterTail();
 			break;
 			
 		default: // error OR Empty-String
@@ -465,7 +470,7 @@ public class NonTerminals
 		}
 	}
 	
-	public static void WriteParameter() {
+	public static void writeParameter() {
 		switch (Lookahead)
 		{
 		case "+":
@@ -478,7 +483,7 @@ public class NonTerminals
 		case "not":
 		case "(":
 		case "MP_Identifier":
-			OrdinalExpression();
+			ordinalExpression();
 			break;
 			
 		default: // error OR Empty-String
@@ -487,7 +492,7 @@ public class NonTerminals
 		}
 	}
 
-	public static void AssignmentStatement() {
+	public static void assignmentStatement() {
 		switch (Lookahead)
 		{
 		case "MP_Identifier":
@@ -498,7 +503,7 @@ public class NonTerminals
 			match(Lookahead);
 			if ( Lookahead.equals(":=") ) {
 				match(Lookahead);
-				Expression();
+				expression();
 			}
 			else error();
 			break;
@@ -509,16 +514,16 @@ public class NonTerminals
 		}
 	}
 
-	public static void IfStatement() {
+	public static void ifStatement() {
 		switch (Lookahead)
 		{
 		case "if":
 			match(Lookahead);
-			BooleanExpression();
+			booleanExpression();
 			if ( Lookahead.equals("then") ) {
 				match(Lookahead);
-				Statement();
-				OptionalElsePart();
+				statement();
+				optionalElsePart();
 			}
 			else error();
 			break;
@@ -529,12 +534,12 @@ public class NonTerminals
 		}
 	}
 	
-	public static void OptionalElsePart() {
+	public static void optionalElsePart() {
 		switch (Lookahead)
 		{
 		case "else":
 			match(Lookahead);
-			Statement();
+			statement();
 			break;
 			
 		default: // error OR Empty-String
@@ -542,15 +547,15 @@ public class NonTerminals
 		}
 	}
 	
-	public static void RepeatStatement() {
+	public static void repeatStatement() {
 		switch (Lookahead)
 		{
 		case "repeat":
 			match(Lookahead);
-			StatementSequence();
+			statementSequence();
 			if ( Lookahead.equals("until") ) {
 				match(Lookahead);
-				BooleanExpression();
+				booleanExpression();
 			}
 			else error();
 			break;
@@ -561,15 +566,15 @@ public class NonTerminals
 		}
 	}
 	
-	public static void WhileStatement() {
+	public static void whileStatement() {
 		switch (Lookahead)
 		{
 		case "while":
 			match(Lookahead);
-			BooleanExpression();
+			booleanExpression();
 			if ( Lookahead.equals("do") ) {
 				match(Lookahead);
-				Statement();
+				statement();
 			}
 			else error();
 			break;
@@ -580,20 +585,20 @@ public class NonTerminals
 		}
 	}
 
-	public static void ForStatement() {
+	public static void forStatement() {
 		switch (Lookahead)
 		{
 		case "for":
 			match(Lookahead);
-			ControlVariable();
+			controlVariable();
 			if ( Lookahead.equals(":=") ) {
 				match(Lookahead);
-				InitialValue();
-				StepValue();
-				FinalValue();
+				initialValue();
+				stepValue();
+				finalValue();
 				if ( Lookahead.equals("do") ) {
 					match(Lookahead);
-					Statement();
+					statement();
 				}
 				else error();
 			}
@@ -606,11 +611,11 @@ public class NonTerminals
 		}
 	}
 
-	public static void ControlVariable() {
+	public static void controlVariable() {
 		switch (Lookahead)
 		{
 		case "MP_Identifier":
-			VariableIdentifier();
+			variableIdentifier();
 			break;
 			
 		default: // error OR Empty-String
@@ -619,7 +624,7 @@ public class NonTerminals
 		}
 	}
 	
-	public static void InitialValue() {
+	public static void initialValue() {
 		switch (Lookahead)
 		{
 		case "+":
@@ -632,7 +637,7 @@ public class NonTerminals
 		case "not":
 		case "(":
 		case "MP_Identifier":
-			OrdinalExpression();
+			ordinalExpression();
 			break;
 			
 		default: // error OR Empty-String
@@ -641,7 +646,7 @@ public class NonTerminals
 		}
 	}
 
-	public static void StepValue() {
+	public static void stepValue() {
 		switch (Lookahead)
 		{
 		case "to":
@@ -655,7 +660,7 @@ public class NonTerminals
 		}
 	}
 
-	public static void FinalValue() {
+	public static void finalValue() {
 		switch (Lookahead)
 		{
 		case "+":
@@ -668,7 +673,7 @@ public class NonTerminals
 		case "not":
 		case "(":
 		case "MP_Identifier":
-			OrdinalExpression();
+			ordinalExpression();
 			break;
 			
 		default: // error OR Empty-String
@@ -677,12 +682,12 @@ public class NonTerminals
 		}
 	}
 
-	public static void ProcedureStatement() {
+	public static void procedureStatement() {
 		switch (Lookahead)
 		{
 		case "MP_Identifier":
-			ProcedureIdentifier(); 
-			OptionalActualParameterList();
+			procedureIdentifier(); 
+			optionalActualParameterList();
 			break;
 			
 		default: // error OR Empty-String
@@ -691,13 +696,13 @@ public class NonTerminals
 		}
 	}
 
-	public static void OptionalActualParameterList() {
+	public static void optionalActualParameterList() {
 		switch (Lookahead)
 		{
 		case "(":
 			match(Lookahead);
-			ActualParameter();
-			ActualParameterTail();
+			actualParameter();
+			actualParameterTail();
 			if ( Lookahead.equals(")") ) {
 				match(Lookahead);
 			}
@@ -709,10 +714,39 @@ public class NonTerminals
 		}
 	}
 
-
+	 public static void actualParameterTail(){
+         switch (Lookahead){
+             case ",":
+                 actualParameter();
+                 actualParameterTail();
+                 break;
+             default:
+             
+         }
+         
+     }
+     
+     public static void actualParameter(){
+         switch(Lookahead){
+             case "something": 
+                 ordinalExpression();
+                 break;
+             
+         }
+         
+     }
+     
+     public static void expression(){
+         switch(Lookahead){
+             case "something":
+                 simpleExpression();
+                 optionalRelationalPart();
+                 break;
+         }
+     }
 	
 	/*	
-	public static void Statement() {
+	public static void statement() {
 		switch (Lookahead)
 		{
 		case "MP_":
@@ -738,11 +772,11 @@ public class NonTerminals
 	*/
 
 
-        public static void OptionalRelationalPart(){
+        public static void optionalRelationalPart(){
             switch(Lookahead){
                 case "something":
-                    RelationalOperator();
-                    SimpleExpression();
+                    relationalOperator();
+                    simpleExpression();
                     break;
                 default:
                     
@@ -750,7 +784,7 @@ public class NonTerminals
         }
 
 			
-	public static void RelationalOperator(){
+	public static void relationalOperator(){
             switch(Lookahead){
                 case "equal":
                     match("MP_EQUAL");
@@ -775,24 +809,24 @@ public class NonTerminals
             }
         }
         	
-        public static void SimpleExpression(){
+        public static void simpleExpression(){
             switch(Lookahead){
                 case "something":
-                    OptionalSign();
-                    Term();
-                    TermTail();
+                    optionalSign();
+                    term();
+                    termTail();
                     break;
                 default:
             }
             
         }
 		
-	public static void TermTail(){
+	public static void termTail(){
             switch(Lookahead){
                 case "something":
-                    AddingOperator();
-                    Term();
-                    TermTail();
+                    addingOperator();
+                    term();
+                    termTail();
                     break;
                 default:
                     
@@ -800,7 +834,10 @@ public class NonTerminals
             
         }
         
-        public static void OptionalSign(){
+	//Adding operator missing?
+	
+	
+        public static void optionalSign(){
             switch(Lookahead){
                 case "+":
                     match("MP_PLUS");
@@ -816,27 +853,27 @@ public class NonTerminals
             }
         }
         
-        public static void Term(){
+        public static void term(){
             switch(Lookahead){
                 case "something":
-                    Factor();
-                    FactorTail();
+                    factor();
+                    factorTail();
                     break;
             }
         }
         
-        public static void FactorTail(){
+        public static void factorTail(){
             switch(Lookahead){
                 case "something":
-                    MultiplyingOperator();
-                    Factor();
-                    FactorTail();
+                    multiplyingOperator();
+                    factor();
+                    factorTail();
                     break;
                 default:
             }
         }
         
-        public static void MultiplyingOperator(){
+        public static void multiplyingOperator(){
             switch(Lookahead){
                 case "*":
                     match("MP_MULT");
@@ -855,7 +892,7 @@ public class NonTerminals
             }
         }
         
-        public static void Factor(){
+        public static void factor(){
             switch(Lookahead){
                 case "int":
                     match("MP_INT");
@@ -874,21 +911,21 @@ public class NonTerminals
                     break;
                 case "not":
                     match("MP_NOT");
-                    Factor();
+                    factor();
                     break;
                 case "(":
                     match("(");
-                    Expression();
+                    expression();
                     match(")");
                     break;
                 case "other":
-                    FunctionIdentifier();
-                    OptionalActualParameterList();
+                    functionIdentifier();
+                    optionalActualParameterList();
                     break;
             }
         }
         
-        public static void ProgramIdentifier(){
+        public static void programIdentifier(){
             switch(Lookahead){
                 case "id":
                     match("MP_ID");
@@ -898,7 +935,7 @@ public class NonTerminals
             }
         }
             
-            public static void VariableIdentifier(){
+            public static void variableIdentifier(){
             switch(Lookahead){
                 case "id":
                     match("MP_ID");
@@ -907,7 +944,7 @@ public class NonTerminals
                     error();
             }
             }   
-            public static void ProcedureIdentifier(){
+            public static void procedureIdentifier(){
             switch(Lookahead){
                 case "id":
                     match("MP_ID");
@@ -916,7 +953,7 @@ public class NonTerminals
                     error();
             }
             }
-            public static void FunctionIdentifier(){
+            public static void functionIdentifier(){
             switch(Lookahead){
                 case "id":
                     match("MP_ID");
@@ -925,40 +962,40 @@ public class NonTerminals
                     error();
             }
             }
-            public static void BooleanExpression(){
+            public static void booleanExpression(){
                 switch(Lookahead){
                     case "something":
-                        Expression();
+                        expression();
                         break;
                     default:
                 }
             }
             
-            public static void OrdinalExpression(){
+            public static void ordinalExpression(){
                 switch(Lookahead){
                     case "something":
-                        Expression();
+                        expression();
                         break;
                     default:
                 }
             }
             
-            public static void IdentifierList(){
+            public static void identifierList(){
                 switch(Lookahead){
                     case "somthign":
                         match("MP_ID");
-                        IdentifierTail();
+                        identifierTail();
                         break;
                     default:
                 }
             }
             
-            public static void IdentifierTail(){
+            public static void identifierTail(){
                 switch(Lookahead){
                     case "lask;djf;":
                         match("MP_COMMA");
                         match("MP_ID");
-                        IdentifierTail();
+                        identifierTail();
                         break;
                     default:
                 }
