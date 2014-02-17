@@ -35,21 +35,11 @@ public class NonTerminals
 		switch (Lookahead)
 		{
 		case "something":
-			match(Lookahead);
+			
 			programHeading();
-
-			break;
-		case ";":
-			match(Lookahead);
-
-			break;
-		case "something":
-			match(Lookahead);
+			match("MP_SCOLON");
 			block();
-			break;
-		case ".":
-			match(Lookahead);
-
+			match("MP_PERIOD");
 			break;
 		default: // error
 			break;
@@ -60,11 +50,8 @@ public class NonTerminals
 	public static void programHeading() {
 		switch (Lookahead)
 		{
-		case "program":
-			match(Lookahead);
-			break;
 		case "something":
-			match(Lookahead);
+			match("MP_PROGRAM");
 			programIdentifier();
 			break;
 		default: // error
@@ -76,18 +63,9 @@ public class NonTerminals
 		switch (Lookahead)
 		{
 		case "something":
-			match(Lookahead);
 			variableDeclarationPart();
-			break;
-		case "something":
-			match(Lookahead);
 			procedureAndFunctionDeclarationPart();
 			break;
-		case "something":
-			match(Lookahead);
-			statementPart();
-			break;
-			
 		default: // error
 			break;
 		}
@@ -96,19 +74,11 @@ public class NonTerminals
 	public static void variableDeclarationPart() {
 		switch (Lookahead)
 		{
-		case "var":
-			match(Lookahead);
-			break;
 		case "something":
-			match(Lookahead);
+			match("MP_VAR");
 			variableDeclaration();
-			break;
-		case ";":
-			match(Lookahead);
-			break;
+			match("MP_SCOLON");
 		case "something":
-			match(Lookahead);
-			variableDeclarationTail();
 			break;
 		default: // End thingy?
 			break;
@@ -119,15 +89,11 @@ public class NonTerminals
 		switch (Lookahead)
 		{
 		case "something":
-			match(Lookahead);
 			variableDeclaration();
-			break;
-		case ";":
-			match(Lookahead);
-			break;
-		case "":
-			match(Lookahead);
+			match("MP_SCOLON");
 			variableDeclarationTail();
+			break;
+		case "something":
 			break;
 		default: // End thingy?
 			break;
@@ -138,14 +104,8 @@ public class NonTerminals
 		switch (Lookahead)
 		{
 		case "something":
-			match(Lookahead);
 			identifierList();
-			break;
-		case ":":
-			match(Lookahead);
-			break;
-		case "":
-			match(Lookahead);
+			match("MP_COLON");
 			type();
 			break;
 		default: // error
@@ -159,16 +119,16 @@ public class NonTerminals
 		switch (Lookahead)
 		{
 		case "integer":
-			match(Lookahead);
+			match("MP_INTEGER");
 			break;
 		case "float":
-			match(Lookahead);
+			match("MP_FLOAT");
 			break;
 		case "string":
-			match(Lookahead);
+			match("MP_STRING");
 			break;
 		case "boolean":
-			match(Lookahead);
+			match("MP_BOOLEAN");
 			break;
 		default: // error
 			error();
@@ -180,10 +140,18 @@ public class NonTerminals
 	public static void procedureAndFunctionDeclarationPart() {
 		switch (Lookahead)
 		{
-		case "":
+		case "something":
 			match(Lookahead);
+			procedureDeclaration();
+			procedureAndFunctionDeclarationPart();
 			break;
-			
+		case "something":
+			match(Lookahead);
+			functionDeclaration();
+			procedureAndFunctionDeclarationPart();
+			break;
+		case "something":
+			break;	
 		default: // error
 			error();
 			break;
@@ -193,10 +161,11 @@ public class NonTerminals
 	public static void procedureDeclaration() {
 		switch (Lookahead)
 		{
-		case "":
-			match(Lookahead);
+		case "something":
+			procedureHeading();
+			match("MP_SCOLON");
+			block();
 			break;
-			
 		default: // error
 			error();
 			break;
@@ -206,10 +175,12 @@ public class NonTerminals
 	public static void functionDeclaration() {
 		switch (Lookahead)
 		{
-		case "":
-			match(Lookahead);
+		case "something":
+			functionHeading();
+			match("MP_SCOLON");
+			block();
+			match("MP_SCOLON");
 			break;
-			
 		default: // error
 			error();
 			break;
@@ -219,10 +190,11 @@ public class NonTerminals
 	public static void procedureHeading() {
 		switch (Lookahead)
 		{
-		case "":
-			match(Lookahead);
+		case "something":
+			match("MP_PROCEDURE");
+			procedureIdentifier();
+			optionalFormalParameterList();
 			break;
-			
 		default: // error
 			error();
 			break;
@@ -232,10 +204,12 @@ public class NonTerminals
 	public static void functionHeading() {
 		switch (Lookahead)
 		{
-		case "":
-			match(Lookahead);
+		case "something":
+			match("MP_FUNCTION");
+			functionIdentifier();
+			optionalFormalParameterList();
+			type();
 			break;
-			
 		default: // error
 			error();
 			break;
@@ -245,10 +219,14 @@ public class NonTerminals
 	public static void optionalFormalParameterList() {
 		switch (Lookahead)
 		{
-		case "":
-			match(Lookahead);
+		case "something":
+			match("MP_LPAREN");
+			formalParameterSection();
+			formalParameterSectionTail();
+			match("MP_RPAREN");
 			break;
-			
+		case "something":
+			break;
 		default: // error
 			error();
 			break;
@@ -258,10 +236,13 @@ public class NonTerminals
 	public static void formalParameterSectionTail() {
 		switch (Lookahead)
 		{
-		case "":
-			match(Lookahead);
+		case "something":
+			match("MP_SCOLON");
+			formalParameterSection();
+			formalParameterSectionTail();
 			break;
-			
+		case "something":
+			break;
 		default: // error
 			error();
 			break;
@@ -271,10 +252,12 @@ public class NonTerminals
 	public static void formalParameterSection() {
 		switch (Lookahead)
 		{
-		case "":
-			match(Lookahead);
+		case "something":
+			valueParameterSection();
 			break;
-			
+		case "something":
+			variableParameterSection();
+			break;
 		default: // error
 			error();
 			break;
@@ -284,10 +267,11 @@ public class NonTerminals
 	public static void valueParameterSection() {
 		switch (Lookahead)
 		{
-		case "":
-			match(Lookahead);
+		case "something":
+			identifierList();
+			match("MP_COLON");
+			type();
 			break;
-			
 		default: // error
 			error();
 			break;
@@ -297,8 +281,11 @@ public class NonTerminals
 	public static void variableParameterSection() {
 		switch (Lookahead)
 		{
-		case "":
-			match(Lookahead);
+		case "something":
+			match("MP_VAR");
+			identifierList();
+			match("MP_COLON");
+			type();
 			break;
 			
 		default: // error
@@ -310,10 +297,9 @@ public class NonTerminals
 	public static void statementPart() {
 		switch (Lookahead)
 		{
-		case "":
-			match(Lookahead);
+		case "something":
+			compoundStatement();
 			break;
-			
 		default: // error
 			error();
 			break;
@@ -323,8 +309,10 @@ public class NonTerminals
 	public static void compoundStatement() {
 		switch (Lookahead)
 		{
-		case "":
-			match(Lookahead);
+		case "something":
+			match("MP_BEGIN");
+			statementSequence();
+			match("MP_END");
 			break;
 			
 		default: // error
@@ -336,10 +324,10 @@ public class NonTerminals
 	public static void statementSequence() {
 		switch (Lookahead)
 		{
-		case "":
-			match(Lookahead);
+		case "something":
+			statement();
+			statementTail();
 			break;
-			
 		default: // error
 			error();
 			break;
@@ -349,8 +337,10 @@ public class NonTerminals
 	public static void statementTail() {
 		switch (Lookahead)
 		{
-		case ";":
-			match(Lookahead);
+		case "something":
+			match("MP_SCOLON");
+			statement();
+			statementTail();
 			break;
 			
 		default: // error
