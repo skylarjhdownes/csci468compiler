@@ -13,20 +13,20 @@ public class NonTerminals
 		return;
 	}
 
-	public static void error() {
+	public static void syntaxError() {
 		// TODO STUB!!!!!!
 		return;
 	}
 	public static void systemGoal() {
 		switch (Lookahead)
 		{
-		case "program":
+		case "MP_PROGRAM":
 			match(Lookahead);
 			program();
 			//EOF thing?
 			break;
 
-		default: // error
+		default: // syntaxsyntaxError
 			break;
 		}
 	}
@@ -41,7 +41,7 @@ public class NonTerminals
 			block();
 			match("MP_PERIOD");
 			break;
-		default: // error
+		default: // syntaxsyntaxError
 			break;
 		}
 	}
@@ -50,11 +50,11 @@ public class NonTerminals
 	public static void programHeading() {
 		switch (Lookahead)
 		{
-		case "something":
+		case "MP_PROGRAM":
 			match("MP_PROGRAM");
 			programIdentifier();
 			break;
-		default: // error
+		default: // syntaxsyntaxError
 			break;
 		}
 	}
@@ -66,7 +66,7 @@ public class NonTerminals
 			variableDeclarationPart();
 			procedureAndFunctionDeclarationPart();
 			break;
-		default: // error
+		default: // syntaxsyntaxError
 			break;
 		}
 	}
@@ -74,7 +74,7 @@ public class NonTerminals
 	public static void variableDeclarationPart() {
 		switch (Lookahead)
 		{
-		case "something":
+		case "MP_VAR":
 			match("MP_VAR");
 			variableDeclaration();
 			match("MP_SCOLON");
@@ -108,8 +108,8 @@ public class NonTerminals
 			match("MP_COLON");
 			type();
 			break;
-		default: // error
-			error();
+		default: // syntaxError
+			syntaxError();
 			break;
 		}
 	}
@@ -118,20 +118,20 @@ public class NonTerminals
 	{
 		switch (Lookahead)
 		{
-		case "integer":
+		case "MP_INTEGER":
 			match("MP_INTEGER");
 			break;
-		case "float":
+		case "MP_FLOAT":
 			match("MP_FLOAT");
 			break;
-		case "string":
+		case "MP_STRING":
 			match("MP_STRING");
 			break;
-		case "boolean":
+		case "MP_BOOLEAN":
 			match("MP_BOOLEAN");
 			break;
-		default: // error
-			error();
+		default: // syntaxError
+			syntaxError();
 			break;
 		}
 	
@@ -152,8 +152,8 @@ public class NonTerminals
 			break;
 		case "something":
 			break;	
-		default: // error
-			error();
+		default: // syntaxError
+			syntaxError();
 			break;
 		}
 	}
@@ -166,8 +166,8 @@ public class NonTerminals
 			match("MP_SCOLON");
 			block();
 			break;
-		default: // error
-			error();
+		default: // syntaxError
+			syntaxError();
 			break;
 		}
 	}
@@ -181,8 +181,8 @@ public class NonTerminals
 			block();
 			match("MP_SCOLON");
 			break;
-		default: // error
-			error();
+		default: // syntaxError
+			syntaxError();
 			break;
 		}
 	}
@@ -195,8 +195,8 @@ public class NonTerminals
 			procedureIdentifier();
 			optionalFormalParameterList();
 			break;
-		default: // error
-			error();
+		default: // syntaxError
+			syntaxError();
 			break;
 		}
 	}
@@ -210,8 +210,8 @@ public class NonTerminals
 			optionalFormalParameterList();
 			type();
 			break;
-		default: // error
-			error();
+		default: // syntaxError
+			syntaxError();
 			break;
 		}
 	}
@@ -227,8 +227,8 @@ public class NonTerminals
 			break;
 		case "something":
 			break;
-		default: // error
-			error();
+		default: // syntaxError
+			syntaxError();
 			break;
 		}
 	}
@@ -243,8 +243,8 @@ public class NonTerminals
 			break;
 		case "something":
 			break;
-		default: // error
-			error();
+		default: // syntaxError
+			syntaxError();
 			break;
 		}
 	}
@@ -258,8 +258,8 @@ public class NonTerminals
 		case "something":
 			variableParameterSection();
 			break;
-		default: // error
-			error();
+		default: // syntaxError
+			syntaxError();
 			break;
 		}
 	}
@@ -272,8 +272,8 @@ public class NonTerminals
 			match("MP_COLON");
 			type();
 			break;
-		default: // error
-			error();
+		default: // syntaxError
+			syntaxError();
 			break;
 		}
 	}
@@ -288,8 +288,8 @@ public class NonTerminals
 			type();
 			break;
 			
-		default: // error
-			error();
+		default: // syntaxError
+			syntaxError();
 			break;
 		}
 	}
@@ -300,8 +300,8 @@ public class NonTerminals
 		case "something":
 			compoundStatement();
 			break;
-		default: // error
-			error();
+		default: // syntaxError
+			syntaxError();
 			break;
 		}
 	}
@@ -315,8 +315,8 @@ public class NonTerminals
 			match("MP_END");
 			break;
 			
-		default: // error
-			error();
+		default: // syntaxError
+			syntaxError();
 			break;
 		}
 	}
@@ -328,8 +328,8 @@ public class NonTerminals
 			statement();
 			statementTail();
 			break;
-		default: // error
-			error();
+		default: // syntaxError
+			syntaxError();
 			break;
 		}
 	}
@@ -343,8 +343,8 @@ public class NonTerminals
 			statementTail();
 			break;
 			
-		default: // error
-			error();
+		default: // syntaxError
+			syntaxError();
 			break;
 		}
 	}
@@ -352,7 +352,7 @@ public class NonTerminals
 	public static void statement() {
 		// TODO
 		// Fix the default case.  Should not be EmptyString(), suppose a non-empty but not matching 
-		// string was encountered next, it should throw an error, but how to handle EmptyStatement()???
+		// string was encountered next, it should throw an syntaxError, but how to handle EmptyStatement()???
 		switch (Lookahead)
 		{
 		case "MP_Identifier":
@@ -367,35 +367,35 @@ public class NonTerminals
 			}
 			break;
 
-		case "begin":
+		case "MP_BEGIN":
 			compoundStatement();
 			break;
 			
-		case "read":
+		case "MP_READ":
 			readStatement();
 			break;
 			
-		case "write":
+		case "MP_WRITE":
 			writeStatement();
 			break;
 			
-		case "if":
+		case "MP_IF":
 			ifStatement();
 			break;
 			
-		case "while":
+		case "MP_WHILE":
 			whileStatement();
 			break;
 			
-		case "repeat":
+		case "MP_REPEAT":
 			repeatStatement();
 			break;
 			
-		case "for":
+		case "MP_FOR":
 			forStatement();
 			break;
 			
-		default: // error OR Empty-String
+		default: // syntaxError OR Empty-String
 			emptyStatement();
 			break;
 		}
@@ -406,7 +406,7 @@ public class NonTerminals
 		
 		switch (Lookahead)
 		{
-		default: // error
+		default: // syntaxError
 			break;
 		}
 	}
@@ -423,12 +423,12 @@ public class NonTerminals
 				if (Lookahead.equals(")")) {
 					match(Lookahead);
 				}
-				else error();
+				else syntaxError();
 			}
-			else error();
+			else syntaxError();
 			break;
-		default: // error OR Empty-String
-			error();
+		default: // syntaxError OR Empty-String
+			syntaxError();
 			break;
 		}
 	}
@@ -442,7 +442,7 @@ public class NonTerminals
 			readParameterTail();
 			break;
 			
-		default: // error OR Empty-String
+		default: // syntaxError OR Empty-String
 			break;
 		}
 	}
@@ -454,8 +454,8 @@ public class NonTerminals
 			variableIdentifier();
 			break;
 			
-		default: // error OR Empty-String
-			error();
+		default: // syntaxError OR Empty-String
+			syntaxError();
 			break;
 		}
 	}
@@ -473,13 +473,13 @@ public class NonTerminals
 				if ( Lookahead.equals(")") ) {
 					match(Lookahead);
 				}
-				else error();
+				else syntaxError();
 			}
-			else error();
+			else syntaxError();
 			break;
 			
-		default: // error OR Empty-String
-			error();
+		default: // syntaxError OR Empty-String
+			syntaxError();
 			break;
 		}
 	}
@@ -493,7 +493,7 @@ public class NonTerminals
 			writeParameterTail();
 			break;
 			
-		default: // error OR Empty-String
+		default: // syntaxError OR Empty-String
 			break;
 		}
 	}
@@ -514,8 +514,8 @@ public class NonTerminals
 			ordinalExpression();
 			break;
 			
-		default: // error OR Empty-String
-			error();
+		default: // syntaxError OR Empty-String
+			syntaxError();
 			break;
 		}
 	}
@@ -533,11 +533,11 @@ public class NonTerminals
 				match(Lookahead);
 				expression();
 			}
-			else error();
+			else syntaxError();
 			break;
 			
-		default: // error OR Empty-String
-			error();
+		default: // syntaxError OR Empty-String
+			syntaxError();
 			break;
 		}
 	}
@@ -553,11 +553,11 @@ public class NonTerminals
 				statement();
 				optionalElsePart();
 			}
-			else error();
+			else syntaxError();
 			break;
 			
-		default: // error OR Empty-String
-			error();
+		default: // syntaxError OR Empty-String
+			syntaxError();
 			break;
 		}
 	}
@@ -570,7 +570,7 @@ public class NonTerminals
 			statement();
 			break;
 			
-		default: // error OR Empty-String
+		default: // syntaxError OR Empty-String
 			break;
 		}
 	}
@@ -585,11 +585,11 @@ public class NonTerminals
 				match(Lookahead);
 				booleanExpression();
 			}
-			else error();
+			else syntaxError();
 			break;
 			
-		default: // error OR Empty-String
-			error();
+		default: // syntaxError OR Empty-String
+			syntaxError();
 			break;
 		}
 	}
@@ -604,11 +604,11 @@ public class NonTerminals
 				match(Lookahead);
 				statement();
 			}
-			else error();
+			else syntaxError();
 			break;
 			
-		default: // error OR Empty-String
-			error();
+		default: // syntaxError OR Empty-String
+			syntaxError();
 			break;
 		}
 	}
@@ -628,13 +628,13 @@ public class NonTerminals
 					match(Lookahead);
 					statement();
 				}
-				else error();
+				else syntaxError();
 			}
-			else error();			
+			else syntaxError();			
 			break;
 			
-		default: // error OR Empty-String
-			error();
+		default: // syntaxError OR Empty-String
+			syntaxError();
 			break;
 		}
 	}
@@ -646,8 +646,8 @@ public class NonTerminals
 			variableIdentifier();
 			break;
 			
-		default: // error OR Empty-String
-			error();
+		default: // syntaxError OR Empty-String
+			syntaxError();
 			break;
 		}
 	}
@@ -668,8 +668,8 @@ public class NonTerminals
 			ordinalExpression();
 			break;
 			
-		default: // error OR Empty-String
-			error();
+		default: // syntaxError OR Empty-String
+			syntaxError();
 			break;
 		}
 	}
@@ -682,8 +682,8 @@ public class NonTerminals
 			match(Lookahead);
 			break;
 			
-		default: // error OR Empty-String
-			error();
+		default: // syntaxError OR Empty-String
+			syntaxError();
 			break;
 		}
 	}
@@ -704,8 +704,8 @@ public class NonTerminals
 			ordinalExpression();
 			break;
 			
-		default: // error OR Empty-String
-			error();
+		default: // syntaxError OR Empty-String
+			syntaxError();
 			break;
 		}
 	}
@@ -718,8 +718,8 @@ public class NonTerminals
 			optionalActualParameterList();
 			break;
 			
-		default: // error OR Empty-String
-			error();
+		default: // syntaxError OR Empty-String
+			syntaxError();
 			break;
 		}
 	}
@@ -734,10 +734,10 @@ public class NonTerminals
 			if ( Lookahead.equals(")") ) {
 				match(Lookahead);
 			}
-			else error();
+			else syntaxError();
 			break;
 			
-		default: // error OR Empty-String
+		default: // syntaxError OR Empty-String
 			break;
 		}
 	}
@@ -792,8 +792,8 @@ public class NonTerminals
 		case "MP_":
 			break;
 			
-		default: // error OR Empty-String
-			error();
+		default: // syntaxError OR Empty-String
+			syntaxError();
 			break;
 		}
 	}
@@ -814,26 +814,26 @@ public class NonTerminals
 			
 	public static void relationalOperator(){
             switch(Lookahead){
-                case "equal":
+                case "MP_EQUAL":
                     match("MP_EQUAL");
                     break;
-                case "Less":
+                case "MP_LTHAN":
                     match("MP_LTHAN");
                     break;
-                case "Great":
+                case "MP_GTHAN":
                     match("MP_GTHAN");
                     break;
-                case "Greatequal":
+                case "MP_GQUAL":
                     match("MP_GQUAL");
                     break;
-                case "Lessequal":
+                case "MP_LQUAL":
                     match("MP_LQUAL");
                     break;
-                case "Not":
+                case "MP_NQUAL":
                     match("MP_NQUAL");
                     break;
                 default:
-                    error();
+                    syntaxError();
             }
         }
         	
@@ -877,7 +877,7 @@ public class NonTerminals
                     
                     
                 default:
-                    error();
+                    syntaxError();
             }
         }
         
@@ -893,7 +893,7 @@ public class NonTerminals
             		match("MP_OR");
             		break;
             	default:
-            		error();
+            		syntaxError();
             }
         }
         
@@ -904,7 +904,7 @@ public class NonTerminals
                     factorTail();
                     break;
                 default:
-            		error();
+            		syntaxError();
             }
         }
         
@@ -934,7 +934,7 @@ public class NonTerminals
                     match("MP_AND");
                     break;
                 default:
-                    error();
+                    syntaxError();
             }
         }
         
@@ -977,7 +977,7 @@ public class NonTerminals
                     match("MP_ID");
                     break;
                 default:
-                    error();
+                    syntaxError();
             }
         }
             
@@ -987,7 +987,7 @@ public class NonTerminals
                     match("MP_ID");
                     break;
                 default:
-                    error();
+                    syntaxError();
             }
             }   
             public static void procedureIdentifier(){
@@ -996,7 +996,7 @@ public class NonTerminals
                     match("MP_ID");
                     break;
                 default:
-                    error();
+                    syntaxError();
             }
             }
             public static void functionIdentifier(){
@@ -1005,7 +1005,7 @@ public class NonTerminals
                     match("MP_ID");
                     break;
                 default:
-                    error();
+                    syntaxError();
             }
             }
             public static void booleanExpression(){
