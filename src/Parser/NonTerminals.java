@@ -17,35 +17,31 @@ public class NonTerminals
 		// TODO STUB!!!!!!
 		return;
 	}
-        
-       
-	
-	
 	public static void systemGoal() {
 		switch (Lookahead)
 		{
-		case "something":
+		case "program":
 			match(Lookahead);
 			program();
 			//EOF thing?
 			break;
-			
+
 		default: // error
 			break;
 		}
 	}
-	
+
 	public static void program() {
 		switch (Lookahead)
 		{
 		case "something":
 			match(Lookahead);
 			programHeading();
-			
+
 			break;
 		case ";":
 			match(Lookahead);
-			
+
 			break;
 		case "something":
 			match(Lookahead);
@@ -53,12 +49,13 @@ public class NonTerminals
 			break;
 		case ".":
 			match(Lookahead);
-			
+
 			break;
 		default: // error
 			break;
 		}
 	}
+
 	
 	public static void programHeading() {
 		switch (Lookahead)
@@ -875,7 +872,7 @@ public class NonTerminals
             
         }
         
-	//Adding operator missing?
+
 	
 	
         public static void optionalSign(){
@@ -886,11 +883,27 @@ public class NonTerminals
                 case "-":
                     match("MP_MINUS");
                     break;
-                case "or":
-                    match("MP_OR");
-                    break;
+                    
+                    
+                    
                 default:
                     error();
+            }
+        }
+        
+        public static void addingOperator(){
+            switch(Lookahead){
+            	case "+":
+            		match("MP_PLUS");
+            		break;
+            	case "-":
+            		match("MP_MINUS");
+            		break;
+            	case "or":
+            		match("MP_OR");
+            		break;
+            	default:
+            		error();
             }
         }
         
@@ -900,6 +913,8 @@ public class NonTerminals
                     factor();
                     factorTail();
                     break;
+                default:
+            		error();
             }
         }
         
