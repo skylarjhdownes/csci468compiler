@@ -186,7 +186,7 @@ public class NonTerminals
 	public static void procedureHeading() {
 		switch (Lookahead)
 		{
-		case "something":
+		case "MP_PROCEDURE":
 			match("MP_PROCEDURE");
 			procedureIdentifier();
 			optionalFormalParameterList();
@@ -200,7 +200,7 @@ public class NonTerminals
 	public static void functionHeading() {
 		switch (Lookahead)
 		{
-		case "something":
+		case "MP_FUNCTION":
 			match("MP_FUNCTION");
 			functionIdentifier();
 			optionalFormalParameterList();
@@ -215,7 +215,7 @@ public class NonTerminals
 	public static void optionalFormalParameterList() {
 		switch (Lookahead)
 		{
-		case "something":
+		case "MP_LPAREN":
 			match("MP_LPAREN");
 			formalParameterSection();
 			formalParameterSectionTail();
@@ -230,7 +230,7 @@ public class NonTerminals
 	public static void formalParameterSectionTail() {
 		switch (Lookahead)
 		{
-		case "something":
+		case "MP_SCOLON":
 			match("MP_SCOLON");
 			formalParameterSection();
 			formalParameterSectionTail();
@@ -273,7 +273,7 @@ public class NonTerminals
 	public static void variableParameterSection() {
 		switch (Lookahead)
 		{
-		case "something":
+		case "MP_VAR":
 			match("MP_VAR");
 			identifierList();
 			match("MP_COLON");
@@ -301,7 +301,7 @@ public class NonTerminals
 	public static void compoundStatement() {
 		switch (Lookahead)
 		{
-		case "something":
+		case "MP_BEGIN":
 			match("MP_BEGIN");
 			statementSequence();
 			match("MP_END");
@@ -328,7 +328,7 @@ public class NonTerminals
 	public static void statementTail() {
 		switch (Lookahead)
 		{
-		case "something":
+		case "MP_SCOLON":
 			match("MP_SCOLON");
 			statement();
 			statementTail();
@@ -646,16 +646,16 @@ public class NonTerminals
 	public static void initialValue() {
 		switch (Lookahead)
 		{
-		case "+":
-		case "-":
+		case "MP_PLUS":
+		case "MP_MINUS":
 		case "UnsignedInteger":
 		case "UnsignedFloat":
 		case "StringLiteral":
-		case "True":
-		case "False":
-		case "not":
-		case "(":
-		case "MP_Identifier":
+		case "MP_TRUE":
+		case "MP_FALSE":
+		case "MP_NOT":
+		case "MP_LPAREN":
+		case "MP_IDENTIFIER":
 			ordinalExpression();
 			break;
 			
@@ -682,16 +682,16 @@ public class NonTerminals
 	public static void finalValue() {
 		switch (Lookahead)
 		{
-		case "+":
-		case "-":
+		case "MP_PLUS":
+		case "MP_MINUS":
 		case "UnsignedInteger":
 		case "UnsignedFloat":
 		case "StringLiteral":
-		case "True":
-		case "False":
-		case "not":
-		case "(":
-		case "MP_Identifier":
+		case "MP_TRUE":
+		case "MP_FALSE":
+		case "MP_NOT":
+		case "MP_LPAREN":
+		case "MP_IDENTIFIER":
 			ordinalExpression();
 			break;
 			
@@ -718,7 +718,7 @@ public class NonTerminals
 	public static void optionalActualParameterList() {
 		switch (Lookahead)
 		{
-		case "(":
+		case "MP_LPAREN":
 			match(Lookahead);
 			actualParameter();
 			actualParameterTail();
@@ -843,10 +843,10 @@ public class NonTerminals
 	
         public static void optionalSign(){
             switch(Lookahead){
-                case "+":
+                case "MP_PLUS":
                     match("MP_PLUS");
                     break;
-                case "-":
+                case "MP_MINUS":
                     match("MP_MINUS");
                     break;
                 default:
@@ -857,13 +857,13 @@ public class NonTerminals
         
         public static void addingOperator(){
             switch(Lookahead){
-            	case "+":
+            	case "MP_PLUS":
             		match("MP_PLUS");
             		break;
-            	case "-":
+            	case "MP_MINUS":
             		match("MP_MINUS");
             		break;
-            	case "or":
+            	case "MP_OR":
             		match("MP_OR");
             		break;
             	default:
@@ -918,26 +918,26 @@ public class NonTerminals
         
         public static void factor(){
             switch(Lookahead){
-                case "int":
+                case "MP_INT":
                     match("MP_INT");
                     break;
-                case "float":
+                case "MP_FLOAT":
                     match("MP_FLOAT");
                     break;
-                case "string":
+                case "MP_STRING_LIT":
                     match("MP_STRING_LIT");
                     break;
-                case "true":
+                case "MP_TRUE":
                     match("MP_TRUE");
                     break;
-                case "false":
+                case "MP_FALSE":
                     match("MP_FALSE");
                     break;
-                case "not":
+                case "MP_NOT":
                     match("MP_NOT");
                     factor();
                     break;
-                case "(":
+                case "MP_LPAREN":
                     match("(");
                     expression();
                     match(")");
@@ -954,7 +954,7 @@ public class NonTerminals
         
         public static void programIdentifier(){
             switch(Lookahead){
-                case "id":
+                case "MP_ID":
                     match("MP_ID");
                     break;
                 default:
@@ -965,7 +965,7 @@ public class NonTerminals
             
             public static void variableIdentifier(){
             switch(Lookahead){
-                case "id":
+                case "MP_ID":
                     match("MP_ID");
                     break;
                 default:
@@ -975,7 +975,7 @@ public class NonTerminals
             }   
             public static void procedureIdentifier(){
             switch(Lookahead){
-                case "id":
+                case "MP_ID":
                     match("MP_ID");
                     break;
                 default:
@@ -985,7 +985,7 @@ public class NonTerminals
             }
             public static void functionIdentifier(){
             switch(Lookahead){
-                case "id":
+                case "MP_ID":
                     match("MP_ID");
                     break;
                 default:
@@ -1017,7 +1017,7 @@ public class NonTerminals
             
             public static void identifierList(){
                 switch(Lookahead){
-                    case "somthign":
+                    case "something":
                         match("MP_ID");
                         identifierTail();
                         break;
@@ -1029,7 +1029,7 @@ public class NonTerminals
             
             public static void identifierTail(){
                 switch(Lookahead){
-                    case "lask;djf;":
+                    case "something":
                         match("MP_COMMA");
                         match("MP_ID");
                         identifierTail();
