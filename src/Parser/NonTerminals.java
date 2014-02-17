@@ -78,9 +78,8 @@ public class NonTerminals
 			match("MP_VAR");
 			variableDeclaration();
 			match("MP_SCOLON");
-		case "something":
-			break;
 		default: // End thingy?
+			emptyStatement();
 			break;
 		}
 	}
@@ -93,9 +92,8 @@ public class NonTerminals
 			match("MP_SCOLON");
 			variableDeclarationTail();
 			break;
-		case "something":
-			break;
 		default: // End thingy?
+			emptyStatement();
 			break;
 		}
 	}
@@ -150,10 +148,8 @@ public class NonTerminals
 			functionDeclaration();
 			procedureAndFunctionDeclarationPart();
 			break;
-		case "something":
-			break;	
 		default: // syntaxError
-			syntaxError();
+			emptyStatement();
 			break;
 		}
 	}
@@ -225,10 +221,8 @@ public class NonTerminals
 			formalParameterSectionTail();
 			match("MP_RPAREN");
 			break;
-		case "something":
-			break;
 		default: // syntaxError
-			syntaxError();
+			emptyStatement();
 			break;
 		}
 	}
@@ -241,10 +235,8 @@ public class NonTerminals
 			formalParameterSection();
 			formalParameterSectionTail();
 			break;
-		case "something":
-			break;
 		default: // syntaxError
-			syntaxError();
+			emptyStatement();
 			break;
 		}
 	}
@@ -314,7 +306,6 @@ public class NonTerminals
 			statementSequence();
 			match("MP_END");
 			break;
-			
 		default: // syntaxError
 			syntaxError();
 			break;
@@ -342,7 +333,6 @@ public class NonTerminals
 			statement();
 			statementTail();
 			break;
-			
 		default: // syntaxError
 			syntaxError();
 			break;
@@ -436,7 +426,7 @@ public class NonTerminals
 	public static void readParameterTail() {
 		switch (Lookahead)
 		{
-		case ",":
+		case "MP_COMMA":
 			match(Lookahead);
 			readParameter();
 			readParameterTail();
@@ -463,8 +453,8 @@ public class NonTerminals
 	public static void writeStatement() {
 		switch (Lookahead)
 		{
-		case "write":
-		case "writeln":
+		case "MP_WRITE":
+		case "MP_WRITELN":
 			match(Lookahead);
 			if ( Lookahead.equals("(")) {
 				match(Lookahead);
@@ -487,13 +477,13 @@ public class NonTerminals
 	public static void writeParameterTail() {
 		switch (Lookahead)
 		{
-		case ",":
+		case "MP_COMMA":
 			match(Lookahead);
 			writeParameter();
 			writeParameterTail();
 			break;
-			
 		default: // syntaxError OR Empty-String
+			emptyStatement();
 			break;
 		}
 	}
@@ -571,6 +561,7 @@ public class NonTerminals
 			break;
 			
 		default: // syntaxError OR Empty-String
+			emptyStatement();
 			break;
 		}
 	}
@@ -738,18 +729,20 @@ public class NonTerminals
 			break;
 			
 		default: // syntaxError OR Empty-String
+			emptyStatement();
 			break;
 		}
 	}
 
 	 public static void actualParameterTail(){
          switch (Lookahead){
-             case ",":
+             case "MP_COMMA":
                  actualParameter();
                  actualParameterTail();
                  break;
              default:
-             
+            	 emptyStatement();
+            	 break;
          }
          
      }
@@ -759,7 +752,9 @@ public class NonTerminals
              case "something": 
                  ordinalExpression();
                  break;
-             
+             default:
+            	 syntaxError();
+            	 break;
          }
          
      }
@@ -770,35 +765,11 @@ public class NonTerminals
                  simpleExpression();
                  optionalRelationalPart();
                  break;
+             default:
+            	 syntaxError();
+            	 break;
          }
      }
-	
-	/*	
-	public static void statement() {
-		switch (Lookahead)
-		{
-		case "MP_":
-			break;
-			
-		case "MP_":
-			break;
-			
-		case "MP_":
-			break;
-			
-		case "MP_":
-			break;
-			
-		case "MP_":
-			break;
-			
-		default: // syntaxError OR Empty-String
-			syntaxError();
-			break;
-		}
-	}
-	*/
-
 
         public static void optionalRelationalPart(){
             switch(Lookahead){
@@ -807,7 +778,8 @@ public class NonTerminals
                     simpleExpression();
                     break;
                 default:
-                    
+                	emptyStatement();
+                	break;
             }
         }
 
@@ -833,7 +805,8 @@ public class NonTerminals
                     match("MP_NQUAL");
                     break;
                 default:
-                    syntaxError();
+                	syntaxError();
+                	break;
             }
         }
         	
@@ -845,6 +818,8 @@ public class NonTerminals
                     termTail();
                     break;
                 default:
+                	syntaxError();
+                	break;
             }
             
         }
@@ -857,7 +832,8 @@ public class NonTerminals
                     termTail();
                     break;
                 default:
-                    
+                	emptyStatement();
+                	break;
             }
             
         }
@@ -873,11 +849,9 @@ public class NonTerminals
                 case "-":
                     match("MP_MINUS");
                     break;
-                    
-                    
-                    
                 default:
-                    syntaxError();
+                	syntaxError();
+                	break;
             }
         }
         
@@ -894,6 +868,7 @@ public class NonTerminals
             		break;
             	default:
             		syntaxError();
+                	break;
             }
         }
         
@@ -916,6 +891,8 @@ public class NonTerminals
                     factorTail();
                     break;
                 default:
+                	emptyStatement();
+                	break;
             }
         }
         
@@ -934,7 +911,8 @@ public class NonTerminals
                     match("MP_AND");
                     break;
                 default:
-                    syntaxError();
+                	syntaxError();
+                	break;
             }
         }
         
@@ -967,7 +945,10 @@ public class NonTerminals
                 case "other":
                     functionIdentifier();
                     optionalActualParameterList();
-                    break;
+                    break;    
+                default:
+                    syntaxError();
+                	break;
             }
         }
         
@@ -977,7 +958,8 @@ public class NonTerminals
                     match("MP_ID");
                     break;
                 default:
-                    syntaxError();
+                	syntaxError();
+                	break;
             }
         }
             
@@ -987,8 +969,9 @@ public class NonTerminals
                     match("MP_ID");
                     break;
                 default:
-                    syntaxError();
-            }
+                	syntaxError();
+                	break;            
+                }
             }   
             public static void procedureIdentifier(){
             switch(Lookahead){
@@ -996,8 +979,9 @@ public class NonTerminals
                     match("MP_ID");
                     break;
                 default:
-                    syntaxError();
-            }
+                	syntaxError();
+                	break;            
+                }
             }
             public static void functionIdentifier(){
             switch(Lookahead){
@@ -1005,8 +989,9 @@ public class NonTerminals
                     match("MP_ID");
                     break;
                 default:
-                    syntaxError();
-            }
+                	syntaxError();
+                	break;
+            	}
             }
             public static void booleanExpression(){
                 switch(Lookahead){
@@ -1014,6 +999,8 @@ public class NonTerminals
                         expression();
                         break;
                     default:
+                    	syntaxError();
+                    	break;
                 }
             }
             
@@ -1023,6 +1010,8 @@ public class NonTerminals
                         expression();
                         break;
                     default:
+                    	syntaxError();
+                    	break;
                 }
             }
             
@@ -1033,6 +1022,8 @@ public class NonTerminals
                         identifierTail();
                         break;
                     default:
+                    	syntaxError();
+                    	break;
                 }
             }
             
@@ -1044,6 +1035,8 @@ public class NonTerminals
                         identifierTail();
                         break;
                     default:
+                    	emptyStatement();
+                    	break;
                 }
             }
 }
