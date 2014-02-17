@@ -16,18 +16,22 @@ public class testDriver {
 			MicroPascalScanner sc = new MicroPascalScanner(testFile);
 
 			Token current;
-			while ( sc.hasNextToken() ) {
+			while ( sc.hasNextToken() ) 
+			{
 				current = sc.getToken();
-				System.out.println("Token>>  "+"Ln:   "+current.getLineNumber()+"\tCl: "+current.getColumnNumber()+"\t\tType:  "+current.getToken()+"\t\tLex:  "+current.getLexeme());
+//				System.out.println("Token>>  "+"Ln:   "+current.getLineNumber()+"\tCl: "+current.getColumnNumber()+"\t\tType:  "+current.getToken()+"\t\tLex:  "+current.getLexeme());
+				current.getToken();
 			}
 		}
-		else{
+		else
+		{
 			testFile = new File(args[0]);
 
 			MicroPascalScanner sc = new MicroPascalScanner(testFile);
 
 			Token current;
-			while ( sc.hasNextToken() ) {
+			while ( sc.hasNextToken() ) 
+			{
 				current = sc.getToken();
 				System.out.println("Token>>  "+"Ln:   "+current.getLineNumber()+"\tCl: "+current.getColumnNumber()+"\t\tType:  "+current.getToken()+"\t\tLex:  "+current.getLexeme());
 			}

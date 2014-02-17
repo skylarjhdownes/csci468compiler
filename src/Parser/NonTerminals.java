@@ -7,9 +7,15 @@ public class NonTerminals
 	public static void match(String in) {
 		// TODO STUB!!!!!!
 		
-		// match the identifier in the parse tree.
+		if (in.equals(lookahead)){
+			// Bump to next lookahead
+			// and return.
+		}
+		else{
+			syntaxError();
+		}
 		
-		// Bump to next lookahead.
+		
 		return;
 	}
 
@@ -21,7 +27,6 @@ public class NonTerminals
 		switch (Lookahead)
 		{
 		case "MP_PROGRAM":
-			match(Lookahead);
 			program();
 			//EOF thing?
 			break;
