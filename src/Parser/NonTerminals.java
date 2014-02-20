@@ -19,8 +19,9 @@ public class NonTerminals
 		return;
 	}
 
-	public static void syntaxError() {
+	public static void syntaxError(int line, int column) {
 		// TODO STUB!!!!!!
+		System.out.println("Syntax error found on line " + line + ", column" + column + ".");
 		return;
 	}
 	public static void systemGoal() {
@@ -31,7 +32,7 @@ public class NonTerminals
 			//EOF thing?
 			break;
 
-		default: // syntaxsyntaxError
+		default: // syntaxError
 			break;
 		}
 	}
@@ -46,7 +47,7 @@ public class NonTerminals
 			block();
 			match("MP_PERIOD");
 			break;
-		default: // syntaxsyntaxError
+		default: // syntaxError
 			break;
 		}
 	}
@@ -59,7 +60,7 @@ public class NonTerminals
 			match("MP_PROGRAM");
 			programIdentifier();
 			break;
-		default: // syntaxsyntaxError
+		default: // syntaxError
 			break;
 		}
 	}
@@ -71,7 +72,7 @@ public class NonTerminals
 			variableDeclarationPart();
 			procedureAndFunctionDeclarationPart();
 			break;
-		default: // syntaxsyntaxError
+		default: // syntaxError
 			break;
 		}
 	}
