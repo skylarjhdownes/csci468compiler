@@ -9,7 +9,7 @@ public class testDriver {
 
 		if( args.length == 0 )
 		{
-			System.out.println("No input file give, ALL IS LOST. ABANDON SHIP!!!!!!!!!!!!!!!!");
+			System.out.println("No input file given, ALL IS LOST. ABANDON SHIP!!!!!!!!!!!!!!!!");
 			
 			testFile = new File("C:\\Users\\Stephen Bush\\Documents\\Test.txt");
 

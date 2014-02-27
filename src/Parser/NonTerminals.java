@@ -19,11 +19,12 @@ public class NonTerminals
 		return;
 	}
 
-	public static void syntaxError(int line, int column) {
+	public static void syntaxError() { //int line, int column) {
 		// TODO STUB!!!!!!
 		System.out.println("Syntax error found on line " + line + ", column" + column + ".");
 		return;
 	}
+	
 	public static void systemGoal() {
 		switch (Lookahead)
 		{
