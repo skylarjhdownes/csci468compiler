@@ -337,7 +337,7 @@ public class NonTerminals
 		switch (Lookahead)
 		{
 		case "MP_Identifier":
-			VariableIdentifier();
+			ControlVariable();
 			break;
 			
 		default: // Error OR Empty-String
