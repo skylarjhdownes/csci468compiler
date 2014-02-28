@@ -642,10 +642,14 @@ public class NonTerminals
 		{
 		case "MP_Identifier":
 <<<<<<< HEAD
+<<<<<<< HEAD
 			ControlVariable();
 =======
 			variableIdentifier();
 >>>>>>> c4e95c2d87ee4e498634ca5a7efb8d51dbb21eda
+=======
+			ControlVariable();
+>>>>>>> c1ce95a440cc63b7780f0be1dfc9a7b7fc61feec
 			break;
 			
 		default: // syntaxError OR Empty-String
