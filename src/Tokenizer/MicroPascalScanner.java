@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.LinkedList;
 
 
 public class MicroPascalScanner implements I_Tokenizer {
@@ -15,6 +16,7 @@ public class MicroPascalScanner implements I_Tokenizer {
 	private String buffer = null;
 	private boolean hasNextChar = true;
 	private FileReader fr;
+	LinkedList<Token> tokenList = new LinkedList<Token>();
 	Tokenizer iden = new FSA_Identifier(this);
 	Tokenizer strSym = new FSA_StrSymbol(this);
 	Tokenizer lit = new FSA_Literal(this);
@@ -25,6 +27,22 @@ public class MicroPascalScanner implements I_Tokenizer {
 			fr = new FileReader(input);
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
+		}
+	}
+	
+	public LinkedList<Token> getAllTokens() {
+		if ( hasNextToken() ) {
+			scanAllTokens();
+		}
+		return tokenList;
+	}
+	
+	private void scanAllTokens() {
+		while ( hasNextToken() ) 
+		{
+			getToken();
+			//System.out.println("Token>>  "+"Ln:   "+current.getLineNumber()+"\tCl: "+current.getColumnNumber()+"\t\tType:  "+current.getToken()+"\t\tLex:  "+current.getLexeme());
+			//tokenList.add(current);
 		}
 	}
 
@@ -113,6 +131,10 @@ public class MicroPascalScanner implements I_Tokenizer {
 
 
 		} while (true);
+		
+		
+		// Add the token to the list of already found tokens
+		tokenList.add(tok);
 
 		return tok;
 	}
