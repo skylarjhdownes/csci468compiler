@@ -7,7 +7,7 @@ public class NonTerminals
 	public static void match(String in) {
 		// TODO STUB!!!!!!
 		
-		if (in.equals(lookahead)){
+		if (in.equals(Lookahead)){
 			// Bump to next lookahead
 			// and return.
 		}
@@ -21,7 +21,11 @@ public class NonTerminals
 
 	public static void syntaxError() { //int line, int column) {
 		// TODO STUB!!!!!!
-		System.out.println("Syntax error found on line " + line + ", column" + column + ".");
+		System.out.println("Syntax error found on line " + 
+				//line + 
+				", column" + 
+				//column + 
+				".");
 		return;
 	}
 	
@@ -150,7 +154,7 @@ public class NonTerminals
 			procedureDeclaration();
 			procedureAndFunctionDeclarationPart();
 			break;
-		case "something":
+		case "somethingElse":
 			match(Lookahead);
 			functionDeclaration();
 			procedureAndFunctionDeclarationPart();
@@ -254,7 +258,7 @@ public class NonTerminals
 		case "something":
 			valueParameterSection();
 			break;
-		case "something":
+		case "somethingElse":
 			variableParameterSection();
 			break;
 		default: // syntaxError
