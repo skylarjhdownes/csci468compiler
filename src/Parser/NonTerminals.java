@@ -10,14 +10,34 @@ public class NonTerminals {
     static LinkedList<Token> tokens;
     static Token LATok;
     static String Lookahead;
+	
+    // Variables for the parse-tree print
+    static int indent = 0;
+	static final boolean PRINT_PARSE_TREE = true;
+	static final int LAPad = 25;
+
 
     public static void match(String in) {
 		// TODO STUB!!!!!!
 
         if (in.equals(Lookahead)) {
-            LATok = tokens.get(tokindex++);
-            Lookahead = LATok.getToken();
+            
+    		if ( PRINT_PARSE_TREE ) System.out.printf(""+String.format("%1$" + LAPad + "s", Lookahead)+" =="+String.format("%1$" + (indent*3+1) + "s", "")
+    				+Lookahead+"\n");
+        	
+        	if ( tokindex < tokens.size() ) {
+        		LATok = tokens.get(tokindex++);
+                Lookahead = LATok.getToken();
+        	}
+        	else { 
+        		// **Stephen:  Modified this so it doesnt throw an out-of-bounds exception.  Also, added an else statement to insert the EOF token.  Dont know if this should be the final solution to the EOF problem, but meh.  WORKAROUND!
+        		Lookahead = "MP_EOF";
+        	}
+            
+            
         } else {
+			System.out.println("Match Error>\n  Expected: "+in+"  =<>=  "+Lookahead);
+
             syntaxError();
         }
 
@@ -36,10 +56,11 @@ public class NonTerminals {
         LATok = tokens.getFirst();
         Lookahead = LATok.getToken();
         systemGoal();
-
     }
 
     public static void systemGoal() {
+		if ( PRINT_PARSE_TREE ) System.out.printf(""+String.format("%1$" + LAPad + "s", Lookahead)+" ->"+String.format("%1$" + (indent++*3+1) + "s", "")
+				+"SystemGoal"+"\n");
         switch (Lookahead) {
             case "MP_PROGRAM":
                 program();
@@ -50,9 +71,12 @@ public class NonTerminals {
                 syntaxError();
                 break;
         }
+        indent--;
     }
 
     public static void program() {
+		if ( PRINT_PARSE_TREE ) System.out.printf(""+String.format("%1$" + LAPad + "s", Lookahead)+" ->"+String.format("%1$" + (indent++*3+1) + "s", "")
+				+"Program"+"\n");
         switch (Lookahead) {
             case "MP_PROGRAM":
                 programHeading();
@@ -64,9 +88,12 @@ public class NonTerminals {
                 syntaxError();// syntaxError
                 break;
         }
+        indent--;
     }
 
     public static void programHeading() {
+		if ( PRINT_PARSE_TREE ) System.out.printf(""+String.format("%1$" + LAPad + "s", Lookahead)+" ->"+String.format("%1$" + (indent++*3+1) + "s", "")
+				+"ProgramHeading"+"\n");
         switch (Lookahead) {
             case "MP_PROGRAM":
                 match("MP_PROGRAM");
@@ -76,9 +103,12 @@ public class NonTerminals {
                 syntaxError();// syntaxError
                 break;
         }
+        indent--;
     }
 
     public static void block() {
+		if ( PRINT_PARSE_TREE ) System.out.printf(""+String.format("%1$" + LAPad + "s", Lookahead)+" ->"+String.format("%1$" + (indent++*3+1) + "s", "")
+				+"Block"+"\n");
         switch (Lookahead) {
             case "MP_BEGIN":
             case "MP_FUNCTION":
@@ -92,9 +122,12 @@ public class NonTerminals {
                 syntaxError();// syntaxError
                 break;
         }
+        indent--;
     }
 
     public static void variableDeclarationPart() {
+		if ( PRINT_PARSE_TREE ) System.out.printf(""+String.format("%1$" + LAPad + "s", Lookahead)+" ->"+String.format("%1$" + (indent++*3+1) + "s", "")
+				+"VariableDeclarationPart"+"\n");
         switch (Lookahead) {
             case "MP_BEGIN":
             case "MP_FUNCTION":
@@ -105,13 +138,17 @@ public class NonTerminals {
                 variableDeclaration();
                 match("MP_SCOLON");
                 variableDeclarationTail();
+                break;
             default: // End thingy?
                 syntaxError();
                 break;
         }
+        indent--;
     }
 
     public static void variableDeclarationTail() {
+		if ( PRINT_PARSE_TREE ) System.out.printf(""+String.format("%1$" + LAPad + "s", Lookahead)+" ->"+String.format("%1$" + (indent++*3+1) + "s", "")
+				+"VariableDeclarationTail"+"\n");
         switch (Lookahead) {
             case "MP_BEGIN":
             case "MP_FUNCTION":
@@ -126,9 +163,12 @@ public class NonTerminals {
                 syntaxError();
                 break;
         }
+        indent--;
     }
 
     public static void variableDeclaration() {
+		if ( PRINT_PARSE_TREE ) System.out.printf(""+String.format("%1$" + LAPad + "s", Lookahead)+" ->"+String.format("%1$" + (indent++*3+1) + "s", "")
+				+"VariableDelcaration"+"\n");
         switch (Lookahead) {
             case "MP_IDENTIFIER":
                 identifierList();
@@ -139,9 +179,12 @@ public class NonTerminals {
                 syntaxError();
                 break;
         }
+        indent--;
     }
 
     public static void type() {
+		if ( PRINT_PARSE_TREE ) System.out.printf(""+String.format("%1$" + LAPad + "s", Lookahead)+" ->"+String.format("%1$" + (indent++*3+1) + "s", "")
+				+"Type"+"\n");
         switch (Lookahead) {
             case "MP_INTEGER":
                 match("MP_INTEGER");
@@ -159,10 +202,12 @@ public class NonTerminals {
                 syntaxError();
                 break;
         }
-
+        indent--;
     }
 
     public static void procedureAndFunctionDeclarationPart() {
+		if ( PRINT_PARSE_TREE ) System.out.printf(""+String.format("%1$" + LAPad + "s", Lookahead)+" ->"+String.format("%1$" + (indent++*3+1) + "s", "")
+				+"ProcedureAndFunctionDeclarationPart"+"\n");
         switch (Lookahead) {
             case "MP_PROCEDURE":
                 procedureDeclaration();
@@ -178,9 +223,12 @@ public class NonTerminals {
                 syntaxError();
                 break;
         }
+        indent--;
     }
 
     public static void procedureDeclaration() {
+		if ( PRINT_PARSE_TREE ) System.out.printf(""+String.format("%1$" + LAPad + "s", Lookahead)+" ->"+String.format("%1$" + (indent++*3+1) + "s", "")
+				+"ProcedureDeclaration"+"\n");
         switch (Lookahead) {
             case "MP_PROCEDURE":
                 procedureHeading();
@@ -192,9 +240,12 @@ public class NonTerminals {
                 syntaxError();
                 break;
         }
+        indent--;
     }
 
     public static void functionDeclaration() {
+		if ( PRINT_PARSE_TREE ) System.out.printf(""+String.format("%1$" + LAPad + "s", Lookahead)+" ->"+String.format("%1$" + (indent++*3+1) + "s", "")
+				+"FunctionDeclaration"+"\n");
         switch (Lookahead) {
             case "MP_FUNCTION":
                 functionHeading();
@@ -206,9 +257,12 @@ public class NonTerminals {
                 syntaxError();
                 break;
         }
+        indent--;
     }
 
     public static void procedureHeading() {
+		if ( PRINT_PARSE_TREE ) System.out.printf(""+String.format("%1$" + LAPad + "s", Lookahead)+" ->"+String.format("%1$" + (indent++*3+1) + "s", "")
+				+"ProcedureHeading"+"\n");
         switch (Lookahead) {
             case "MP_PROCEDURE":
                 match("MP_PROCEDURE");
@@ -219,24 +273,30 @@ public class NonTerminals {
                 syntaxError();
                 break;
         }
+        indent--;
     }
 
     public static void functionHeading() {
+		if ( PRINT_PARSE_TREE ) System.out.printf(""+String.format("%1$" + LAPad + "s", Lookahead)+" ->"+String.format("%1$" + (indent++*3+1) + "s", "")
+				+"FunctionHeading"+"\n");
         switch (Lookahead) {
             case "MP_FUNCTION":
                 match("MP_FUNCTION");
                 functionIdentifier();
                 optionalFormalParameterList();
-                match("MP_COLON");
+                // match("MP_COLON"); <-- **Stephen**:  Why was this one in here??  Looking at rule #20, there is no colon in there. 
                 type();
                 break;
             default: // syntaxError
                 syntaxError();
                 break;
         }
+        indent--;
     }
 
     public static void optionalFormalParameterList() {
+		if ( PRINT_PARSE_TREE ) System.out.printf(""+String.format("%1$" + LAPad + "s", Lookahead)+" ->"+String.format("%1$" + (indent++*3+1) + "s", "")
+				+"OptionalFormalParameterList"+"\n");
         switch (Lookahead) {
             case "MP_LPAREN":
                 match("MP_LPAREN");
@@ -254,9 +314,12 @@ public class NonTerminals {
                 syntaxError();
                 break;
         }
+        indent--;
     }
 
     public static void formalParameterSectionTail() {
+		if ( PRINT_PARSE_TREE ) System.out.printf(""+String.format("%1$" + LAPad + "s", Lookahead)+" ->"+String.format("%1$" + (indent++*3+1) + "s", "")
+				+"FormalParameterList"+"\n");
         switch (Lookahead) {
             case "MP_SCOLON":
                 match("MP_SCOLON");
@@ -269,9 +332,12 @@ public class NonTerminals {
                 syntaxError();
                 break;
         }
+        indent--;
     }
 
     public static void formalParameterSection() {
+		if ( PRINT_PARSE_TREE ) System.out.printf(""+String.format("%1$" + LAPad + "s", Lookahead)+" ->"+String.format("%1$" + (indent++*3+1) + "s", "")
+				+"FormalParameterSection"+"\n");
         switch (Lookahead) {
             case "MP_IDENTIFIER":
                 valueParameterSection();
@@ -283,9 +349,12 @@ public class NonTerminals {
                 syntaxError();
                 break;
         }
+        indent--;
     }
 
     public static void valueParameterSection() {
+		if ( PRINT_PARSE_TREE ) System.out.printf(""+String.format("%1$" + LAPad + "s", Lookahead)+" ->"+String.format("%1$" + (indent++*3+1) + "s", "")
+				+"ValueParameterSection"+"\n");
         switch (Lookahead) {
             case "MP_IDENTIFIER":
                 identifierList();
@@ -296,9 +365,12 @@ public class NonTerminals {
                 syntaxError();
                 break;
         }
+        indent--;
     }
 
     public static void variableParameterSection() {
+		if ( PRINT_PARSE_TREE ) System.out.printf(""+String.format("%1$" + LAPad + "s", Lookahead)+" ->"+String.format("%1$" + (indent++*3+1) + "s", "")
+				+"VariableParameterSection"+"\n");
         switch (Lookahead) {
             case "MP_VAR":
                 match("MP_VAR");
@@ -311,9 +383,12 @@ public class NonTerminals {
                 syntaxError();
                 break;
         }
+        indent--;
     }
 
     public static void statementPart() {
+		if ( PRINT_PARSE_TREE ) System.out.printf(""+String.format("%1$" + LAPad + "s", Lookahead)+" ->"+String.format("%1$" + (indent++*3+1) + "s", "")
+				+"StatementPart"+"\n");
         switch (Lookahead) {
             case "MP_BEGIN":
                 compoundStatement();
@@ -322,9 +397,12 @@ public class NonTerminals {
                 syntaxError();
                 break;
         }
+        indent--;
     }
 
     public static void compoundStatement() {
+		if ( PRINT_PARSE_TREE ) System.out.printf(""+String.format("%1$" + LAPad + "s", Lookahead)+" ->"+String.format("%1$" + (indent++*3+1) + "s", "")
+				+"CompoundStatement"+"\n");
         switch (Lookahead) {
             case "MP_BEGIN":
                 match("MP_BEGIN");
@@ -335,9 +413,12 @@ public class NonTerminals {
                 syntaxError();
                 break;
         }
+        indent--;
     }
 
     public static void statementSequence() {
+		if ( PRINT_PARSE_TREE ) System.out.printf(""+String.format("%1$" + LAPad + "s", Lookahead)+" ->"+String.format("%1$" + (indent++*3+1) + "s", "")
+				+"StatementSequence"+"\n");
         switch (Lookahead) {
             case "MP_BEGIN":
             case "MP_ELSE":
@@ -359,9 +440,12 @@ public class NonTerminals {
                 syntaxError();
                 break;
         }
+        indent--;
     }
 
     public static void statementTail() {
+		if ( PRINT_PARSE_TREE ) System.out.printf(""+String.format("%1$" + LAPad + "s", Lookahead)+" ->"+String.format("%1$" + (indent++*3+1) + "s", "")
+				+"StatementTail"+"\n");
         switch (Lookahead) {
             case "MP_SCOLON":
                 match("MP_SCOLON");
@@ -375,10 +459,12 @@ public class NonTerminals {
                 syntaxError();
                 break;
         }
+        indent--;
     }
 
     public static void statement() {
-		
+		if ( PRINT_PARSE_TREE ) System.out.printf(""+String.format("%1$" + LAPad + "s", Lookahead)+" ->"+String.format("%1$" + (indent++*3+1) + "s", "")
+				+"Statement"+"\n");
         switch (Lookahead) {
             case "MP_IDENTIFIER":
                 match("MP_IDENTIFIER");//workaround, just match id and move on
@@ -433,9 +519,12 @@ public class NonTerminals {
                 syntaxError();
                 break;
         }
+        indent--;
     }
 
     public static void emptyStatement() {
+		if ( PRINT_PARSE_TREE ) System.out.printf(""+String.format("%1$" + LAPad + "s", Lookahead)+" ->"+String.format("%1$" + (indent++*3+1) + "s", "")
+				+"EmptyStatement"+"\n");
         switch (Lookahead) {
             case "MP_ELSE":
             case "MP_END":
@@ -446,9 +535,12 @@ public class NonTerminals {
                 syntaxError();// syntaxError
                 break;
         }
+        indent--;
     }
 
     public static void readStatement() {
+		if ( PRINT_PARSE_TREE ) System.out.printf(""+String.format("%1$" + LAPad + "s", Lookahead)+" ->"+String.format("%1$" + (indent++*3+1) + "s", "")
+				+"ReadStatement"+"\n");
         switch (Lookahead) {
             case "MP_READ":
                 match("MP_READ");
@@ -461,9 +553,12 @@ public class NonTerminals {
                 syntaxError();
                 break;
         }
+        indent--;
     }
 
     public static void readParameterTail() {
+		if ( PRINT_PARSE_TREE ) System.out.printf(""+String.format("%1$" + LAPad + "s", Lookahead)+" ->"+String.format("%1$" + (indent++*3+1) + "s", "")
+				+"ReadParameterTail"+"\n");
         switch (Lookahead) {
             case "MP_COMMA":
                 match("MP_COMMA");
@@ -475,9 +570,12 @@ public class NonTerminals {
             default: // syntaxError OR Empty-String
                 break;
         }
+        indent--;
     }
 
     public static void readParameter() {
+		if ( PRINT_PARSE_TREE ) System.out.printf(""+String.format("%1$" + LAPad + "s", Lookahead)+" ->"+String.format("%1$" + (indent++*3+1) + "s", "")
+				+"ReadParameter"+"\n");
         switch (Lookahead) {
             case "MP_Identifier":
                 variableIdentifier();
@@ -487,9 +585,12 @@ public class NonTerminals {
                 syntaxError();
                 break;
         }
+        indent--;
     }
 
     public static void writeStatement() {
+		if ( PRINT_PARSE_TREE ) System.out.printf(""+String.format("%1$" + LAPad + "s", Lookahead)+" ->"+String.format("%1$" + (indent++*3+1) + "s", "")
+				+"WriteStatement"+"\n");
         switch (Lookahead) {
             case "MP_WRITE":
                 match("MP_WRITE");
@@ -510,9 +611,12 @@ public class NonTerminals {
                 syntaxError();
                 break;
         }
+        indent--;
     }
 
     public static void writeParameterTail() {
+		if ( PRINT_PARSE_TREE ) System.out.printf(""+String.format("%1$" + LAPad + "s", Lookahead)+" ->"+String.format("%1$" + (indent++*3+1) + "s", "")
+				+"WriteParameterTail"+"\n");
         switch (Lookahead) {
             case "MP_COMMA":
                 match("MP_COMMA");
@@ -525,9 +629,12 @@ public class NonTerminals {
                 syntaxError();
                 break;
         }
+        indent--;
     }
 
     public static void writeParameter() {
+		if ( PRINT_PARSE_TREE ) System.out.printf(""+String.format("%1$" + LAPad + "s", Lookahead)+" ->"+String.format("%1$" + (indent++*3+1) + "s", "")
+				+"WriteParameter"+"\n");
         switch (Lookahead) {
             case "MP_PLUS":
             case "MP_MINUS":
@@ -546,22 +653,44 @@ public class NonTerminals {
                 syntaxError();
                 break;
         }
+        indent--;
     }
 
     public static void assignmentStatement() {
-        switch (Lookahead) {
-            case "MP_IDENTIFIER"://both rules are the same
-                match("MP_IDENTIFIER");
-                match("MP_ASSIGN");
-                expression();
-                break;
-            default: // syntaxError OR Empty-String
-                syntaxError();
-                break;
+    	if ( PRINT_PARSE_TREE ) System.out.printf(""+String.format("%1$" + LAPad + "s", Lookahead)+" ->"+String.format("%1$" + (indent++*3+1) + "s", "")
+				+"AssignmentStatement"+"\n");
+    	// **Stephen** The parser breaks here, the logical consistency is broken in the Statement method, where it uses an "extra" look-ahead.  
+        /*
+    	switch (Lookahead) {
+        case "MP_IDENTIFIER"://both rules are the same
+            match("MP_IDENTIFIER");
+            match("MP_ASSIGN");
+            expression();
+            break;
+        default: // syntaxError OR Empty-String
+            syntaxError();
+            break;
         }
+        */
+        
+        
+        switch (Lookahead) {
+        case "MP_ASSIGN"://both rules are the same
+            match("MP_ASSIGN");
+            expression();
+            break;
+        default: // syntaxError OR Empty-String
+            syntaxError();
+            break;
+    }
+
+
+        indent--;
     }
 
     public static void ifStatement() {
+		if ( PRINT_PARSE_TREE ) System.out.printf(""+String.format("%1$" + LAPad + "s", Lookahead)+" ->"+String.format("%1$" + (indent++*3+1) + "s", "")
+				+"IfStatement"+"\n");
         switch (Lookahead) {
             case "MP_IF":
                 match("MP_IF");
@@ -575,9 +704,12 @@ public class NonTerminals {
                 syntaxError();
                 break;
         }
+        indent--;
     }
 
     public static void optionalElsePart() {
+		if ( PRINT_PARSE_TREE ) System.out.printf(""+String.format("%1$" + LAPad + "s", Lookahead)+" ->"+String.format("%1$" + (indent++*3+1) + "s", "")
+				+"OptionalElsePart"+"\n");
         switch (Lookahead) {
             case "MP_ELSE":
                 match("MP_ELSE");
@@ -592,9 +724,12 @@ public class NonTerminals {
                 emptyStatement();
                 break;
         }
+        indent--;
     }
 
     public static void repeatStatement() {
+		if ( PRINT_PARSE_TREE ) System.out.printf(""+String.format("%1$" + LAPad + "s", Lookahead)+" ->"+String.format("%1$" + (indent++*3+1) + "s", "")
+				+"RepeatStatement"+"\n");
         switch (Lookahead) {
             case "MP_REPEAT":
                 match("MP_REPEAT");
@@ -606,9 +741,12 @@ public class NonTerminals {
                 syntaxError();
                 break;
         }
+        indent--;
     }
 
     public static void whileStatement() {
+		if ( PRINT_PARSE_TREE ) System.out.printf(""+String.format("%1$" + LAPad + "s", Lookahead)+" ->"+String.format("%1$" + (indent++*3+1) + "s", "")
+				+"WhileStatement"+"\n");
         switch (Lookahead) {
             case "MP_WHILE":
                 match("MP_WHILE");
@@ -621,9 +759,12 @@ public class NonTerminals {
                 syntaxError();
                 break;
         }
+        indent--;
     }
 
     public static void forStatement() {
+		if ( PRINT_PARSE_TREE ) System.out.printf(""+String.format("%1$" + LAPad + "s", Lookahead)+" ->"+String.format("%1$" + (indent++*3+1) + "s", "")
+				+"ForStatement"+"\n");
         switch (Lookahead) {
             case "MP_FOR":
                 match("MP_FOR");
@@ -640,9 +781,12 @@ public class NonTerminals {
                 syntaxError();
                 break;
         }
+        indent--;
     }
 
     public static void controlVariable() {
+		if ( PRINT_PARSE_TREE ) System.out.printf(""+String.format("%1$" + LAPad + "s", Lookahead)+" ->"+String.format("%1$" + (indent++*3+1) + "s", "")
+				+"ControlVariable"+"\n");
         switch (Lookahead) {
             case "MP_IDENTIFIER":
                 variableIdentifier();
@@ -652,9 +796,12 @@ public class NonTerminals {
                 syntaxError();
                 break;
         }
+        indent--;
     }
 
     public static void initialValue() {
+		if ( PRINT_PARSE_TREE ) System.out.printf(""+String.format("%1$" + LAPad + "s", Lookahead)+" ->"+String.format("%1$" + (indent++*3+1) + "s", "")
+				+"InitialValue"+"\n");
         switch (Lookahead) {
             case "MP_PLUS":
             case "MP_MINUS":
@@ -673,9 +820,12 @@ public class NonTerminals {
                 syntaxError();
                 break;
         }
+        indent--;
     }
 
     public static void stepValue() {
+		if ( PRINT_PARSE_TREE ) System.out.printf(""+String.format("%1$" + LAPad + "s", Lookahead)+" ->"+String.format("%1$" + (indent++*3+1) + "s", "")
+				+"StepValue"+"\n");
         switch (Lookahead) {
             case "MP_TO":
                 match("MP_TO");
@@ -688,9 +838,12 @@ public class NonTerminals {
                 syntaxError();
                 break;
         }
+        indent--;
     }
 
     public static void finalValue() {
+		if ( PRINT_PARSE_TREE ) System.out.printf(""+String.format("%1$" + LAPad + "s", Lookahead)+" ->"+String.format("%1$" + (indent++*3+1) + "s", "")
+				+"FinalValue"+"\n");
         switch (Lookahead) {
             case "MP_PLUS":
             case "MP_MINUS":
@@ -709,9 +862,12 @@ public class NonTerminals {
                 syntaxError();
                 break;
         }
+        indent--;
     }
 
     public static void procedureStatement() {
+		if ( PRINT_PARSE_TREE ) System.out.printf(""+String.format("%1$" + LAPad + "s", Lookahead)+" ->"+String.format("%1$" + (indent++*3+1) + "s", "")
+				+"ProcedureStatment"+"\n");
         switch (Lookahead) {
             case "MP_IDENTIFIER":
                 procedureIdentifier();
@@ -722,9 +878,12 @@ public class NonTerminals {
                 syntaxError();
                 break;
         }
+        indent--;
     }
 
     public static void optionalActualParameterList() {
+		if ( PRINT_PARSE_TREE ) System.out.printf(""+String.format("%1$" + LAPad + "s", Lookahead)+" ->"+String.format("%1$" + (indent++*3+1) + "s", "")
+				+"OptionalActualParameterList"+"\n");
         switch (Lookahead) {
             case "MP_LPAREN":
                 match("MP_LPAREN");
@@ -762,9 +921,12 @@ public class NonTerminals {
                 syntaxError();
                 break;
         }
+        indent--;
     }
 
     public static void actualParameterTail() {
+		if ( PRINT_PARSE_TREE ) System.out.printf(""+String.format("%1$" + LAPad + "s", Lookahead)+" ->"+String.format("%1$" + (indent++*3+1) + "s", "")
+				+"ActualParameterTail"+"\n");
         switch (Lookahead) {
             case "MP_COMMA":
                 match("MP_COMMA");
@@ -777,10 +939,12 @@ public class NonTerminals {
                 emptyStatement();
                 break;
         }
-
-    }
+        indent--;
+   }
 
     public static void actualParameter() {
+		if ( PRINT_PARSE_TREE ) System.out.printf(""+String.format("%1$" + LAPad + "s", Lookahead)+" ->"+String.format("%1$" + (indent++*3+1) + "s", "")
+				+"ActualParameter"+"\n");
         switch (Lookahead) {
             case "MP_PLUS":
             case "MP_MINUS":
@@ -798,10 +962,12 @@ public class NonTerminals {
                 syntaxError();
                 break;
         }
-
+        indent--;
     }
 
     public static void expression() {
+		if ( PRINT_PARSE_TREE ) System.out.printf(""+String.format("%1$" + LAPad + "s", Lookahead)+" ->"+String.format("%1$" + (indent++*3+1) + "s", "")
+				+"Expression"+"\n");
         switch (Lookahead) {
             case "MP_PLUS":
             case "MP_MINUS":
@@ -820,9 +986,12 @@ public class NonTerminals {
                 syntaxError();
                 break;
         }
+        indent--;
     }
 
     public static void optionalRelationalPart() {
+		if ( PRINT_PARSE_TREE ) System.out.printf(""+String.format("%1$" + LAPad + "s", Lookahead)+" ->"+String.format("%1$" + (indent++*3+1) + "s", "")
+				+"OptionalRelationalPart"+"\n");
         switch (Lookahead) {
             case "MP_EQUAL":
             case "MP_GEQUAL":
@@ -848,9 +1017,12 @@ public class NonTerminals {
                 syntaxError();
                 break;
         }
+        indent--;
     }
 
     public static void relationalOperator() {
+		if ( PRINT_PARSE_TREE ) System.out.printf(""+String.format("%1$" + LAPad + "s", Lookahead)+" ->"+String.format("%1$" + (indent++*3+1) + "s", "")
+				+"RelationalOperator"+"\n");
         switch (Lookahead) {
             case "MP_EQUAL":
                 match("MP_EQUAL");
@@ -874,9 +1046,12 @@ public class NonTerminals {
                 syntaxError();
                 break;
         }
+        indent--;
     }
 
     public static void simpleExpression() {
+		if ( PRINT_PARSE_TREE ) System.out.printf(""+String.format("%1$" + LAPad + "s", Lookahead)+" ->"+String.format("%1$" + (indent++*3+1) + "s", "")
+				+"SimpleExpression"+"\n");
         switch (Lookahead) {
             case "MP_FALSE":
             case "MP_NOT":
@@ -896,10 +1071,12 @@ public class NonTerminals {
                 syntaxError();
                 break;
         }
-
+        indent--;
     }
 
     public static void termTail() {
+		if ( PRINT_PARSE_TREE ) System.out.printf(""+String.format("%1$" + LAPad + "s", Lookahead)+" ->"+String.format("%1$" + (indent++*3+1) + "s", "")
+				+"TermTail"+"\n");
         switch (Lookahead) {
             case "MP_PLUS":
             case "MP_MINUS":
@@ -929,10 +1106,12 @@ public class NonTerminals {
                 syntaxError();
                 break;
         }
-
+        indent--;
     }
 
     public static void optionalSign() {
+		if ( PRINT_PARSE_TREE ) System.out.printf(""+String.format("%1$" + LAPad + "s", Lookahead)+" ->"+String.format("%1$" + (indent++*3+1) + "s", "")
+				+"OptionalSign"+"\n");
         switch (Lookahead) {
             case "MP_PLUS":
                 match("MP_PLUS");
@@ -953,9 +1132,12 @@ public class NonTerminals {
                 syntaxError();
                 break;
         }
-    }
+        indent--;
+  }
 
     public static void addingOperator() {
+		if ( PRINT_PARSE_TREE ) System.out.printf(""+String.format("%1$" + LAPad + "s", Lookahead)+" ->"+String.format("%1$" + (indent++*3+1) + "s", "")
+				+"AddingOperator"+"\n");
         switch (Lookahead) {
             case "MP_PLUS":
                 match("MP_PLUS");
@@ -970,9 +1152,12 @@ public class NonTerminals {
                 syntaxError();
                 break;
         }
+        indent--;
     }
 
     public static void term() {
+		if ( PRINT_PARSE_TREE ) System.out.printf(""+String.format("%1$" + LAPad + "s", Lookahead)+" ->"+String.format("%1$" + (indent++*3+1) + "s", "")
+				+"Term"+"\n");
         switch (Lookahead) {
             case "MP_FALSE":
             case "MP_NOT":
@@ -988,9 +1173,12 @@ public class NonTerminals {
             default:
                 syntaxError();
         }
+        indent--;
     }
 
     public static void factorTail() {
+		if ( PRINT_PARSE_TREE ) System.out.printf(""+String.format("%1$" + LAPad + "s", Lookahead)+" ->"+String.format("%1$" + (indent++*3+1) + "s", "")
+				+"FactorTail"+"\n");
         switch (Lookahead) {
             case "MP_DO":
             case "MP_DOWNTO":
@@ -1026,9 +1214,12 @@ public class NonTerminals {
                 emptyStatement();
                 break;
         }
+        indent--;
     }
 
     public static void multiplyingOperator() {
+		if ( PRINT_PARSE_TREE ) System.out.printf(""+String.format("%1$" + LAPad + "s", Lookahead)+" ->"+String.format("%1$" + (indent++*3+1) + "s", "")
+				+"MultiplyingOperator"+"\n");
         switch (Lookahead) {
             case "MP_TIMES":
                 match("MP_TIMES");
@@ -1046,12 +1237,15 @@ public class NonTerminals {
                 syntaxError();
                 break;
         }
+        indent--;
     }
 
     public static void factor() {
+		if ( PRINT_PARSE_TREE ) System.out.printf(""+String.format("%1$" + LAPad + "s", Lookahead)+" ->"+String.format("%1$" + (indent++*3+1) + "s", "")
+				+"Factor"+"\n");
         switch (Lookahead) {
-            case "MP_INT_LIT":
-                match("MP_INT_LIT");
+            case "MP_INTEGER_LIT":
+                match("MP_INTEGER_LIT");
                 break;
             case "MP_FLOAT_LIT":
                 match("MP_FLOAT_LIT");
@@ -1082,9 +1276,12 @@ public class NonTerminals {
                 syntaxError();
                 break;
         }
+        indent--;
     }
 
     public static void programIdentifier() {
+		if ( PRINT_PARSE_TREE ) System.out.printf(""+String.format("%1$" + LAPad + "s", Lookahead)+" ->"+String.format("%1$" + (indent++*3+1) + "s", "")
+				+"ProgramIdentifier"+"\n");
         switch (Lookahead) {
             case "MP_IDENTIFIER":
                 match("MP_IDENTIFIER");
@@ -1093,9 +1290,12 @@ public class NonTerminals {
                 syntaxError();
                 break;
         }
+        indent--;
     }
 
     public static void variableIdentifier() {
+		if ( PRINT_PARSE_TREE ) System.out.printf(""+String.format("%1$" + LAPad + "s", Lookahead)+" ->"+String.format("%1$" + (indent++*3+1) + "s", "")
+				+"VariableIdentifier"+"\n");
         switch (Lookahead) {
             case "MP_IDENTIFIER":
                 match("MP_IDENTIFIER");
@@ -1104,9 +1304,12 @@ public class NonTerminals {
                 syntaxError();
                 break;
         }
+        indent--;
     }
 
     public static void procedureIdentifier() {
+		if ( PRINT_PARSE_TREE ) System.out.printf(""+String.format("%1$" + LAPad + "s", Lookahead)+" ->"+String.format("%1$" + (indent++*3+1) + "s", "")
+				+"ProcedureIdentifier"+"\n");
         switch (Lookahead) {
             case "MP_IDENTIFIER":
                 match("MP_IDENTIFIER");
@@ -1115,9 +1318,12 @@ public class NonTerminals {
                 syntaxError();
                 break;
         }
+        indent--;
     }
 
     public static void functionIdentifier() {
+		if ( PRINT_PARSE_TREE ) System.out.printf(""+String.format("%1$" + LAPad + "s", Lookahead)+" ->"+String.format("%1$" + (indent++*3+1) + "s", "")
+				+"FunctionIdentifier"+"\n");
         switch (Lookahead) {
             case "MP_IDENTIFIER":
                 match("MP_IDENTIFIER");
@@ -1126,9 +1332,12 @@ public class NonTerminals {
                 syntaxError();
                 break;
         }
+        indent--;
     }
 
     public static void booleanExpression() {
+		if ( PRINT_PARSE_TREE ) System.out.printf(""+String.format("%1$" + LAPad + "s", Lookahead)+" ->"+String.format("%1$" + (indent++*3+1) + "s", "")
+				+"BooleanExpression"+"\n");
         switch (Lookahead) {
             case "MP_FALSE":
             case "MP_NOT":
@@ -1146,9 +1355,12 @@ public class NonTerminals {
                 syntaxError();
                 break;
         }
+        indent--;
     }
 
     public static void ordinalExpression() {
+		if ( PRINT_PARSE_TREE ) System.out.printf(""+String.format("%1$" + LAPad + "s", Lookahead)+" ->"+String.format("%1$" + (indent++*3+1) + "s", "")
+				+"OrdinalExpression"+"\n");
         switch (Lookahead) {
             case "MP_FALSE":
             case "MP_NOT":
@@ -1166,9 +1378,12 @@ public class NonTerminals {
                 syntaxError();
                 break;
         }
+        indent--;
     }
 
     public static void identifierList() {
+		if ( PRINT_PARSE_TREE ) System.out.printf(""+String.format("%1$" + LAPad + "s", Lookahead)+" ->"+String.format("%1$" + (indent++*3+1) + "s", "")
+				+"IdentifierList"+"\n");
         switch (Lookahead) {
             case "MP_IDENTIFIER":
                 match("MP_IDENTIFIER");
@@ -1178,9 +1393,12 @@ public class NonTerminals {
                 syntaxError();
                 break;
         }
+        indent--;
     }
 
     public static void identifierTail() {
+		if ( PRINT_PARSE_TREE ) System.out.printf(""+String.format("%1$" + LAPad + "s", Lookahead)+" ->"+String.format("%1$" + (indent++*3+1) + "s", "")
+				+"IdentifierTail"+"\n");
         switch (Lookahead) {
             case "MP_COMMA":
                 match("MP_COMMA");
@@ -1193,5 +1411,6 @@ public class NonTerminals {
                 syntaxError();
                 break;
         }
+        indent--;
     }
 }

@@ -11,12 +11,13 @@ public class testDriver_ParseAllTokens {
 	public static void main(String[] args) {
 		File testFile;
 
-		if( args.length == 0 )
+		if( args.length == 0 ) 
 		{
 			System.out.println("No input file given, ALL IS LOST. ABANDON SHIP!!!!!!!!!!!!!!!!");
 			//testFile = new File("C:\\Users\\Stephen Bush\\Documents\\Test.txt");
-			testFile = new File("C:\\Users\\Stephen Bush\\Documents\\Test_Program.txt");
+			//testFile = new File("C:\\Users\\Stephen Bush\\Documents\\Test_Program.txt");
 			//testFile = new File("C:\\Users\\Stephen Bush\\workspace\\HashList\\src\\hashList\\HashList.java");
+			testFile = new File("TestPrograms/Test_Program_1.txt");
 		}
 		else
 		{
@@ -41,7 +42,7 @@ public class testDriver_ParseAllTokens {
 		}
 		
 		System.out.println("Parsing...");
-		NonTerminals_OLD.parse(list);
+		NonTerminals.start(list);
 		
 	}
 }
