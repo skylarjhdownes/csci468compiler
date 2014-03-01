@@ -94,6 +94,14 @@ public class FSA_StrSymbol extends Tokenizer {
 				break;
 
 
+			// **Stephen**: Added this case for the Minus symbol, it got left out somehow
+			case '-':
+				lex += nextChar;
+				retTok = new Token(lex, "MP_MINUS", line, col);
+				foundToken = true;
+				break;
+
+
 			case '(':
 				lex += nextChar;
 				retTok = new Token(lex, "MP_LPAREN", line, col);
