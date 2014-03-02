@@ -284,7 +284,7 @@ public class NonTerminals {
                 match("MP_FUNCTION");
                 functionIdentifier();
                 optionalFormalParameterList();
-                // match("MP_COLON"); <-- **Stephen**:  Why was this one in here??  Looking at rule #20, there is no colon in there. 
+                match("MP_COLON"); // <-- **Stephen**:  Why was this one in here??  Looking at rule #20, there is no colon in there. 
                 type();
                 break;
             default: // syntaxError
@@ -304,10 +304,7 @@ public class NonTerminals {
                 formalParameterSectionTail();
                 match("MP_RPAREN");
                 break;
-            case "MP_BOOLEAN":
-            case "MP_FLOAT":
-            case "MP_INTEGER":
-            case "MP_STRING":
+            case "MP_COLON":
             case "MP_SCOLON":
                 break;
             default: // syntaxError
@@ -577,7 +574,7 @@ public class NonTerminals {
 		if ( PRINT_PARSE_TREE ) System.out.printf(""+String.format("%1$" + LAPad + "s", Lookahead)+" ->"+String.format("%1$" + (indent++*3+1) + "s", "")
 				+"ReadParameter"+"\n");
         switch (Lookahead) {
-            case "MP_Identifier":
+            case "MP_IDENTIFIER":
                 variableIdentifier();
                 break;
 
@@ -638,6 +635,7 @@ public class NonTerminals {
         switch (Lookahead) {
             case "MP_PLUS":
             case "MP_MINUS":
+            case "MP_FIXED_LIT":// **Stephen: Added FIXED_LIT
             case "MP_FLOAT_LIT":
             case "MP_STRING_LIT":
             case "MP_INTEGER_LIT":
@@ -806,6 +804,7 @@ public class NonTerminals {
             case "MP_PLUS":
             case "MP_MINUS":
             case "MP_INTEGER_LIT":
+            case "MP_FIXED_LIT":// **Stephen: Added FIXED_LIT
             case "MP_FLOAT_LIT":
             case "MP_STRING_LIT":
             case "MP_TRUE":
@@ -848,6 +847,7 @@ public class NonTerminals {
             case "MP_PLUS":
             case "MP_MINUS":
             case "MP_INTEGER_LIT":
+            case "MP_FIXED_LIT":// **Stephen: Added FIXED_LIT
             case "MP_FLOAT_LIT":
             case "MP_STRING_LIT":
             case "MP_TRUE":
@@ -869,10 +869,14 @@ public class NonTerminals {
 		if ( PRINT_PARSE_TREE ) System.out.printf(""+String.format("%1$" + LAPad + "s", Lookahead)+" ->"+String.format("%1$" + (indent++*3+1) + "s", "")
 				+"ProcedureStatment"+"\n");
         switch (Lookahead) {
-            case "MP_IDENTIFIER":
-                procedureIdentifier();
-                optionalActualParameterList();
-                break;
+            //case "MP_IDENTIFIER":
+            //    procedureIdentifier();
+            //    optionalActualParameterList();
+            //    break;
+        
+        	case "MP_LPAREN":
+        		optionalActualParameterList();
+        		break;
 
             default: // syntaxError OR Empty-String
                 syntaxError();
@@ -949,6 +953,7 @@ public class NonTerminals {
             case "MP_PLUS":
             case "MP_MINUS":
             case "MP_INTEGER_LIT":
+            case "MP_FIXED_LIT":// **Stephen: Added FIXED_LIT
             case "MP_FLOAT_LIT":
             case "MP_STRING_LIT":
             case "MP_TRUE":
@@ -972,6 +977,7 @@ public class NonTerminals {
             case "MP_PLUS":
             case "MP_MINUS":
             case "MP_INTEGER_LIT":
+            case "MP_FIXED_LIT":// **Stephen: Added FIXED_LIT
             case "MP_FLOAT_LIT":
             case "MP_STRING_LIT":
             case "MP_TRUE":
@@ -1004,7 +1010,7 @@ public class NonTerminals {
                 break;
             case "MP_DO":
             case "MP_DOWNTO":
-            case "MP_ElSE":
+            case "MP_ELSE":
             case "MP_END":
             case "MP_THEN":
             case "MP_TO":
@@ -1033,14 +1039,14 @@ public class NonTerminals {
             case "MP_GTHAN":
                 match("MP_GTHAN");
                 break;
-            case "MP_GQUAL":
-                match("MP_GQUAL");
+            case "MP_GEQUAL":
+                match("MP_GEQUAL");
                 break;
-            case "MP_LQUAL":
-                match("MP_LQUAL");
+            case "MP_LEQUAL":
+                match("MP_LEQUAL");
                 break;
-            case "MP_NQUAL":
-                match("MP_NQUAL");
+            case "MP_NEQUAL":
+                match("MP_NEQUAL");
                 break;
             default:
                 syntaxError();
@@ -1058,6 +1064,7 @@ public class NonTerminals {
             case "MP_TRUE":
             case "MP_IDENTIFIER":
             case "MP_INTEGER_LIT":
+            case "MP_FIXED_LIT":// **Stephen: Added FIXED_LIT
             case "MP_FLOAT_LIT":
             case "MP_STRING_LIT":
             case "MP_LPAREN":
@@ -1093,7 +1100,7 @@ public class NonTerminals {
             case "MP_NEQUAL":
             case "MP_DO":
             case "MP_DOWNTO":
-            case "MP_ElSE":
+            case "MP_ELSE":
             case "MP_END":
             case "MP_THEN":
             case "MP_TO":
@@ -1124,6 +1131,7 @@ public class NonTerminals {
             case "MP_TRUE":
             case "MP_IDENTIFIER":
             case "MP_INTEGER_LIT":
+            case "MP_FIXED_LIT":// **Stephen: Added FIXED_LIT
             case "MP_FLOAT_LIT":
             case "MP_STRING_LIT":
             case "MP_LPAREN":
@@ -1164,6 +1172,7 @@ public class NonTerminals {
             case "MP_TRUE":
             case "MP_IDENTIFIER":
             case "MP_INTEGER_LIT":
+            case "MP_FIXED_LIT":// **Stephen: Added FIXED_LIT
             case "MP_FLOAT_LIT":
             case "MP_STRING_LIT":
             case "MP_LPAREN":
@@ -1228,7 +1237,10 @@ public class NonTerminals {
                 match("MP_FLOAT_DIVIDE");
                 break;
             case "MP_DIV":
-                match("MP_INT_DIV");
+                match("MP_DIV");
+                break;
+            case "MP_MOD":
+                match("MP_MOD");
                 break;
             case "MP_AND":
                 match("MP_AND");
@@ -1247,8 +1259,11 @@ public class NonTerminals {
             case "MP_INTEGER_LIT":
                 match("MP_INTEGER_LIT");
                 break;
-            case "MP_FLOAT_LIT":
+            case "MP_FLOAT_LIT":  
                 match("MP_FLOAT_LIT");
+                break;
+            case "MP_FIXED_LIT":// **Stephen: Added FIXED_LIT
+                match("MP_FIXED_LIT");
                 break;
             case "MP_STRING_LIT":
                 match("MP_STRING_LIT");
@@ -1344,6 +1359,7 @@ public class NonTerminals {
             case "MP_TRUE":
             case "MP_IDENTIFIER":
             case "MP_INTEGER_LIT":
+            case "MP_FIXED_LIT":// **Stephen: Added FIXED_LIT
             case "MP_FLOAT_LIT":
             case "MP_STRING_LIT":
             case "MP_LPAREN":
@@ -1367,6 +1383,7 @@ public class NonTerminals {
             case "MP_TRUE":
             case "MP_IDENTIFIER":
             case "MP_INTEGER_LIT":
+            case "MP_FIXED_LIT":// **Stephen: Added FIXED_LIT
             case "MP_FLOAT_LIT":
             case "MP_STRING_LIT":
             case "MP_LPAREN":
