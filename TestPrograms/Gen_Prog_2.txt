@@ -1,0 +1,28 @@
+program ID;
+    
+    procedure ID;
+       
+       function ID: float;
+          
+          function ID: float;
+             
+             begin
+                 for ID:=+ false to not true or true< 42 do while+ not false do
+             end;
+          
+          begin
+              if true div 3.14159 then repeat repeat for ID:=+ not( 3.14159 mod ID) div 42 downto 42 do
+             begin
+                ;
+                
+             end until"STRING" until not 42- false else write( ID,"STRING"/ false>="STRING")
+       end;
+    
+    begin
+       ;
+       
+    end;
+ 
+ begin
+     ID
+ end.

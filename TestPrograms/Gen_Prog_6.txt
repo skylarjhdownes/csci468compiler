@@ -1,0 +1,152 @@
+program ID;
+    
+    procedure ID( var ID, ID, ID: integer;
+        ID, ID: string;
+        var ID, ID: integer);
+        var ID: string;
+       
+       procedure ID( ID: boolean);
+          
+          function ID( ID: boolean): float;
+              var ID, ID: integer;
+             
+             procedure ID;
+                
+                function ID( ID: boolean): boolean;
+                   
+                   procedure ID( var ID: boolean);
+                      
+                      begin
+                         
+                      end;
+                   
+                   function ID: float;
+                      
+                      begin
+                         ;
+                          while( not( "STRING")) do repeat repeat until( false);
+                          for ID:= true/ false<+ ID downto false do if ID(+ "STRING") mod "STRING" and 42 then ID;
+                          write( ID/ true,- 42) until ID;
+                          repeat writeln( 42) until+ 42<> ID;
+                         
+                      end;
+                   
+                   begin
+                       repeat repeat ID until "STRING"* ID= false mod 42 until "STRING"<> ID/ 3.14159
+                   end;
+                
+                begin
+                    writeln((+ 42 and ID), true and ID, ID, ID= ID)
+                end;
+             
+             function ID( var ID: boolean;
+                 var ID, ID, ID, ID, ID, ID: float): integer;
+                
+                begin
+                    writeln( 42)
+                end;
+             
+             function ID: integer;
+                
+                procedure ID;
+                   
+                   begin
+                       while false<> 42 mod "STRING" and false do ID;
+                      ;
+                       while "STRING" do while ID do for ID:=+ false= true downto+ 3.14159<> ID do while not 42/ false* ID do repeat until+ not false;
+                      ;
+                      
+                   end;
+                
+                procedure ID( ID: string);
+                   
+                   begin
+                       while 3.14159<>+ not ID do
+                      begin
+                          ID
+                      end
+                   end;
+                
+                begin
+                    writeln( true< false-( 3.14159>( not( "STRING"* false)- true* not false<> "STRING"- not 3.14159 and not 42 div 3.14159)) or( 42 div( 3.14159-( 3.14159<>- not 42) or 3.14159> ID/ ID and false div false div not false+ "STRING")));
+                    if not false then write( ID( not not(((+ not "STRING">= 42)/ not ID* not false))- ID, "STRING"/ false mod false- not "STRING", false, 42>+ ID))
+                end;
+             
+             procedure ID;
+                
+                begin
+                   
+                end;
+             
+             function ID: float;
+                
+                begin
+                    writeln(- "STRING")
+                end;
+             
+             begin
+                 writeln( "STRING"-( not not( 3.14159- not "STRING")));
+                
+             end;
+          
+          procedure ID;
+             
+             begin
+                 repeat if "STRING" and 42 then if- not(( false> 42+ not "STRING")<> 3.14159) div ID then until 42 mod 42 div false
+             end;
+          
+          function ID: float;
+             
+             begin
+                 read( ID, ID)
+             end;
+          
+          begin
+              ID;
+              write( "STRING" and not not ID<= not "STRING"+ 42 or true or ID)
+          end;
+       
+       procedure ID;
+          
+          begin
+             ;
+             
+          end;
+       
+       function ID: integer;
+           var ID: float;
+          
+          begin
+              for ID:= true to not 3.14159<> 42 do while false or ID+ not "STRING"<> false do if- 3.14159- "STRING" or ID then
+             begin
+                 while true and "STRING" div "STRING" do;
+                 read( ID)
+             end
+          end;
+       
+       begin
+          ;
+           repeat
+          begin
+              repeat ID until ID
+          end;
+           until false;
+           if 42= false then
+       end;
+    
+    procedure ID;
+       
+       begin
+           read( ID)
+       end;
+    
+    function ID: float;
+        var ID: string;
+       
+       begin
+           writeln( 42 and( not( false>=- not ID div( 42 div false and true mod true mod ID))),( false>=(- "STRING")), not not( true* ID) mod "STRING")
+       end;
+    
+    begin
+       
+    end.
