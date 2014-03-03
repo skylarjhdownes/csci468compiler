@@ -1,0 +1,13 @@
+program ID;
+    
+    function ID: string;
+       
+       begin
+          ;
+          
+       end;
+    
+    begin
+        if+ ID then writeln(42<42,"STRING"+ true);
+       
+    end.
