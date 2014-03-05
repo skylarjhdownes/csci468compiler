@@ -5,12 +5,10 @@ import java.util.Scanner;
 
 public class testDriver 
 {
-	private static Scanner reader;
-
 	public static void main(String[] args) throws java.io.IOException
 	{
 		File testFile;
-		reader = new Scanner(System.in);
+		Scanner reader = new Scanner(System.in);
 		
 		if( args.length == 0 )
 		{
@@ -46,7 +44,7 @@ public class testDriver
 			while ( sc.hasNextToken() ) 
 			{
 				current = sc.getToken();
-//				System.out.println("Token>>  "+"Ln:   "+current.getLineNumber()+"\tCl: "+current.getColumnNumber()+"\t\tType:  "+current.getToken()+"\t\tLex:  "+current.getLexeme());
+				System.out.println("Token>>  "+"Ln:   "+current.getLineNumber()+"\tCl: "+current.getColumnNumber()+"\t\tType:  "+current.getToken()+"\t\tLex:  "+current.getLexeme());
 				current.getToken();
 			}
 		}
