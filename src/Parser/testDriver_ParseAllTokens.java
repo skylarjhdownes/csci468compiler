@@ -18,8 +18,11 @@ public class testDriver_ParseAllTokens {
 			//testFile = new File("C:\\Users\\Stephen Bush\\Documents\\Test_Program.txt");
 			//testFile = new File("C:\\Users\\Stephen Bush\\workspace\\HashList\\src\\hashList\\HashList.java");
 			//testFile = new File("TestPrograms/Test_Program_1.txt");
-			testFile = new File("TestPrograms/Gen_Prog_7.txt");
-		}
+			//testFile = new File("TestPrograms/Gen_Prog_7.txt");
+			//testFile = new File("TestPrograms/Gen_Prog_5.txt");
+
+			testFile = new File("TestPrograms/MicroPascalProgramGenerator/Share/TestProgram4.txt");
+}
 		else
 		{
 			testFile = new File(args[0]);

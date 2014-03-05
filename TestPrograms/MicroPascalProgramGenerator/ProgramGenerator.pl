@@ -9,10 +9,7 @@
 use Switch;
 use strict;
 
-my $FLAG_DEBUG_1 = 0;
-my $indent = 1;
-my $RecLimit = 50;
-
+# Build out the LL table
 my @LLTable;
 $LLTable[0][19] = 1;
 $LLTable[1][19] = 2;
@@ -79,16 +76,33 @@ $LLTable[61][31] = 113;
 $LLTable[62][37] = 115;$LLTable[62][38] = 114;
 
 
+# Inflated the StatementTail row with extra cells, to make it generate statements more often.
+$LLTable[21][0] = 32;$LLTable[21][1] = 32;$LLTable[21][2] = 32;$LLTable[21][3] = 32;$LLTable[21][4] = 32;$LLTable[21][5] = 32;$LLTable[21][6] = 32;
 
 
-processTerm(50);
+my $FLAG_DEBUG_1 = 0;
+my $indent = 0;
+my $RecLimit = 20;
+my $RecScale = -1;
+
+
+# Start with rule 1 to build a full program
+executeRule(1); # Rule -> SystemGoal
+
+# Here are some examples of alternate start points, and how to start them.
+   # Start with the ProcedureAndFunctionDeclarationPart term, which can begin a function, procedure, or go to the empty-string.
+#processTerm(31); # ProcedureAndFunctionDeclarationPart
+
+   # Start with a statement, which can be followed by any number of other statements. (Or none.)
+#processTerm(45); # Statement
+
 
 exit(0);
 
-
+# This method processes all of the terms in the grammar, either by resolving and printing all terminals, or by expanding non-terminals by randomly selecting a valid rule.
 sub processTerm {
 	my $sw = @_[0];
-	if ( $FLAG_DEBUG_1 ) { print("Process Term:  ".$sw."\n"); }
+	if ( $FLAG_DEBUG_1 >= 1 ) { print("Process Term:  ".$sw."\n"); }
 	switch ( $sw ) {
 		case 1 { #ActualParameter 
 			executeRule(chooseRandomNextTerm(43));
@@ -452,15 +466,16 @@ sub processTerm {
 	}
 }
 
+# This method prints an indent at the beginning of each line based on the nesting level.
 sub printIndent() {
 	print("\n");
 	printf("%".$indent."s"," ");
 }
 
-
+# This method processes all of the rules in the CFG by calling processTerm() on every term in each rule.
 sub executeRule {	
 	my $sw = @_[0];
-	if ( $FLAG_DEBUG_1 ) { print("Execute Rule:  ".$sw."\n"); }
+	if ( $FLAG_DEBUG_1 >= 1 ) { print("Execute Rule:  ".$sw."\n"); }
 	switch ( $sw ) {
 		case 1 {
 			processTerm(36);
@@ -811,6 +826,7 @@ sub executeRule {
 		}
 
 		case 67 {
+			#print("<<<<{PROCEDURE STATEMENT}>>>>");
 			processTerm(34);
 			processTerm(25);
 		}
@@ -1030,20 +1046,25 @@ sub executeRule {
 	}
 }
 
+# This method chooses random cells in the LL table until it selects one that isnt empty (thus, isnt a syntax error).
 sub chooseRandomNextTerm {
 	my $Row = @_[0];
-	if ( $FLAG_DEBUG_1 ) { print("Selecting a Rule for:  ".$Row."\n"); }
+	if ( $FLAG_DEBUG_1 >= 2 ) { print("Selecting a Rule for:  ".$Row."\n"); }
 	
 	# SPECIAL CASE: Non-Terminal #8, ProcedureAndFunctionDeclarationPart.  If the recursion level is too high, manually force it to return the empty string for the sake of program termination.  (It tends to enter an infinite sequence of nested procedure/function declarations.
 	if ( $Row == 8 && $indent > $RecLimit ) { 
-		$RecLimit -= 1;
+		$RecLimit += $RecScale;
 		return 16; 
 	}
-	
+
 	my $testInd;
 	do {
 		$testInd = int(rand()*57);
-		if ( $FLAG_DEBUG_1 ) { print("Trying: ".$testInd."     == ".$LLTable[$Row][$testInd]."\n"); }
+		if ( $FLAG_DEBUG_1 >= 2 ) { print("Trying: ".$testInd."     == ".$LLTable[$Row][$testInd]."\n"); }
+		if ( $Row == 22 ) { if ( $indent > $RecLimit ) { if ( $LLTable[$Row][$testInd] == 35 ) { 
+			# $RecLimit += $RecScale; 
+			next; 
+		} } }
 	} while ( $LLTable[$Row][$testInd] == undef );
 	
 	return $LLTable[$Row][$testInd];
