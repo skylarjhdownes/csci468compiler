@@ -130,14 +130,11 @@ public class FSA_StrSymbol extends Tokenizer {
 				break;
 
 
-			case'"':
+			case'\'':
 				lex+= nextChar;
 				try{
 					nextChar = myScanner.getNextChar();
-					while(nextChar != '"'){
-						if(nextChar == '\''){//contains apostrophe
-							throw new ApoExc();
-						}
+					while(nextChar != '\''){
 						if (nextChar == '\r' || nextChar == '\n' ) {
 							throw new IndexOutOfBoundsException();
 						}
@@ -152,10 +149,6 @@ public class FSA_StrSymbol extends Tokenizer {
 					retTok = new Token(lex, "MP_RUN_STRING", line, col);
 					foundToken = true;
 				}
-				catch(ApoExc e){
-					retTok = new Token("", "MP_ERROR_APOSTROPHE_IN_STRING", line, col);
-					foundToken = true;
-				}
 				break;
 
 			default:
@@ -165,12 +158,4 @@ public class FSA_StrSymbol extends Tokenizer {
 			}//end switch
 		return retTok;
 	}
-}
-
-class ApoExc extends Exception{
-	public ApoExc(){}
-	public ApoExc(String mes){
-		super(mes);
-	}
-
 }
