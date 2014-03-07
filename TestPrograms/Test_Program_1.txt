@@ -1,0 +1,29 @@
+program lab1;
+    var  apple, candy: integer;
+       y: float;
+       zebra, xyz: integer;
+       
+   procedure mixit(a, b: integer; var x: float);
+      var pony: integer;
+      
+      function fred(var q: float) integer;
+      
+         begin 
+
+           fred := q + 1;
+     end;
+     
+     function mary(x: integer) integer;
+     
+        begin
+           mary := x - 1;
+        end;
+        
+
+    begin
+        pony := a + b;
+    end;
+    
+  begin
+        write(zebra)
+  end.

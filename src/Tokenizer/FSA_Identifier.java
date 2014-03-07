@@ -132,13 +132,14 @@ public class FSA_Identifier extends Tokenizer {
 				
 				// Check this token against a list of known strings
 				if ( lastAcceptableLexeme.equals("begin") ) token = "MP_BEGIN";
-				else if ( lastAcceptableLexeme.equals("Boolean") ) token = "MP_BOOLEAN";
+				else if ( lastAcceptableLexeme.equals("boolean") ) token = "MP_BOOLEAN";
+				else if ( lastAcceptableLexeme.equals("and") ) token = "MP_AND";
 				else if ( lastAcceptableLexeme.equals("div") ) token = "MP_DIV";
 				else if ( lastAcceptableLexeme.equals("do") ) token = "MP_DO";
 				else if ( lastAcceptableLexeme.equals("downto") ) token = "MP_DOWNTO";
 				else if ( lastAcceptableLexeme.equals("else") ) token = "MP_ELSE";
 				else if ( lastAcceptableLexeme.equals("end") ) token = "MP_END";
-				else if ( lastAcceptableLexeme.equals("FALSE") ) token = "MP_FALSE";
+				else if ( lastAcceptableLexeme.equals("false") ) token = "MP_FALSE";
 				else if ( lastAcceptableLexeme.equals("fixed") ) token = "MP_FIXED";
 				else if ( lastAcceptableLexeme.equals("float") ) token = "MP_FLOAT";
 				else if ( lastAcceptableLexeme.equals("for") ) token = "MP_FOR";
@@ -154,7 +155,7 @@ public class FSA_Identifier extends Tokenizer {
 				else if ( lastAcceptableLexeme.equals("repeat") ) token = "MP_REPEAT";
 				else if ( lastAcceptableLexeme.equals("string") ) token = "MP_STRING";
 				else if ( lastAcceptableLexeme.equals("then") ) token = "MP_THEN";
-				else if ( lastAcceptableLexeme.equals("TRUE") ) token = "MP_TRUE";
+				else if ( lastAcceptableLexeme.equals("true") ) token = "MP_TRUE";
 				else if ( lastAcceptableLexeme.equals("to") ) token = "MP_TO";
 				else if ( lastAcceptableLexeme.equals("until") ) token = "MP_UNTIL";
 				else if ( lastAcceptableLexeme.equals("var") ) token = "MP_VAR";
