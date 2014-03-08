@@ -56,8 +56,8 @@ public class SymbolTable {
     Every variable has size 1, so size is increased by one each time we make a new row, 
     with 1 being the starting size to save room for the display register value later
     */
-    public void addRow(String ID, String Kind, String Type, String returnValues, String inputParameters){
-        Row newRow = new Row(ID, Kind, Type, size++, 1, returnValues, inputParameters);
+    public void addRow(String ID, String kind, String type, String returnValues, String inputParameters){
+        Row newRow = new Row(ID, kind, type, size++, 1, returnValues, inputParameters);
         items.add(newRow);
     }
     
@@ -68,11 +68,11 @@ public class SymbolTable {
     public Row findVariable(String id){
         
         Row returnRow;
-        ListIterator it = items.listIterator();
+        ListIterator<Row> it = items.listIterator();
         
         while (it.hasNext()){
             returnRow = it.next();
-            if(returnRow.getID = id){
+            if(returnRow.getID() == id){
                 return returnRow;
             }
         }
