@@ -8,14 +8,14 @@ program ID;
           begin
               if 42 then read( ID, ID) else
              begin
-                 write( "STRING", "STRING"* "STRING"< true* true and "STRING")
+                 write( 'STRING', 'STRING'* 'STRING'< true* true and 'STRING')
              end
        end;
     
     procedure ID;
        
        begin
-           repeat read( ID) until "STRING"
+           repeat read( ID) until 'STRING'
        end;
     
     function ID: integer;
@@ -36,7 +36,7 @@ program ID;
              procedure ID;
                 
                 begin
-                    repeat if "STRING" then;
+                    repeat if 'STRING' then;
                     until ID> not 42
                 end;
              
@@ -78,14 +78,14 @@ program ID;
        procedure ID;
           
           begin
-              for ID:= 42<+ true to "STRING" do read( ID)
+              for ID:= 42<+ true to 'STRING' do read( ID)
           end;
        
        procedure ID;
            var ID, ID, ID: integer;
           
           begin
-              while true/(- not 3.14159 div 42) do if "STRING" mod true then writeln(+ 3.14159> not 42, 42, false,( false), false, false)
+              while true/(- not 3.14159 div 42) do if 'STRING' mod true then writeln(+ 3.14159> not 42, 42, false,( false), false, false)
           end;
        
        begin

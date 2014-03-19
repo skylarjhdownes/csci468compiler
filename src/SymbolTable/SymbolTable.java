@@ -110,11 +110,12 @@ public class SymbolTable {
             current.printRow();
         }
 
+        SymbolTable currentTable;
         ListIterator<SymbolTable> childs = children.listIterator();
         while (childs.hasNext()) {//tell the children to print
 
-            current = childs.next();
-            current.printTableFromHere();
+        	currentTable = childs.next();
+        	currentTable.printTableFromHere();
         }
     }
 
@@ -137,11 +138,11 @@ public class SymbolTable {
                 current.printRow();
             }
 
+            SymbolTable currentTable;
             ListIterator<SymbolTable> childs = children.listIterator();
             while (childs.hasNext()) {//tell the children to print
-
-                current = childs.next();
-                current.printTableFromHere();
+            	currentTable = childs.next();
+            	currentTable.printTableFromHere();
             }
         }
 

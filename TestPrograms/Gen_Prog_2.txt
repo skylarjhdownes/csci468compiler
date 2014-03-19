@@ -15,7 +15,7 @@ program ID;
              begin
                 ;
                 
-             end until"STRING" until not 42- false else write( ID,"STRING"/ false>="STRING")
+             end until'STRING' until not 42- false else write( ID,'STRING'/ false>='STRING')
        end;
     
     begin

@@ -24,15 +24,15 @@ program ID;
                       
                       begin
                          ;
-                          while( not( "STRING")) do repeat repeat until( false);
-                          for ID:= true/ false<+ ID downto false do if ID(+ "STRING") mod "STRING" and 42 then ID;
+                          while( not( 'STRING')) do repeat repeat until( false);
+                          for ID:= true/ false<+ ID downto false do if ID(+ 'STRING') mod 'STRING' and 42 then ID;
                           write( ID/ true,- 42) until ID;
                           repeat writeln( 42) until+ 42<> ID;
                          
                       end;
                    
                    begin
-                       repeat repeat ID until "STRING"* ID= false mod 42 until "STRING"<> ID/ 3.14159
+                       repeat repeat ID until 'STRING'* ID= false mod 42 until 'STRING'<> ID/ 3.14159
                    end;
                 
                 begin
@@ -51,9 +51,9 @@ program ID;
                 procedure ID;
                    
                    begin
-                       while false<> 42 mod "STRING" and false do ID;
+                       while false<> 42 mod 'STRING' and false do ID;
                       ;
-                       while "STRING" do while ID do for ID:=+ false= true downto+ 3.14159<> ID do while not 42/ false* ID do repeat until+ not false;
+                       while 'STRING' do while ID do for ID:=+ false= true downto+ 3.14159<> ID do while not 42/ false* ID do repeat until+ not false;
                       ;
                       
                    end;
@@ -68,8 +68,8 @@ program ID;
                    end;
                 
                 begin
-                    writeln( true< false-( 3.14159>( not( "STRING"* false)- true* not false<> "STRING"- not 3.14159 and not 42 div 3.14159)) or( 42 div( 3.14159-( 3.14159<>- not 42) or 3.14159> ID/ ID and false div false div not false+ "STRING")));
-                    if not false then write( ID( not not(((+ not "STRING">= 42)/ not ID* not false))- ID, "STRING"/ false mod false- not "STRING", false, 42>+ ID))
+                    writeln( true< false-( 3.14159>( not( 'STRING'* false)- true* not false<> 'STRING'- not 3.14159 and not 42 div 3.14159)) or( 42 div( 3.14159-( 3.14159<>- not 42) or 3.14159> ID/ ID and false div false div not false+ 'STRING')));
+                    if not false then write( ID( not not(((+ not 'STRING'>= 42)/ not ID* not false))- ID, 'STRING'/ false mod false- not 'STRING', false, 42>+ ID))
                 end;
              
              procedure ID;
@@ -81,18 +81,18 @@ program ID;
              function ID: float;
                 
                 begin
-                    writeln(- "STRING")
+                    writeln(- 'STRING')
                 end;
              
              begin
-                 writeln( "STRING"-( not not( 3.14159- not "STRING")));
+                 writeln( 'STRING'-( not not( 3.14159- not 'STRING')));
                 
              end;
           
           procedure ID;
              
              begin
-                 repeat if "STRING" and 42 then if- not(( false> 42+ not "STRING")<> 3.14159) div ID then until 42 mod 42 div false
+                 repeat if 'STRING' and 42 then if- not(( false> 42+ not 'STRING')<> 3.14159) div ID then until 42 mod 42 div false
              end;
           
           function ID: float;
@@ -103,7 +103,7 @@ program ID;
           
           begin
               ID;
-              write( "STRING" and not not ID<= not "STRING"+ 42 or true or ID)
+              write( 'STRING' and not not ID<= not 'STRING'+ 42 or true or ID)
           end;
        
        procedure ID;
@@ -117,9 +117,9 @@ program ID;
            var ID: float;
           
           begin
-              for ID:= true to not 3.14159<> 42 do while false or ID+ not "STRING"<> false do if- 3.14159- "STRING" or ID then
+              for ID:= true to not 3.14159<> 42 do while false or ID+ not 'STRING'<> false do if- 3.14159- 'STRING' or ID then
              begin
-                 while true and "STRING" div "STRING" do;
+                 while true and 'STRING' div 'STRING' do;
                  read( ID)
              end
           end;
@@ -144,7 +144,7 @@ program ID;
         var ID: string;
        
        begin
-           writeln( 42 and( not( false>=- not ID div( 42 div false and true mod true mod ID))),( false>=(- "STRING")), not not( true* ID) mod "STRING")
+           writeln( 42 and( not( false>=- not ID div( 42 div false and true mod true mod ID))),( false>=(- 'STRING')), not not( true* ID) mod 'STRING')
        end;
     
     begin
