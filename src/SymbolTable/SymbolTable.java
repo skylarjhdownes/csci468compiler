@@ -16,80 +16,148 @@ public class SymbolTable {
     int nestLevel;
     int size = 1;
     String tableName;
-    
+
     //main constructor needs a parent, the nesting level, and the name of the table
-    public SymbolTable(SymbolTable in_parent, int in_nest, String name){
+    private SymbolTable(SymbolTable in_parent, int in_nest, String name) {
         parent = in_parent;
         nestLevel = in_nest;
         tableName = name;
     }
-    public SymbolTable(){} //empty constructor if needed
-    
-    public String getName(){
+
+    public SymbolTable(String in_name) {
+        parent = null;
+        nestLevel = 1;
+        tableName = in_name;
+    }
+
+    public String getName() {
         return tableName;
     }
     
-    public int getNestingLevel(){
+    public int getNestingLevel() {
         return nestLevel;
     }
-    
-    public SymbolTable getParent(){
+
+    public SymbolTable getParent() {
         return parent;
     }
-    
-    public int getSize(){
+
+    public int getSize() {
         return size;
     }
-    
-    public void setName(String name){
+
+    public void setName(String name) {
         tableName = name;
     }
-    public void setNestingLevel(int level){
+
+    public void setNestingLevel(int level) {
         nestLevel = level;
     }
-    public void setParent(SymbolTable newParent){
+
+    public void setParent(SymbolTable newParent) {
         parent = newParent;
     }
-    
+
     /*
-    This method is just a skeleton until I know what Skylar's row class is like
-    Every variable has size 1, so size is increased by one each time we make a new row, 
-    with 1 being the starting size to save room for the display register value later
-    */
-    public void addRow(String ID, String Kind, String Type, String returnValues, String inputParameters){
-        Row newRow = new Row(ID, Kind, Type, size++, 1, returnValues, inputParameters);
+     This method is just a skeleton until I know what Skylar's row class is like
+     Every variable has size 1, so size is increased by one each time we make a new row, 
+     with 1 being the starting size to save room for the display register value later
+     */
+    public void addRow(String ID, String kind, String type, String returnValues, String inputParameters) {
+        Row newRow = new Row(ID, kind, type, size++, 1, returnValues, inputParameters);
         items.add(newRow);
     }
-    
+
     /*
-    This method will find and return the row for information regarding an ID, following 
-    the scope hierarchy. If no row with that particular ID is found, then null is returned
-    */
-    public Row findVariable(String id){
-        
+     This method will find and return the row for information regarding an ID, following 
+     the scope hierarchy. If no row with that particular ID is found, then null is returned
+     */
+    public Row findVariable(String id) {
+
         Row returnRow;
-        ListIterator it = items.listIterator();
-        
-        while (it.hasNext()){
+        ListIterator<Row> it = items.listIterator();
+
+        while (it.hasNext()) {
             returnRow = it.next();
-            if(returnRow.getID = id){
+            if (returnRow.getID() == id) {
                 return returnRow;
             }
         }
         //the row we're looking for isn't in our list, we'll check our parent
-        if(parent == null){ //have no parent, so variable doesn't exist
+        if (parent == null) { //have no parent, so variable doesn't exist
             return null;
-        }
-        else{
+        } else {
             return parent.findVariable(id);
-        }   
+        }
     }
-    
-    public SymbolTable makeNewTable(String name)
-    {
+
+    public SymbolTable makeNewTable(String name) {
         SymbolTable newTable = new SymbolTable(this, nestLevel + 1, name);
         children.add(newTable);
         return newTable;
+    }
+
+    /*
+     method will print from current table down, including all children, but no parent
+     */
+    public void printTableFromHere() {
+
+        Row current;
+        ListIterator<Row> myitems = items.listIterator();
+
+        while (myitems.hasNext()) {//prints items of current table
+            current = myitems.next();
+            current.printRow();
+        }
+
+        ListIterator<SymbolTable> childs = children.listIterator();
+        while (childs.hasNext()) {//tell the children to print
+
+            current = childs.next();
+            current.printTableFromHere();
+        }
+    }
+
+    /*
+     prints entire symbol table tree
+     */
+    public void printTableFromTop() {
+
+        if (parent != null) { //keeps traveling up the tree until we reach root parent
+            parent.printTableFromTop();
+        } 
+        
+        else { //we've are at the "root" table
+            
+            Row current;
+            ListIterator<Row> myitems = items.listIterator();
+            
+            while (myitems.hasNext()) {//prints items of current table
+                current = myitems.next();
+                current.printRow();
+            }
+
+            ListIterator<SymbolTable> childs = children.listIterator();
+            while (childs.hasNext()) {//tell the children to print
+
+                current = childs.next();
+                current.printTableFromHere();
+            }
+        }
+
+    }
+
+    /*
+     prints only this symbol table
+     */
+    public void print() {
+        Row current;
+        ListIterator<Row> myitems = items.listIterator();
+
+        while (myitems.hasNext()) {//prints items of current table
+            current = myitems.next();
+            current.printRow();
+        }
     }
 
 }
