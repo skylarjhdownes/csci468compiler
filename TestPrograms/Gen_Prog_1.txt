@@ -8,6 +8,6 @@ program ID;
        end;
     
     begin
-        if+ ID then writeln(42<42,"STRING"+ true);
+        if+ ID then writeln(42<42,'STRING'+ true);
        
     end.
