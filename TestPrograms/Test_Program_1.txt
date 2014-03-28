@@ -6,14 +6,14 @@ program lab1;
    procedure mixit(a, b: integer; var x: float);
       var pony: integer;
       
-      function fred(var q: float) integer;
+      function fred(var q: float) : integer;
       
          begin 
 
            fred := q + 1;
      end;
      
-     function mary(x: integer) integer;
+     function mary(x : integer) : integer;
      
         begin
            mary := x - 1;
