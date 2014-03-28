@@ -65,8 +65,8 @@ public class Row {
     	inputParameters = inputParameters_in;
     }
     
-    public void getSeparatedInputParameters() {
-    	//TODO
+    public String[] getSeparatedInputParameters() {
+    	return inputParameters.split(" ");
     }
     
 }
