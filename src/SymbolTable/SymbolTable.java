@@ -122,6 +122,9 @@ public class SymbolTable {
 
         Row current;
         ListIterator<Row> myitems = items.listIterator();
+        
+        System.out.println("Table: " + tableName + " NestingLevel: " + nestLevel + "  ---------------------------------------------------------------------------------");
+
 
         while (myitems.hasNext()) {//prints items of current table
             current = myitems.next();
@@ -150,6 +153,8 @@ public class SymbolTable {
             
             Row current;
             ListIterator<Row> myitems = items.listIterator();
+            
+            System.out.println("Table: " + tableName + " NestingLevel: " + nestLevel + "  ---------------------------------------------------------------------------------");
             
             while (myitems.hasNext()) {//prints items of current table
                 current = myitems.next();

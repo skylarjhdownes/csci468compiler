@@ -17,7 +17,7 @@ public class Row {
     
     public void printRow()
     {
-    	System.out.println(String.format("ID:%10s   Kind:%10s   Type:%10s   Offset:%2d   Size:%2d   ReturnValues:%7s   InputParam:%20s", ID, kind, type, offset, size, returnValues, inputParameters));
+    	System.out.println(String.format("ID:%10s   Kind:%10s   Type:%10s   Offset:%2d   Size:%2d   ReturnValues:%10s   InputParam:%30s", ID, kind, type, offset, size, returnValues, inputParameters));
     }
     
     public String getID() {

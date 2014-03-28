@@ -26,4 +26,4 @@ program lab1;
     
   begin
         write(zebra)
-  end;
+  end.
