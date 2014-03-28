@@ -1,6 +1,7 @@
 package Parser;
 
 import java.util.LinkedList;
+import SymbolTable.*;
 
 import Tokenizer.Token;
 
@@ -10,6 +11,10 @@ public class NonTerminals {
     static LinkedList<Token> tokens;
     static Token LATok;
     static String Lookahead;
+    static SymbolTable symTab;
+    static String lastID;//Jon: to store last ID
+    static String[] idList = new String[20];//Jon: used in identifierList() for keeping track of a list of id's before we know their type
+    static int idListIndex = 0;				//if we don't know their type, we can't add them to the symbol table yet.
 	
     // Variables for the parse-tree print
     static int indent = 0;
@@ -24,6 +29,8 @@ public class NonTerminals {
             
     		if ( PRINT_PARSE_TREE ) System.out.printf(""+String.format("%1$" + LAPad + "s", Lookahead)+" =="+String.format("%1$" + (indent*2+1) + "s", "")
     				+Lookahead+"\n");
+    		
+    		lastID = LATok.getLexeme();//**Jon: This is to store the last matched ID for use in adding to the symbol table afterwards
         	
         	if ( tokindex < tokens.size() ) {
         		LATok = tokens.get(tokindex++);
@@ -50,6 +57,23 @@ public class NonTerminals {
         return;
     }
 
+    private static void addProcedureToParent(SymbolTable myTable){
+    	
+    	String paramList = myTable.getParameters();
+    	String retType = "none";//Jon:Procedures don't have a return type
+    	
+    	myTable.getParent().addRow(myTable.getName(), "procedure", retType, retType, paramList); 	
+    	
+    }
+    
+    private static void addFunctionToParent(SymbolTable myTable){
+    	
+    	String paramList = myTable.getParameters();
+    	String retType = myTable.findVariable(myTable.getName()).getType();//Jon: find the return variable, and get its type. It will be the return type
+    	
+    	myTable.getParent().addRow(myTable.getName(), "function", retType, retType, paramList); 	
+    }
+    
     public static void start(LinkedList<Token> list) {
         tokens = list;
         tokindex = 1;
@@ -66,6 +90,7 @@ public class NonTerminals {
             	System.out.println(" (#1)"); // Rule #1
                 program();
                 match("MP_EOF");
+                symTab.printTableFromTop();
                 break;
 
             default: // syntaxError
@@ -101,6 +126,7 @@ public class NonTerminals {
             	System.out.println(" (#3)"); // Rule #3
                 match("MP_PROGRAM");
                 programIdentifier();
+                symTab = new SymbolTable(lastID);//creates initial symbol table for the program
                 break;
             default:
                 syntaxError();// syntaxError
@@ -167,7 +193,7 @@ public class NonTerminals {
                 match("MP_SCOLON");
                 variableDeclarationTail();
                 break;
-            default: // End thingy?
+            default:
                 syntaxError();
                 break;
         }
@@ -183,6 +209,11 @@ public class NonTerminals {
                 identifierList();
                 match("MP_COLON");
                 type();
+                for(int i = 0; i < idListIndex; i++){//Jon: go through our list of identifiers and add them to the symbol table now that we know their type
+                	symTab.addRow(idList[i], "var", lastID, "none", "none");//Jon: lastID should be set to the last type matched in type()
+                	idList[i] = "";//Jon: empty the spot after we've added it to the table
+                }
+                idListIndex = 0;//Jon: reset the index now that we're done with the array
                 break;
             default: // syntaxError
                 syntaxError();
@@ -252,6 +283,8 @@ public class NonTerminals {
                 match("MP_SCOLON");
                 block();
                 match("MP_SCOLON");
+                addProcedureToParent(symTab);//Jon: adds this procedure as a row to the parent class
+                symTab = symTab.getParent();//Jon: move the table back to it's parent because we're done with it at this point
                 break;
             default: // syntaxError
                 syntaxError();
@@ -270,6 +303,8 @@ public class NonTerminals {
                 match("MP_SCOLON");
                 block();
                 match("MP_SCOLON");
+                addFunctionToParent(symTab);
+                symTab = symTab.getParent();//Jon: move the table back to it's parent because we're done with it at this point
                 break;
             default: // syntaxError
                 syntaxError();
@@ -286,6 +321,7 @@ public class NonTerminals {
             	System.out.println(" (#19)"); // Rule #19
                 match("MP_PROCEDURE");
                 procedureIdentifier();
+                symTab = symTab.makeNewTable(lastID);//Jon: make a new table, and lastID should be set to the name from matching in procedureIdentifier()
                 optionalFormalParameterList();
                 break;
             default: // syntaxError
@@ -303,9 +339,12 @@ public class NonTerminals {
             	System.out.println(" (#20)"); // Rule #20
                 match("MP_FUNCTION");
                 functionIdentifier();
+                String funcID = lastID;//Jon: used at the end to add a variable value for returning at the end of the function call
+                symTab = symTab.makeNewTable(lastID);//Jon: make a new table, and lastID should be set to the name from matching in procedureIdentifier()
                 optionalFormalParameterList();
-                match("MP_COLON"); // <-- **Stephen**:  Why was this one in here??  Looking at rule #20, there is no colon in there. 
+                match("MP_COLON"); 
                 type();
+                symTab.addRow(funcID, "var", lastID, "none", "none");//Jon: adds a last variable to store the return value of the function
                 break;
             default: // syntaxError
                 syntaxError();
@@ -384,6 +423,11 @@ public class NonTerminals {
                 identifierList();
                 match("MP_COLON");
                 type();
+                for(int i = 0; i < idListIndex; i++){//Jon: go through our list of identifiers and add them to the symbol table now that we know their type
+                	symTab.addRow(idList[i], "param", lastID, "none", "none");//Jon: lastID should be set to the last type matched in type()
+                	idList[i] = "";//Jon: empty the spot after we've added it to the table
+                }
+                idListIndex = 0;//Jon: reset the index now that we're done with the array
                 break;
             default: // syntaxError
                 syntaxError();
@@ -402,6 +446,11 @@ public class NonTerminals {
                 identifierList();
                 match("MP_COLON");
                 type();
+                for(int i = 0; i < idListIndex; i++){//Jon: go through our list of identifiers and add them to the symbol table now that we know their type
+                	symTab.addRow(idList[i], "param", lastID, "none", "none");//Jon: lastID should be set to the last type matched in type()
+                	idList[i] = "";//Jon: empty the spot after we've added it to the table
+                }
+                idListIndex = 0;//Jon: reset the index now that we're done with the array
                 break;
 
             default: // syntaxError
@@ -1524,6 +1573,7 @@ public class NonTerminals {
             case "MP_IDENTIFIER":
             	System.out.println(" (#113)"); // Rule #113
                 match("MP_IDENTIFIER");
+                idList[idListIndex++] = lastID;//Jon: add the id to our running list and increment the index
                 identifierTail();
                 break;
             default:
@@ -1541,6 +1591,7 @@ public class NonTerminals {
             	System.out.println(" (#114)"); // Rule #114
                 match("MP_COMMA");
                 match("MP_IDENTIFIER");
+                idList[idListIndex++] = lastID;//Jon: add the id to our running list and increment the index
                 identifierTail();
                 break;
             case "MP_COLON":

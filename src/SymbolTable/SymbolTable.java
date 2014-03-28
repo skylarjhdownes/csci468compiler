@@ -26,7 +26,7 @@ public class SymbolTable {
 
     public SymbolTable(String in_name) {
         parent = null;
-        nestLevel = 1;
+        nestLevel = 0;
         tableName = in_name;
     }
 
@@ -59,7 +59,6 @@ public class SymbolTable {
     }
 
     /*
-     This method is just a skeleton until I know what Skylar's row class is like
      Every variable has size 1, so size is increased by one each time we make a new row, 
      with 1 being the starting size to save room for the display register value later
      */
@@ -95,6 +94,25 @@ public class SymbolTable {
         SymbolTable newTable = new SymbolTable(this, nestLevel + 1, name);
         children.add(newTable);
         return newTable;
+    }
+    
+    /*
+     * Finds all the items of kind "Parameter" and returns the list as a string
+     * This function is used in getting a list of parameter for inserting functions and parameters into the symbol tables
+     */
+    public String getParameters(){
+    	 Row current;
+         ListIterator<Row> myitems = items.listIterator();
+
+         String retString = "";
+         while (myitems.hasNext()) {//prints items of current table
+             current = myitems.next();
+             if(current.getKind() == "param"){
+            	 retString += current.getType() + " ";
+             }
+         }
+         
+         return retString;
     }
 
     /*
