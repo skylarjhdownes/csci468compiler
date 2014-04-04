@@ -14,7 +14,7 @@ public class SymbolTable {
     LinkedList<SymbolTable> children = new LinkedList<>();
     SymbolTable parent;
     int nestLevel;
-    int size = 1;
+    int size = 0; // Stephen: changed the starting size to 0???  Dont know why it was 1
     String tableName;
 
     //main constructor needs a parent, the nesting level, and the name of the table

@@ -9,9 +9,8 @@ program lab1;
       function fred(var q: float) : integer;
       
          begin 
-
            fred := q + 1;
-     end;
+		 end;
      
      function mary(x : integer) : integer;
      

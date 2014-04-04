@@ -3,6 +3,7 @@ import java.util.LinkedList;
 import java.util.Scanner;
 
 import Parser.NonTerminals;
+import Parser.NonTerminalsCompiler;
 import Tokenizer.MicroPascalScanner;
 import Tokenizer.Token;
 
@@ -80,6 +81,9 @@ public class Compiler {
 		System.out.println("\n\n\nParsing...\n\n");
 		NonTerminals.start(list);
 
+		String fOut = (testFile.getAbsolutePath())+".il";
+		File compFile = new File(fOut);
+		NonTerminalsCompiler.compile(list,compFile);
 
 	}
 

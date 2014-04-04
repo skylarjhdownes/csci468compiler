@@ -1,14 +1,20 @@
 package Parser;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.LinkedList;
-import SymbolTable.*;
 
+import SymbolTable.*;
 import Tokenizer.Token;
 
-public class NonTerminals {
+public class NonTerminalsCompiler {
 
     static int tokindex;
     static LinkedList<Token> tokens;
+    static FileOutputStream outfs;
+    static File outFile;
     static Token LATok;
     static String Lookahead;
     static SymbolTable symTab;
@@ -21,10 +27,13 @@ public class NonTerminals {
 	static final boolean PRINT_PARSE_TREE = true;
 	static final int LAPad = 20;
 	
+	// Variables for the compilation
+    static int numArgs = 0;
+    static boolean flag_printExtraStuff = true;
+	
+	
 
     public static void match(String in) {
-		// TODO STUB!!!!!!
-
         if (in.equals(Lookahead)) {
             
     		if ( PRINT_PARSE_TREE ) System.out.printf(""+String.format("%1$" + LAPad + "s", Lookahead)+" =="+String.format("%1$" + (indent*2+1) + "s", "")
@@ -51,7 +60,6 @@ public class NonTerminals {
     }
 
     public static void syntaxError() { //int line, int column) {
-        // TODO STUB!!!!!!
         System.out.println("Syntax error found on line " + LATok.getLineNumber() + ", column" + LATok.getColumnNumber() + ".");
         return;
     }
@@ -72,13 +80,36 @@ public class NonTerminals {
     	
     	myTable.getParent().addRow(myTable.getName(), "function", retType, retType, paramList); 	
     }
+      
     
-    public static void start(LinkedList<Token> list) {
+    public static void compile(LinkedList<Token> list, File fout) {
         tokens = list;
         tokindex = 1;
         LATok = tokens.getFirst();
         Lookahead = LATok.getToken();
+        outFile = fout;
+        try {
+			outfs = new FileOutputStream(fout);
+		} catch (FileNotFoundException e) {
+			System.out.println("Bad file name!");
+			e.printStackTrace();
+			System.exit(1);
+		} 
+
         systemGoal();
+        
+        // Be a good boy, close the stream!
+        try { outfs.close(); } catch (IOException e) { e.printStackTrace(); }
+        
+    }
+    private static void compileWrite( String in ) {
+		try {
+			outfs.write(in.getBytes());
+		} catch (IOException e) {
+			System.out.println("I/O Exception.  whuuuuut?");
+			e.printStackTrace();
+		}
+    	
     }
 
     public static void systemGoal() {
@@ -89,6 +120,7 @@ public class NonTerminals {
             	System.out.println(" (#1)"); // Rule #1
                 program();
                 match("MP_EOF");
+                compileWrite("HLT\r\n");
                 symTab.printTableFromTop();
                 break;
 
@@ -125,6 +157,11 @@ public class NonTerminals {
             	System.out.println(" (#3)"); // Rule #3
                 match("MP_PROGRAM");
                 programIdentifier();
+                
+            	// COMPILER CODE
+                	compileWrite("_L_Prog_"+lastID+":\r\n");
+        		// COMPILER END CODE     
+                
                 symTab = new SymbolTable(lastID);//creates initial symbol table for the program
                 break;
             default:
@@ -145,7 +182,33 @@ public class NonTerminals {
             	System.out.println(" (#4)"); // Rule #4
                 variableDeclarationPart();
                 procedureAndFunctionDeclarationPart();
+                
+                // COMPILER CODE
+	            	// Check for function/procedure arguments
+	            	if ( numArgs > 0 ) {
+	            		int offset = numArgs-symTab.getSize();
+	            		while ( numArgs > 0 ) {
+	            			compileWrite("POP "+(offset)+"(SP)\r\n");
+	            			numArgs--;
+	            		}
+	            	}
+	            
+	            	// Build the Activation record
+	            	int symTsize = (symTab.getSize()+1); 
+	            	compileWrite("PUSH D0\r\n");
+	            	compileWrite("MOV SP D0\r\n");
+	            	compileWrite("ADD SP #"+symTsize+"\r\n");             
+	            // COMPILER END CODE
+
                 statementPart();
+                
+                // COMPILER CODE
+                	// Restore the previous Activation record
+                	compileWrite("SUB SP #"+symTsize+"\r\n");
+                	compileWrite("MOV D0 "+symTsize+"(D0)\r\n");
+                	if ( flag_printExtraStuff ) compileWrite("{End block}\r\n\r\n");
+                // COMPILER END CODE
+                	
                 break;
             default:
                 syntaxError();// syntaxError
@@ -253,6 +316,7 @@ public class NonTerminals {
 				+"ProcedureAndFunctionDeclarationPart");
         switch (Lookahead) {
             case "MP_PROCEDURE":
+            	
             	System.out.println(" (#14)"); // Rule #14
                 procedureDeclaration();
                 procedureAndFunctionDeclarationPart();
@@ -320,8 +384,19 @@ public class NonTerminals {
             	System.out.println(" (#19)"); // Rule #19
                 match("MP_PROCEDURE");
                 procedureIdentifier();
+                
+                // COMPILER CODE
+            	if ( flag_printExtraStuff ) compileWrite("\r\n");
+                	compileWrite("_L_Procedure_"+lastID+":\r\n");
+                // COMPILER END CODE
+                
                 symTab = symTab.makeNewTable(lastID);//Jon: make a new table, and lastID should be set to the name from matching in procedureIdentifier()
                 optionalFormalParameterList();
+
+                // COMPILER CODE
+            		numArgs = symTab.getSize();
+            	// COMPILER CODE
+
                 break;
             default: // syntaxError
                 syntaxError();
@@ -338,9 +413,22 @@ public class NonTerminals {
             	System.out.println(" (#20)"); // Rule #20
                 match("MP_FUNCTION");
                 functionIdentifier();
+                
+                // COMPILER CODE
+                	if ( flag_printExtraStuff ) compileWrite("\r\n");
+            		compileWrite("_L_Function_"+lastID+":\r\n");
+            	// COMPILER END CODE
+            
+                
                 String funcID = lastID;//Jon: used at the end to add a variable value for returning at the end of the function call
                 symTab = symTab.makeNewTable(lastID);//Jon: make a new table, and lastID should be set to the name from matching in procedureIdentifier()
                 optionalFormalParameterList();
+                
+                // COMPILER CODE
+            		numArgs = symTab.getSize();
+            	// COMPILER CODE
+
+                
                 match("MP_COLON"); 
                 type();
                 symTab.addRow(funcID, "var", lastID, "none", "none");//Jon: adds a last variable to store the return value of the function
