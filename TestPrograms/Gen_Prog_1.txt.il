@@ -1,1 +1,24 @@
-Prog_ID:
+BR _L_Prog_ID:
+
+_L_Function_ID:
+POP 0(SP)
+PUSH D0
+MOV SP D0
+ADD SP #2
+SUB SP #2
+PUSH 1(D0)
+MOV D0 2(D0)
+RET
+{End block}
+
+
+_L_Prog_ID:
+POP 0(SP)
+PUSH D0
+MOV SP D0
+ADD SP #2
+WRTLN SUB SP #2
+MOV D0 2(D0)
+{End block}
+
+HLT

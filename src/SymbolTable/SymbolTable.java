@@ -14,7 +14,7 @@ public class SymbolTable {
     LinkedList<SymbolTable> children = new LinkedList<>();
     SymbolTable parent;
     int nestLevel;
-    int size = 0; // Stephen: changed the starting size to 0???  Dont know why it was 1
+    int size = 1; // Stephen: changed the starting size to 0???  Dont know why it was 1 EDIT: Changed it back, i found out why it was 1.  Changed the size function instead -.-
     String tableName;
 
     //main constructor needs a parent, the nesting level, and the name of the table
@@ -43,7 +43,7 @@ public class SymbolTable {
     }
 
     public int getSize() {
-        return size;
+        return size-1;  // Changed this to return size - 1, since the size starts at 1 instead of 0. (That is, a table with no entries reports its size at 1)
     }
 
     public void setName(String name) {
@@ -78,7 +78,7 @@ public class SymbolTable {
 
         while (it.hasNext()) {
             returnRow = it.next();
-            if (returnRow.getID() == id) {
+            if (returnRow.getID().equals(id)) { // Stephen: BAD JON!!  Using == to compare strings!  baaad!
                 return returnRow;
             }
         }
@@ -107,7 +107,7 @@ public class SymbolTable {
          String retString = "";
          while (myitems.hasNext()) {//prints items of current table
              current = myitems.next();
-             if(current.getKind() == "param"){
+             if(current.getKind().equals("param")){
             	 retString += current.getType() + " ";
              }
          }

@@ -24,5 +24,7 @@ program lab1;
     end;
     
   begin
+		read(apple);
+		read(y);
         write(zebra)
   end.

@@ -5,6 +5,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.LinkedList;
+import java.util.Stack;
 
 import SymbolTable.*;
 import Tokenizer.Token;
@@ -28,8 +29,8 @@ public class NonTerminalsCompiler {
 	static final int LAPad = 20;
 	
 	// Variables for the compilation
-    static int numArgs = 0;
     static boolean flag_printExtraStuff = true;
+    static Stack<String> headingStack = new Stack<String>();
 	
 	
 
@@ -158,9 +159,10 @@ public class NonTerminalsCompiler {
                 match("MP_PROGRAM");
                 programIdentifier();
                 
-            	// COMPILER CODE
-                	compileWrite("_L_Prog_"+lastID+":\r\n");
-        		// COMPILER END CODE     
+                // COMPILER CODE
+                	compileWrite("BR L_Prog_"+lastID+"\r\n");
+            		headingStack.push("L_Prog_"+lastID);
+            	// COMPILER END CODE
                 
                 symTab = new SymbolTable(lastID);//creates initial symbol table for the program
                 break;
@@ -184,8 +186,13 @@ public class NonTerminalsCompiler {
                 procedureAndFunctionDeclarationPart();
                 
                 // COMPILER CODE
+                	// Print a header label for this Block
+                	if ( flag_printExtraStuff ) compileWrite("\r\n");
+                	compileWrite(headingStack.pop()+":\r\n");
+                
 	            	// Check for function/procedure arguments
-	            	if ( numArgs > 0 ) {
+                	int numArgs = symTab.getParameters().split(" ").length;
+                	if ( numArgs > 0 ) {
 	            		int offset = numArgs-symTab.getSize();
 	            		while ( numArgs > 0 ) {
 	            			compileWrite("POP "+(offset)+"(SP)\r\n");
@@ -205,7 +212,18 @@ public class NonTerminalsCompiler {
                 // COMPILER CODE
                 	// Restore the previous Activation record
                 	compileWrite("SUB SP #"+symTsize+"\r\n");
+                	// If this block completes a function, then its return value must be pushed onto the top of the stack.
+                	if ( symTab.getParent() != null )
+                		if ( symTab.getParent().findVariable(symTab.getName()).getKind().equals("function") ) {
+                			compileWrite("PUSH "+symTab.findVariable(symTab.getName()).getOffset()+"(D0)\r\n");             			
+                		}
                 	compileWrite("MOV D0 "+symTsize+"(D0)\r\n");
+                	
+                	
+                	// If this block is not the main program, it must return to the calling function
+                	if ( headingStack.size() >= 1 ) compileWrite("RET\r\n");
+                	
+                	
                 	if ( flag_printExtraStuff ) compileWrite("{End block}\r\n\r\n");
                 // COMPILER END CODE
                 	
@@ -343,10 +361,10 @@ public class NonTerminalsCompiler {
             case "MP_PROCEDURE":
             	System.out.println(" (#17)"); // Rule #17
                 procedureHeading();
+                addProcedureToParent(symTab);//Jon: adds this procedure as a row to the parent class
                 match("MP_SCOLON");
                 block();
                 match("MP_SCOLON");
-                addProcedureToParent(symTab);//Jon: adds this procedure as a row to the parent class
                 symTab = symTab.getParent();//Jon: move the table back to it's parent because we're done with it at this point
                 break;
             default: // syntaxError
@@ -363,10 +381,10 @@ public class NonTerminalsCompiler {
             case "MP_FUNCTION":
             	System.out.println(" (#18)"); // Rule #18
                 functionHeading();
+                addFunctionToParent(symTab);
                 match("MP_SCOLON");
                 block();
                 match("MP_SCOLON");
-                addFunctionToParent(symTab);
                 symTab = symTab.getParent();//Jon: move the table back to it's parent because we're done with it at this point
                 break;
             default: // syntaxError
@@ -386,16 +404,12 @@ public class NonTerminalsCompiler {
                 procedureIdentifier();
                 
                 // COMPILER CODE
-            	if ( flag_printExtraStuff ) compileWrite("\r\n");
-                	compileWrite("_L_Procedure_"+lastID+":\r\n");
-                // COMPILER END CODE
-                
+                	headingStack.push("L_Procedure_"+lastID);
+            	// COMPILER END CODE
+            
+   
                 symTab = symTab.makeNewTable(lastID);//Jon: make a new table, and lastID should be set to the name from matching in procedureIdentifier()
                 optionalFormalParameterList();
-
-                // COMPILER CODE
-            		numArgs = symTab.getSize();
-            	// COMPILER CODE
 
                 break;
             default: // syntaxError
@@ -415,19 +429,13 @@ public class NonTerminalsCompiler {
                 functionIdentifier();
                 
                 // COMPILER CODE
-                	if ( flag_printExtraStuff ) compileWrite("\r\n");
-            		compileWrite("_L_Function_"+lastID+":\r\n");
-            	// COMPILER END CODE
+            		headingStack.push("L_Function_"+lastID);
+           		// COMPILER END CODE
             
                 
                 String funcID = lastID;//Jon: used at the end to add a variable value for returning at the end of the function call
                 symTab = symTab.makeNewTable(lastID);//Jon: make a new table, and lastID should be set to the name from matching in procedureIdentifier()
                 optionalFormalParameterList();
-                
-                // COMPILER CODE
-            		numArgs = symTab.getSize();
-            	// COMPILER CODE
-
                 
                 match("MP_COLON"); 
                 type();
@@ -762,6 +770,24 @@ public class NonTerminalsCompiler {
             case "MP_IDENTIFIER":
             	System.out.println(" (#48)"); // Rule #48
                 variableIdentifier();
+                
+                // COMPILER CODE
+            		symTab.printTableFromTop();
+            		Row rp = symTab.findVariable(lastID);
+            		switch (rp.getType()) {
+            			case "integer":
+            				compileWrite("RD ");
+            				break;
+            			case "float":
+            				compileWrite("RDF ");
+            				break;
+            			case "string":
+            				compileWrite("RDS ");
+            				break;
+            		}
+            		compileWrite(rp.getOffset()+"(D0)\r\n");
+            	// COMPILER END CODE
+
                 break;
 
             default: // syntaxError OR Empty-String
@@ -779,6 +805,13 @@ public class NonTerminalsCompiler {
             	System.out.println(" (#49)"); // Rule #49
                 match("MP_WRITE");
                 match("MP_LPAREN");
+                
+                // COMPILER CODE
+            		compileWrite("WRT ");
+            		// TODO -- Finish the WriteStatement, left out the expression portion.
+            			compileWrite("\r\n");
+            	// COMPILER END CODE
+            
                 writeParameter();
                 writeParameterTail();
                 match("MP_RPAREN");
@@ -787,6 +820,13 @@ public class NonTerminalsCompiler {
             	System.out.println(" (#50)"); // Rule #50
                 match("MP_WRITELN");
                 match("MP_LPAREN");
+                
+                // COMPILER CODE
+            		compileWrite("WRTLN ");
+            	// COMPILER END CODE
+            
+
+                
                 writeParameter();
                 writeParameterTail();
                 match("MP_RPAREN");
@@ -866,8 +906,18 @@ public class NonTerminalsCompiler {
         switch (Lookahead) {
         case "MP_ASSIGN"://both rules are the same
         	System.out.println(" (#54,55)"); // Rule #54,55
+        	
+        	// COMPILER CODE
+        		Row ap = symTab.findVariable(lastID);
+        	// COMPILER END CODE
+        		
             match("MP_ASSIGN");
             expression();
+            
+            // COMPILER CODE
+            	compileWrite("POP "+ap.getOffset()+"(D0)\r\n");
+        	// COMPILER CODE
+
             break;
         default: // syntaxError OR Empty-String
             syntaxError();
