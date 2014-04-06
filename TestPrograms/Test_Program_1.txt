@@ -5,12 +5,14 @@ program lab1;
        
    procedure mixit(a, b: integer; var x: float);
       var pony: integer;
+			str: string;
       
       function fred(var q: float) : integer;
       
          begin 
-
+			str := 'This is a string with spaces';
            fred := q + 1;
+		   writeln(str,' ',fred);
      end;
      
      function mary(x : integer) : integer;
@@ -21,9 +23,16 @@ program lab1;
         
 
     begin
+		zebra := 1.5 + fred(x) + 2.1;
         pony := a + b;
     end;
     
   begin
-        write(zebra)
+		zebra := 10;
+		xyz := 6+8;
+		y := (7 + 9 div 3)-1*2;
+		mixit(zebra, 5, 3.5);
+        writeln(zebra,' ',xyz,' ', y);
+		read(xyz, apple,candy);
+		writeln(xyz, ' ', apple, ' ', candy);
   end.

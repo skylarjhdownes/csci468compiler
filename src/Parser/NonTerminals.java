@@ -1,8 +1,10 @@
 package Parser;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
-import SymbolTable.*;
 
+import SymbolTable.*;
+import SemanticAnalyzer.*;
 import Tokenizer.Token;
 
 public class NonTerminals {
@@ -11,11 +13,19 @@ public class NonTerminals {
     static LinkedList<Token> tokens;
     static Token LATok;
     static String Lookahead;
+    
+    //Variables for symbol table making
     static SymbolTable symTab;
     static String lastID;//Jon: to store last ID
     static String[] idList = new String[20];//Jon: used in identifierList() for keeping track of a list of id's before we know their type
     static int idListIndex = 0;				//if we don't know their type, we can't add them to the symbol table yet.
 	
+    //Variables for the semantic analyzer
+    static SemanticAnalyzer semAn = new SemanticAnalyzer();
+    static Token lastTok;
+    static int wrtRdNum = 0;
+    static ArrayList<Token> readParams = new ArrayList<Token>();
+    
     // Variables for the parse-tree print
     static int indent = 0;
 	static final boolean PRINT_PARSE_TREE = true;
@@ -31,6 +41,7 @@ public class NonTerminals {
     				+Lookahead+"\n");
     		
     		lastID = LATok.getLexeme();//**Jon: This is to store the last matched ID for use in adding to the symbol table afterwards
+    		lastTok = LATok;//This is for the semantic analyzer
         	
         	if ( tokindex < tokens.size() ) {
         		LATok = tokens.get(tokindex++);
@@ -54,6 +65,7 @@ public class NonTerminals {
     public static void syntaxError() { //int line, int column) {
         // TODO STUB!!!!!!
         System.out.println("Syntax error found on line " + LATok.getLineNumber() + ", column" + LATok.getColumnNumber() + ".");
+        System.exit(1);
         return;
     }
 
@@ -62,7 +74,7 @@ public class NonTerminals {
     	String paramList = myTable.getParameters();
     	String retType = "none";//Jon:Procedures don't have a return type
     	
-    	myTable.getParent().addRow(myTable.getName(), "procedure", retType, retType, paramList); 	
+    	myTable.getParent().addFunctionOrParameterRow(myTable.getName(), "procedure", retType, retType, paramList, myTable.getSize()); 	
     	
     }
     
@@ -71,7 +83,7 @@ public class NonTerminals {
     	String paramList = myTable.getParameters();
     	String retType = myTable.findVariable(myTable.getName()).getType();//Jon: find the return variable, and get its type. It will be the return type
     	
-    	myTable.getParent().addRow(myTable.getName(), "function", retType, retType, paramList); 	
+    	myTable.getParent().addFunctionOrParameterRow(myTable.getName(), "function", retType, retType, paramList, myTable.getSize()); 	
     }
     
     public static void start(LinkedList<Token> list) {
@@ -91,6 +103,7 @@ public class NonTerminals {
                 program();
                 match("MP_EOF");
                 symTab.printTableFromTop();
+                semAn.end();
                 break;
 
             default: // syntaxError
@@ -127,6 +140,7 @@ public class NonTerminals {
                 match("MP_PROGRAM");
                 programIdentifier();
                 symTab = new SymbolTable(lastID);//creates initial symbol table for the program
+                semAn.addLabel(symTab);
                 break;
             default:
                 syntaxError();// syntaxError
@@ -146,7 +160,9 @@ public class NonTerminals {
             	System.out.println(" (#4)"); // Rule #4
                 variableDeclarationPart();
                 procedureAndFunctionDeclarationPart();
+                semAn.statementStart(symTab);
                 statementPart();
+                semAn.statementEnd(symTab);
                 break;
             default:
                 syntaxError();// syntaxError
@@ -280,10 +296,11 @@ public class NonTerminals {
             case "MP_PROCEDURE":
             	System.out.println(" (#17)"); // Rule #17
                 procedureHeading();
+                addProcedureToParent(symTab);//Jon: adds this procedure as a row to the parent class
+                semAn.addLabel(symTab);
                 match("MP_SCOLON");
                 block();
                 match("MP_SCOLON");
-                addProcedureToParent(symTab);//Jon: adds this procedure as a row to the parent class
                 symTab = symTab.getParent();//Jon: move the table back to it's parent because we're done with it at this point
                 break;
             default: // syntaxError
@@ -300,10 +317,11 @@ public class NonTerminals {
             case "MP_FUNCTION":
             	System.out.println(" (#18)"); // Rule #18
                 functionHeading();
+                addFunctionToParent(symTab);
+                semAn.addLabel(symTab);
                 match("MP_SCOLON");
                 block();
                 match("MP_SCOLON");
-                addFunctionToParent(symTab);
                 symTab = symTab.getParent();//Jon: move the table back to it's parent because we're done with it at this point
                 break;
             default: // syntaxError
@@ -639,8 +657,13 @@ public class NonTerminals {
                 match("MP_READ");
                 match("MP_LPAREN");
                 readParameter();
+                readParams.add(lastTok);
+                semAn.comma();
                 readParameterTail();
                 match("MP_RPAREN");
+                semAn.comma();
+                semAn.read(readParams, symTab);
+                readParams.clear();
                 break;
             default: // syntaxError OR Empty-String
                 syntaxError();
@@ -656,7 +679,9 @@ public class NonTerminals {
             case "MP_COMMA":
             	System.out.println(" (#46)"); // Rule #46
                 match("MP_COMMA");
+                semAn.comma();
                 readParameter();
+                readParams.add(lastTok);
                 readParameterTail();
                 break;
             case "MP_RPAREN":
@@ -693,6 +718,7 @@ public class NonTerminals {
                 match("MP_WRITE");
                 match("MP_LPAREN");
                 writeParameter();
+                semAn.write();
                 writeParameterTail();
                 match("MP_RPAREN");
                 break;
@@ -701,8 +727,10 @@ public class NonTerminals {
                 match("MP_WRITELN");
                 match("MP_LPAREN");
                 writeParameter();
+                semAn.write();
                 writeParameterTail();
                 match("MP_RPAREN");
+                semAn.writeln();
                 break;
 
             default: // syntaxError OR Empty-String
@@ -720,6 +748,7 @@ public class NonTerminals {
             	System.out.println(" (#51)"); // Rule #51
                 match("MP_COMMA");
                 writeParameter();
+                semAn.write();
                 writeParameterTail();
                 break;
             case "MP_RPAREN":
@@ -779,8 +808,10 @@ public class NonTerminals {
         switch (Lookahead) {
         case "MP_ASSIGN"://both rules are the same
         	System.out.println(" (#54,55)"); // Rule #54,55
+        	Token popInto = lastTok; // this is the variable we will be assigning a value to
             match("MP_ASSIGN");
             expression();
+            semAn.pop(popInto, symTab);
             break;
         default: // syntaxError OR Empty-String
             syntaxError();
@@ -985,8 +1016,12 @@ public class NonTerminals {
 		if ( PRINT_PARSE_TREE ) System.out.printf(""+String.format("%1$" + LAPad + "s", Lookahead)+" ->"+String.format("%1$" + (indent++*2+1) + "s", "")
 				+"ProcedureStatment");
 
-    	System.out.println(" (#67)"); // Rule #67
+    	System.out.println(" (#67)");// Rule #67
+    	Token procedure = lastTok;
+    	readParams = new ArrayList<Token>();
 		optionalActualParameterList();
+		semAn.functionProcedureCall(readParams, symTab, procedure);
+		readParams.clear();
 		/*
 		switch (Lookahead) {
             //case "MP_IDENTIFIER":
@@ -1015,8 +1050,10 @@ public class NonTerminals {
             	System.out.println(" (#68)"); // Rule #68
                 match("MP_LPAREN");
                 actualParameter();
+                readParams.add(lastTok);
                 actualParameterTail();
                 match("MP_RPAREN");
+                semAn.comma();
                 break;
             case "MP_AND":
             case "MP_DIV":
@@ -1059,7 +1096,9 @@ public class NonTerminals {
             case "MP_COMMA":
             	System.out.println(" (#70)"); // Rule #70
                 match("MP_COMMA");
+                semAn.comma();
                 actualParameter();
+                readParams.add(lastTok);
                 actualParameterTail();
                 break;
             case "MP_RPAREN":
@@ -1163,26 +1202,32 @@ public class NonTerminals {
             case "MP_EQUAL":
             	System.out.println(" (#76)"); // Rule #76
                 match("MP_EQUAL");
+                semAn.addComp(lastTok);
                 break;
             case "MP_LTHAN":
             	System.out.println(" (#77)"); // Rule #77
                 match("MP_LTHAN");
+                semAn.addComp(lastTok);
                 break;
             case "MP_GTHAN":
             	System.out.println(" (#78)"); // Rule #78
                 match("MP_GTHAN");
+                semAn.addComp(lastTok);
                 break;
             case "MP_GEQUAL":
             	System.out.println(" (#80)"); // Rule #80
                 match("MP_GEQUAL");
+                semAn.addComp(lastTok);
                 break;
             case "MP_LEQUAL":
             	System.out.println(" (#79)"); // Rule #79
                 match("MP_LEQUAL");
+                semAn.addComp(lastTok);
                 break;
             case "MP_NEQUAL":
             	System.out.println(" (#81)"); // Rule #81
                 match("MP_NEQUAL");
+                semAn.addComp(lastTok);
                 break;
             default:
                 syntaxError();
@@ -1227,7 +1272,9 @@ public class NonTerminals {
             case "MP_OR":
             	System.out.println(" (#83)"); // Rule #83
                 addingOperator();
+                Token operator = lastTok;//Store the last match, which will have been the adding operation
                 term();
+                semAn.addOp(operator);//adds the operation after the next term has been pushed
                 termTail();
                 break;
             case "MP_EQUAL":
@@ -1262,10 +1309,12 @@ public class NonTerminals {
             case "MP_PLUS":
             	System.out.println(" (#85)"); // Rule #85
                 match("MP_PLUS");
+                semAn.makePos();
                 break;
             case "MP_MINUS":
             	System.out.println(" (#86)"); // Rule #86
                 match("MP_MINUS");
+                semAn.makeNeg();
                 break;
             case "MP_FALSE":
             case "MP_NOT":
@@ -1364,7 +1413,9 @@ public class NonTerminals {
             case "MP_MOD":
             	System.out.println(" (#92)"); // Rule #92
                 multiplyingOperator();
+                Token operator = lastTok;
                 factor();
+                semAn.addOp(operator);
                 factorTail();
                 break;
             default:
@@ -1412,30 +1463,37 @@ public class NonTerminals {
             case "MP_INTEGER_LIT":
             	System.out.println(" (#99)"); // Rule #99
                 match("MP_INTEGER_LIT");
+                semAn.pushCheck(lastTok, symTab);
                 break;
             case "MP_FLOAT_LIT":  
             	System.out.println(" (#100)"); // Rule #100
                 match("MP_FLOAT_LIT");
+                semAn.pushCheck(lastTok, symTab);
                 break;
             case "MP_FIXED_LIT":// **Stephen: Added FIXED_LIT
             	System.out.println(" (#100)"); // Rule #100
                 match("MP_FIXED_LIT");
+                semAn.pushCheck(lastTok, symTab);
                 break;
             case "MP_STRING_LIT":
             	System.out.println(" (#101)"); // Rule #101
                 match("MP_STRING_LIT");
+                semAn.pushCheck(lastTok, symTab);
                 break;
             case "MP_TRUE":
             	System.out.println(" (#102)"); // Rule #102
                 match("MP_TRUE");
+                semAn.pushCheck(lastTok, symTab);
                 break;
             case "MP_FALSE":
             	System.out.println(" (#103)"); // Rule #103
                 match("MP_FALSE");
+                semAn.pushCheck(lastTok, symTab);
                 break;
             case "MP_NOT":
             	System.out.println(" (#104)"); // Rule #104
                 match("MP_NOT");
+                semAn.pushCheck(lastTok, symTab);
                 factor();
                 break;
             case "MP_LPAREN":
@@ -1447,7 +1505,17 @@ public class NonTerminals {
             case "MP_IDENTIFIER":
             	System.out.println(" (#106)"); // Rule #106
                 functionIdentifier();
-                optionalActualParameterList();
+                Token identifier = lastTok;
+                Row funcOrVar = symTab.findVariable(lastID);
+                if(funcOrVar.getKind().equals("function")){
+                	readParams = new ArrayList<Token>();
+                	semAn.pushRoomForRetVal(funcOrVar.getType());
+                	optionalActualParameterList();
+                	semAn.functionProcedureCall(readParams, symTab, identifier);
+                }
+                else{
+                	semAn.pushCheck(identifier, symTab);
+                }
                 break;
             default:
                 syntaxError();
