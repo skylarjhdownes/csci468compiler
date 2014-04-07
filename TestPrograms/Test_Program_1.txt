@@ -1,38 +1,46 @@
 program lab1;
-    var  apple, candy: integer;
-       y: float;
-       zebra, xyz: integer;
+    var  otherthing, choice: integer;
        
-   procedure mixit(a, b: integer; var x: float);
-      var pony: integer;
-			str: string;
-      
-      function fred(var q: float) : integer;
-      
-         begin 
-			str := 'This is a string with spaces';
-           fred := q + 1;
-		   writeln(str,' ',fred);
-     end;
-     
-     function mary(x : integer) : integer;
-     
-        begin
-           mary := x - 1;
-        end;
-        
-
-    begin
-		zebra := 1.5 + fred(x) + 2.1;
-        pony := a + b;
-    end;
+	function factorial( b: integer):integer;
+	var x: integer;
+	begin
+		if b = 0 then
+			factorial := 1
+		else
+			factorial := b * factorial(b-1);
+	end;
+	
+	procedure listNum( start: integer);
+	var finish: integer;
+	begin
+		finish := -50;
+		while start > finish do
+		begin
+			write(start, ' ');
+			start := start - 1;
+		end;
+		writeln('');
+	end;
+	
+	procedure scopeTest;
+	var otherthing: float;
+	begin
+		otherthing := 1 * 2.0 / 4 + 2;
+		writeln('From procedure otherthing is: ', otherthing);
+	end;
     
   begin
-		zebra := 10;
-		xyz := 6+8;
-		y := (7 + 9 div 3)-1*2;
-		mixit(zebra, 5, 3.5);
-        writeln(zebra,' ',xyz,' ', y);
-		read(xyz, apple,candy);
-		writeln(xyz, ' ', apple, ' ', candy);
+		writeln('Welcome to my program (^_^ )');
+		writeln('Please enter an integer to find the factorial of:');
+		read(choice);
+		if choice >= 1 then	
+			writeln(factorial(choice))
+		else
+			writeln('-1');
+		listNum(100 div 2);
+		otherthing := 15 * 15;
+		writeln('From *main* otherthing is: ', otherthing);
+		scopeTest;
+		writeln('From *main* otherthing still is: ', otherthing);
+		writeln('Thank you for using this!');
   end.

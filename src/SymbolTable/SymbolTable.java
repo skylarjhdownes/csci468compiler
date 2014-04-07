@@ -119,8 +119,7 @@ public class SymbolTable {
             	 retString += current.getType() + " ";
              }
          }
-         
-         retString = retString.substring(0, retString.length() - 1);//This it to get rid of the trailing space
+         if(retString.length() > 0) retString = retString.substring(0, retString.length() - 1);//This it to get rid of the trailing space
          
          return retString;
     }

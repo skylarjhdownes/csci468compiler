@@ -49,6 +49,71 @@ public class SemanticAnalyzer{
 		labelnum++;
 	}
 	
+	public void addLabel(String name, int num){
+		labels[labelnum][0] = name + num;
+		labels[labelnum][1] = name;
+		labels[labelnum][2] = "L" + (labelnum + 1);
+		labelnum++;
+	}
+
+	public void branch(String name, String when){
+		if(when.equals("always")){
+			for(int i = labelnum -1; i >= 0; i--){
+				if(labels[i][0].equals(name)){
+					write("BR " + labels[i][2]);
+				}
+			}
+		}
+		
+		else if(when.equals("true")){
+			if(!(topOfStack.equals("boolean"))){
+				error("Branching on term that is not a boolean on " + name + " call" );
+			}
+			else{
+				for(int i = labelnum -1; i >= 0; i--){
+					if(labels[i][0].equals(name)){
+						write("BRTS " + labels[i][2]);
+					}
+				}
+			}
+		}
+		else if(when.equals("false")){
+			if(!(topOfStack.equals("boolean"))){
+				error("Branching on term that is not a boolean on " + name + " call" );
+			}
+			else{
+				for(int i = labelnum -1; i >= 0; i--){
+					if(labels[i][0].equals(name)){
+						write("BRFS " + labels[i][2]);
+					}
+				}
+			}
+		}
+		else if(when.equals("equals")){
+			for(int i = labelnum -1; i >= 0; i--){
+				if(labels[i][0].equals(name)){
+					if(topOfStack.equals("integer")||topOfStack.equals("boolean")){
+						write("CMPEQS");
+					}
+					else{
+						write("CMPEQSF");
+					}
+					write("BRTS " + labels[i][2]);
+				}
+			}
+		}
+		
+		topOfStack = "empty";
+	}
+
+	public void placeLabel(String name){
+		for(int i = labelnum -1; i >= 0; i--){
+			if(labels[i][0].equals(name)){
+				write(labels[i][2] + ":");
+			}
+		}
+	}
+	
 	public void pushCheck(Token variable, SymbolTable symTab){
 		Row info = symTab.findVariable(variable.getLexeme());
 		
@@ -109,6 +174,12 @@ public class SemanticAnalyzer{
 				error("Found a "+ variable.getToken()+" called "+variable.getLexeme() + "in expression");
 			}
 			
+			if(makeNeg || makePos){
+				write("NEGS");
+				makeNeg = false;
+				makePos = false;
+			}
+			
 		}
 		else if(topOfStack.equals("float")){
 			if(variable.getToken().equals("MP_FIXED_LIT")||variable.getToken().equals("MP_FLOAT_LIT")){
@@ -130,12 +201,18 @@ public class SemanticAnalyzer{
 			else{
 				error("Found a "+ variable.getToken()+" called "+variable.getLexeme() + "in expression");
 			}
+			
+			if(makeNeg||makePos){
+				write("NEGSF");
+				makeNeg = false;
+				makePos = false;
+			}
 		}
 		
 		
 	}
 	
-	public void functionProcedureCall(ArrayList<Token> params, SymbolTable symTab, Token call){
+/*	public void functionProcedureCall(ArrayList<Token> params, SymbolTable symTab, Token call){
 		Row callInfo = symTab.findVariable(call.getLexeme());
 		String[] paramlist = callInfo.getInputParameters().split(" ");//required parameters
 		String[] paramsGiven = new String[params.size()];//given parameters
@@ -183,7 +260,7 @@ public class SemanticAnalyzer{
 		
 		for(int i = 0; i < paramsGiven.length; i++){
 			if(!(paramsGiven[i].equals(paramlist[i]))){
-				error("Incorrect parameter type. Looking for "+paramlist[i]+" but found "+paramsGiven[i]);
+				error("Incorrect parameter type. Looking for "+paramlist[i]+" but found "+paramsGiven[i] + " line:" + call.getLineNumber() + " col:" + call.getColumnNumber());
 			}
 		}
 		
@@ -245,6 +322,67 @@ public class SemanticAnalyzer{
 		}
 		
 		
+		
+	}*/
+	
+	public void functionProcedureCall(String paramTypesList, SymbolTable symTab, Token call){
+		Row callinfo = symTab.findVariable(call.getLexeme());
+		String[] paramsGiven = paramTypesList.split(" ");
+		String[] actualParams = callinfo.getInputParameters().split(" ");
+		if(paramsGiven.length != actualParams.length){
+			error("Wrong number of parameters for call " + call.getLexeme() + " at line:" + call.getLineNumber() + " col:" + call.getColumnNumber());
+		}
+		
+		for(int i = 0; i < paramsGiven.length; i++){
+			if(!(paramsGiven[i].equals(actualParams[i]))){
+				error("Incorrect parameter type. Looking for "+actualParams[i]+" but found "+paramsGiven[i] + " line:" + call.getLineNumber() + " col:" + call.getColumnNumber());
+			}
+		}
+		
+		
+		for(int i = labelnum -1; i >= 0; i--){//make the call
+			if(labels[i][0].equals(callinfo.getID())){
+				write("CALL " + labels[i][2]);
+			}
+		}
+		if(!(actualParams[0].equals(""))) write("SUB SP #" + actualParams.length + " SP");//deconstruct the parameters leaving the return value on top, or no value
+		
+		if(symTab.findVariable(call.getLexeme()).getKind().equals("function")){
+			String type = symTab.findVariable(call.getLexeme()).getType();
+			if(topOfStackBeforeFunctionCall.equals("empty")){
+				topOfStack = type;
+				topOfStackBeforeFunctionCall = "empty";
+			}
+			else if(topOfStackBeforeFunctionCall.equals("float")){
+				if(type.equals("integer")||type.equals("boolean")){
+					topOfStack = "float";
+					write("CASTSF");
+					topOfStackBeforeFunctionCall = "empty";
+				}
+				else if(type.equals("float")){
+					topOfStack = "float";
+					topOfStackBeforeFunctionCall = "empty";
+				}
+				else{
+					error("String concatenation and stuff not implemented yet Line:" + call.getLineNumber() + " col:" + call.getColumnNumber());
+				}
+			}
+			else if(topOfStackBeforeFunctionCall.equals("integer")||topOfStackBeforeFunctionCall.equals("boolean")){
+				if(type.equals("integer")||type.equals("boolean")){
+					topOfStack = type;
+					topOfStackBeforeFunctionCall = "empty";
+				}
+				else if(type.equals("float")){
+					topOfStack = "float";
+					write("CASTSF");
+					topOfStackBeforeFunctionCall = "empty";
+				}
+				else{
+					error("String concatenation and stuff not implemented yet Line:" + call.getLineNumber() + " col:" + call.getColumnNumber());
+				}
+			}
+
+		}
 		
 	}
 	
@@ -364,6 +502,26 @@ public class SemanticAnalyzer{
 		
 	}
 	
+	public void stepValue(Token Tokenvalue){
+		String value = Tokenvalue.getLexeme();
+		if(topOfStack.equals("integer")|| topOfStack.equals("boolean")){
+			if(value.equals("to")){
+				write("PUSH #1");
+			}
+			else{
+				write("PUSH #-1");
+			}
+		}
+		else{
+			if(value.equals("to")){
+				write("PUSH #1.0");
+			}
+			else{
+				write("PUSH #-1.0");
+			}
+		}
+	}
+	
 	public void makeNeg(){
 		makeNeg = true;
 		
@@ -399,7 +557,7 @@ public class SemanticAnalyzer{
 			else if(operation.getLexeme().equals("-")){
 				write("SUBSF");
 			}
-			else if(operation.getToken().equals("MP__FLOAT_DIV")){
+			else if(operation.getLexeme().equals("/")){
 				write("DIVSF");
 			}
 			else if(operation.getToken().equals("MP_DIV")){
@@ -421,6 +579,51 @@ public class SemanticAnalyzer{
 	
 	public void addComp(Token comparator){
 		
+		if(topOfStack.equals("integer")||topOfStack.equals("boolean")){
+			if(comparator.getLexeme().equals(">")){
+				write("CMPGTS");
+			}
+			else if(comparator.getLexeme().equals(">=")){
+				write("CMPGES");
+			}
+			else if(comparator.getLexeme().equals("<")){
+				write("CMPLTS");
+			}
+			else if(comparator.getLexeme().equals("<=")){
+				write("CMPLES");
+			}
+			else if(comparator.getLexeme().equals("=")){
+				write("CMPEQS");
+			}
+			else if(comparator.getLexeme().equals("<>")){
+				write("CMPNES");
+			}
+			topOfStack = "boolean";
+		}
+		else if(topOfStack.equals("float")){
+			if(comparator.getLexeme().equals(">")){
+				write("CMPGTSF");
+			}
+			else if(comparator.getLexeme().equals(">=")){
+				write("CMPGESF");
+			}
+			else if(comparator.getLexeme().equals("<")){
+				write("CMPLTSF");
+			}
+			else if(comparator.getLexeme().equals("<=")){
+				write("CMPLESF");
+			}
+			else if(comparator.getLexeme().equals("=")){
+				write("CMPEQSF");
+			}
+			else if(comparator.getLexeme().equals("<>")){
+				write("CMPNESF");
+			}
+			topOfStack = "boolean";
+		}
+		else{
+			error("Problem adding comparison on line:" + comparator.getLineNumber() + " col:" + comparator.getColumnNumber());
+		}
 	}
 	
 	public void read(ArrayList<Token> params,SymbolTable symTab){
@@ -428,7 +631,7 @@ public class SemanticAnalyzer{
 		for(int i = 0; i < params.size(); i++){
 			current = symTab.findVariable(params.get(i).getLexeme());
 			if (current == null){
-				error("Can't read into variable " + params.get(i).getLexeme());
+				error("Can't read into variable " + params.get(i).getLexeme() + " at line:"+ params.get(i).getLineNumber() + " col:" + params.get(i).getColumnNumber());
 			}
 			else{
 				String type = current.getType();
@@ -479,7 +682,7 @@ public class SemanticAnalyzer{
 
 		if(symTab.getParent() != null && symTab.getParent().findVariable(symTab.getName()).getKind() == "function"){
 			String[] params = symTab.getParameters().split(" ");
-			write("MOV " + (symTab.getSize() - 1) + "(D" + symTab.getNestingLevel() + ") " + (-3 - params.length) + "(D" + symTab.getNestingLevel() + ")" );//store return variable at the very bottom of everything
+			write("MOV " + (symTab.findVariable(symTab.getName()).getOffset()) + "(D" + symTab.getNestingLevel() + ") " + (-3 - params.length) + "(D" + symTab.getNestingLevel() + ")" );//store return variable at the very bottom of everything
 
 		}
 		
@@ -491,6 +694,10 @@ public class SemanticAnalyzer{
 			}
 		}
 		
+	}
+	
+	public  String topOfStackType(){
+		return topOfStack;
 	}
 	
 	public void end(){
