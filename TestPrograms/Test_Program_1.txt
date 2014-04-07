@@ -32,7 +32,7 @@ program lab1;
   begin
 		writeln('Welcome to my program (^_^ )');
 		writeln('Please enter an integer to find the factorial of:');
-		read(choice);
+		read(choice, otherthing);
 		if choice >= 1 then	
 			writeln(factorial(choice))
 		else

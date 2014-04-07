@@ -3,9 +3,6 @@ package SemanticAnalyzer;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.FileNotFoundException;
-import java.text.NumberFormat;
-import java.text.ParsePosition;
 import java.util.ArrayList;
 
 import Tokenizer.Token;
@@ -14,7 +11,8 @@ import SymbolTable.*;
 
 
 /*
- * 
+ * The semantic analyzer will write code for the umachine program, given instructions and input from the parser
+ * If an instruction cannot be done, an error is given and the program quits
  */
 public class SemanticAnalyzer{
 	
@@ -33,7 +31,7 @@ public class SemanticAnalyzer{
 			if(!(file.exists())){
 				file.createNewFile();
 			}
-			program = new FileWriter(FILE_NAME);
+			program = new FileWriter(file);
 			program.write("BR L1\n");
 		} catch (IOException e) {
 			System.out.println("File Program.il doesn't exist, stopping");
@@ -42,6 +40,10 @@ public class SemanticAnalyzer{
 		
 	}
 	
+	/*
+	 * Add a label for a symbol table. Each symbol table will have one set of statements, so one label for one table is sufficient
+	 * The label is stored in an array of strings, with 0 indexing the name of the table, 1 indexing the kind of table, and 2 indexing the label itself
+	 */
 	public void addLabel(SymbolTable symTab){
 		labels[labelnum][0] = symTab.getName();
 		if(symTab.getParent() != null){
@@ -54,6 +56,9 @@ public class SemanticAnalyzer{
 		labelnum++;
 	}
 	
+	/*
+	 * Add a label for any control flow statement such as if/else/looping
+	 */
 	public void addLabel(String name, int num){
 		labels[labelnum][0] = name + num;
 		labels[labelnum][1] = name;
@@ -61,6 +66,9 @@ public class SemanticAnalyzer{
 		labelnum++;
 	}
 
+	/*
+	 * create a branch to a name, and stipulate when you want to branch to that name
+	 */
 	public void branch(String name, String when){
 		if(when.equals("always")){
 			for(int i = labelnum -1; i >= 0; i--){
@@ -111,6 +119,9 @@ public class SemanticAnalyzer{
 		topOfStack = "empty";
 	}
 
+	/*
+	 * Simply place a label at the spot we are currently at
+	 */
 	public void placeLabel(String name){
 		for(int i = labelnum -1; i >= 0; i--){
 			if(labels[i][0].equals(name)){
@@ -119,6 +130,9 @@ public class SemanticAnalyzer{
 		}
 	}
 	
+	/*
+	 * Checks what kind of value is being pushed, either a variable or a literal
+	 */
 	public void pushCheck(Token variable, SymbolTable symTab){
 		Row info = symTab.findVariable(variable.getLexeme());
 		
@@ -134,6 +148,9 @@ public class SemanticAnalyzer{
 		
 	}
 	
+	/*
+	 * Finds out what kind of literal is being pushed, and writes accordingly as well as enforces stack type
+	 */
 	private void pushLiteral(Token variable){
 		
 		if(topOfStack.equals("empty")){
@@ -217,6 +234,9 @@ public class SemanticAnalyzer{
 		
 	}
 	
+	/*
+	 * Creates the call to a function or procedure, given a list of the parameters given, the current symbol table, and the token of the procedure or function to call to
+	 */
 	public void functionProcedureCall(String paramTypesList, SymbolTable symTab, Token call){
 		Row callinfo = symTab.findVariable(call.getLexeme());
 		String[] paramsGiven = paramTypesList.split(" ");
@@ -278,10 +298,16 @@ public class SemanticAnalyzer{
 		
 	}
 	
+	/*
+	 * Whenever a comma is reached when finding parameters, it clears the type on top of the stack so parameters are not dependent on what is currently on the stack
+	 */
 	public void comma(){
 		topOfStack = "empty";
 	}
 	
+	/*
+	 * Push a variable onto the stack, given the current symbol table, and enforce the stack type
+	 */
 	private void pushVariable(Token variable, SymbolTable symTab){
 		
 		Row info = symTab.findVariable(variable.getLexeme());
@@ -332,6 +358,9 @@ public class SemanticAnalyzer{
 		}
 	}
 	
+	/*
+	 * Pushes room for a return variable in a function call, as well as store the type of the stack before the function call is made
+	 */
 	public void pushRoomForRetVal(String type){
 		
 		topOfStackBeforeFunctionCall = topOfStack;
@@ -347,6 +376,9 @@ public class SemanticAnalyzer{
 		}
 	}
 	
+	/*
+	 * Pop the top of the stack into the variable, given the current symbol table, and also enforces type checking and implicit conversions
+	 */
 	public void pop(Token variable, SymbolTable symTab){
 		
 		Row info = symTab.findVariable(variable.getLexeme());
@@ -394,6 +426,9 @@ public class SemanticAnalyzer{
 		
 	}
 	
+	/*
+	 * Pushes "to" as 1, and downto as "-1" onto the stack, while enforcing stack type
+	 */
 	public void stepValue(Token Tokenvalue){
 		String value = Tokenvalue.getLexeme();
 		if(topOfStack.equals("integer")|| topOfStack.equals("boolean")){
@@ -414,16 +449,25 @@ public class SemanticAnalyzer{
 		}
 	}
 	
+	/*
+	 * Simply flips a boolean, so we no to make whatever is pushed on next into a negative
+	 */
 	public void makeNeg(){
 		makeNeg = true;
 		
 	}
 	
+	/*
+	 * Same as makeNeg semantically, this is just an alias for readability's sake
+	 */
 	public void makePos(){
 		makePos = true;
 		
 	}
 	
+	/*
+	 * Add a math operation while enforcing stack type and operation ability
+	 */
 	public void addOp(Token operation){
 		if(topOfStack.equals("integer")||topOfStack.equals("boolean")){
 			if(operation.getLexeme().equals("+")){
@@ -469,6 +513,9 @@ public class SemanticAnalyzer{
 		
 	}
 	
+	/*
+	 * Add a comparison operation while enforcing stack type
+	 */
 	public void addComp(Token comparator){
 		
 		if(topOfStack.equals("integer")||topOfStack.equals("boolean")){
@@ -518,6 +565,9 @@ public class SemanticAnalyzer{
 		}
 	}
 	
+	/*
+	 * Create read statements given a list of variables
+	 */
 	public void read(ArrayList<Token> params,SymbolTable symTab){
 		Row current;
 		for(int i = 0; i < params.size(); i++){
@@ -540,16 +590,25 @@ public class SemanticAnalyzer{
 		}
 	}
 	
+	/*
+	 * Write whatever is on top of the stack, and clear the stack type
+	 */
 	public void write(){
 		write("WRTS");
 		topOfStack = "empty";
 	}
 	
+	/*
+	 * Write an empty line and clear the stack type
+	 */
 	public void writeln(){
 		write("WRTLN #\"\"");
 		topOfStack = "empty";
 	}
 	
+	/*
+	 * Given a symbol table, figure out it's type, and "create" room on the stack as well as move parameters in, if any are given
+	 */
 	public void statementStart(SymbolTable symTab){
 		
 		int i;
@@ -570,6 +629,9 @@ public class SemanticAnalyzer{
 		}
 	}
 	
+	/*
+	 * Deconstruct the statement from the stack, and store the return variable, if any
+	 */
 	public void statementEnd(SymbolTable symTab){
 
 		if(symTab.getParent() != null && symTab.getParent().findVariable(symTab.getName()).getKind() == "function"){
@@ -588,10 +650,16 @@ public class SemanticAnalyzer{
 		
 	}
 	
+	/*
+	 * Return the type on top of the stack
+	 */
 	public  String topOfStackType(){
 		return topOfStack;
 	}
 	
+	/*
+	 * End the analyzer, append "HLT", and close the file for writing
+	 */
 	public void end(){
 		try{
 			program.write("HLT\n");
@@ -602,6 +670,9 @@ public class SemanticAnalyzer{
 		}
 	}
 	
+	/*
+	 * Write the string given, and move to a new line
+	 */
 	private void write(String command){
 		try{
 			program.write(command + "\n");
@@ -610,6 +681,9 @@ public class SemanticAnalyzer{
 		}
 	}
 	
+	/*
+	 * Print out the error message given, and end the program
+	 */
 	private void error(String msg){
 		System.out.println(msg);
 		System.exit(1);

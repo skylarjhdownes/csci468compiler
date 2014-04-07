@@ -90,6 +90,7 @@ PUSH #"Please enter an integer to find the factorial of:"
 WRTS
 WRTLN #""
 RD 2(D0)
+RD 1(D0)
 PUSH 2(D0)
 PUSH #1
 CMPGES

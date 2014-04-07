@@ -71,7 +71,9 @@ public class NonTerminals {
         System.exit(1);
         return;
     }
-
+    /*
+     * These two procedure will add a "call" entry to their parent symbol tables
+     */
     private static void addProcedureToParent(SymbolTable myTable){
     	
     	String paramList = myTable.getParameters();
@@ -143,7 +145,7 @@ public class NonTerminals {
                 match("MP_PROGRAM");
                 programIdentifier();
                 symTab = new SymbolTable(lastID);//creates initial symbol table for the program
-                semAn.addLabel(symTab);
+                semAn.addLabel(symTab);//adds a label for the "main" program, and since it's the first, the label will b L1
                 break;
             default:
                 syntaxError();// syntaxError
@@ -163,9 +165,9 @@ public class NonTerminals {
             	System.out.println(" (#4)"); // Rule #4
                 variableDeclarationPart();
                 procedureAndFunctionDeclarationPart();
-                semAn.statementStart(symTab);
+                semAn.statementStart(symTab);//every time a block of statements starts, we need to "build" room in the stack based on the current symbol table
                 statementPart();
-                semAn.statementEnd(symTab);
+                semAn.statementEnd(symTab);//after the block is done, we need to "deconstruct" the stack
                 break;
             default:
                 syntaxError();// syntaxError
@@ -300,7 +302,7 @@ public class NonTerminals {
             	System.out.println(" (#17)"); // Rule #17
                 procedureHeading();
                 addProcedureToParent(symTab);//Jon: adds this procedure as a row to the parent class
-                semAn.addLabel(symTab);
+                semAn.addLabel(symTab);//create a label for this procedure to use in calling it later
                 match("MP_SCOLON");
                 block();
                 match("MP_SCOLON");
@@ -321,7 +323,7 @@ public class NonTerminals {
             	System.out.println(" (#18)"); // Rule #18
                 functionHeading();
                 addFunctionToParent(symTab);
-                semAn.addLabel(symTab);
+                semAn.addLabel(symTab);//add a label for this function so that we can call it later
                 match("MP_SCOLON");
                 block();
                 match("MP_SCOLON");
@@ -659,14 +661,12 @@ public class NonTerminals {
             	System.out.println(" (#45)"); // Rule #45
                 match("MP_READ");
                 match("MP_LPAREN");
-                readParams = new ArrayList<Token>();
+                readParams = new ArrayList<Token>();//this is to guarantee a "fresh" list, and is used to gather all the variables that we'll read into
                 readParameter();
                 readParams.add(lastTok);
-                semAn.comma();
                 readParameterTail();
                 match("MP_RPAREN");
-                semAn.comma();
-                semAn.read(readParams, symTab);
+                semAn.read(readParams, symTab);//create code to read into all of the parameters given
                 readParams.clear();
                 break;
             default: // syntaxError OR Empty-String
@@ -683,7 +683,6 @@ public class NonTerminals {
             case "MP_COMMA":
             	System.out.println(" (#46)"); // Rule #46
                 match("MP_COMMA");
-                semAn.comma();
                 readParameter();
                 readParams.add(lastTok);
                 readParameterTail();
@@ -722,7 +721,7 @@ public class NonTerminals {
                 match("MP_WRITE");
                 match("MP_LPAREN");
                 writeParameter();
-                semAn.write();
+                semAn.write();//since write parameter goes to expression, what needs to be writting will be on top of the stack naturally, we just write from it
                 writeParameterTail();
                 match("MP_RPAREN");
                 break;
@@ -734,7 +733,7 @@ public class NonTerminals {
                 semAn.write();
                 writeParameterTail();
                 match("MP_RPAREN");
-                semAn.writeln();
+                semAn.writeln();//this operates the same as write, but we put an empty writeln at the end to jump to a new line
                 break;
 
             default: // syntaxError OR Empty-String
@@ -794,20 +793,6 @@ public class NonTerminals {
     public static void assignmentStatement() {
     	if ( PRINT_PARSE_TREE ) System.out.printf(""+String.format("%1$" + LAPad + "s", Lookahead)+" ->"+String.format("%1$" + (indent++*2+1) + "s", "")
 				+"AssignmentStatement");
-    	// **Stephen** The parser breaks here, the logical consistency is broken in the Statement method, where it uses an "extra" look-ahead.  
-        /*
-    	switch (Lookahead) {
-        case "MP_IDENTIFIER"://both rules are the same
-            match("MP_IDENTIFIER");
-            match("MP_ASSIGN");
-            expression();
-            break;
-        default: // syntaxError OR Empty-String
-            syntaxError();
-            break;
-        }
-        */
-        
         
         switch (Lookahead) {
         case "MP_ASSIGN"://both rules are the same
@@ -815,7 +800,7 @@ public class NonTerminals {
         	Token popInto = lastTok; // this is the variable we will be assigning a value to
             match("MP_ASSIGN");
             expression();
-            semAn.pop(popInto, symTab);
+            semAn.pop(popInto, symTab);//pop the end result of the expression into our variable
             break;
         default: // syntaxError OR Empty-String
             syntaxError();
@@ -832,15 +817,15 @@ public class NonTerminals {
         switch (Lookahead) {
             case "MP_IF":
             	System.out.println(" (#56)"); // Rule #56
-            	String name = "if" + controlCounter;
-            	semAn.addLabel("if", controlCounter);
+            	String name = "if" + controlCounter;//create unique name
+            	semAn.addLabel("if", controlCounter);//add a label for it's type and unique name
             	controlCounter++;
                 match("MP_IF");
                 booleanExpression();
-                semAn.branch(name, "false");
+                semAn.branch(name, "false");//branch to the end if false
                 match("MP_THEN");
                 statement();
-                optionalElsePart(name);
+                optionalElsePart(name);//pass the name variable to the else statement
                 break;
 
             default: // syntaxError OR Empty-String
@@ -856,20 +841,20 @@ public class NonTerminals {
         switch (Lookahead) {
             case "MP_ELSE":
             	System.out.println(" (#57)"); // Rule #57
-            	String name = "else" + controlCounter;
-            	semAn.addLabel("else", controlCounter);
+            	String name = "else" + controlCounter;//create a unique name as well
+            	semAn.addLabel("else", controlCounter);//add a label for it
             	controlCounter++;
-            	semAn.branch(name, "always");
-            	semAn.placeLabel(prevIf);
+            	semAn.branch(name, "always");//always branch past the else if the previous if came true
+            	semAn.placeLabel(prevIf);//this is where the previous if branches to on failure
                 match("MP_ELSE");
                 statement();
-                semAn.placeLabel(name);
+                semAn.placeLabel(name);//place the exit of the else statement. If the if statement came true, it will always branch to here
                 break;
             case "MP_END":
             case "MP_UNTIL":
             case "MP_SCOLON":
             	System.out.println(" (#58)"); // Rule #58
-            	semAn.placeLabel(prevIf);
+            	semAn.placeLabel(prevIf);//there is no else statement, so the if statement branches to here
                 break;
 
             default: // syntaxError OR Empty-String
@@ -886,14 +871,14 @@ public class NonTerminals {
             case "MP_REPEAT":
             	System.out.println(" (#59)"); // Rule #59
                 match("MP_REPEAT");
-                String name = "repeat" + controlCounter;
-                semAn.addLabel("repeat", controlCounter);
+                String name = "repeat" + controlCounter;//create a unique name
+                semAn.addLabel("repeat", controlCounter);//add label for it
                 controlCounter++;
-                semAn.placeLabel(name);
+                semAn.placeLabel(name);//place that label here
                 statementSequence();
                 match("MP_UNTIL");
                 booleanExpression();
-                semAn.branch(name, "false");
+                semAn.branch(name, "false");//branch back to the beginning on failure
                 break;
             default: // syntaxError OR Empty-String
                 syntaxError();
@@ -909,19 +894,23 @@ public class NonTerminals {
             case "MP_WHILE":
             	System.out.println(" (#60)"); // Rule #60
                 match("MP_WHILE");
-                String whileEnter = "whileEnter" + controlCounter;
-                semAn.addLabel("whileEnter", controlCounter);
+                
+                String whileEnter = "whileEnter" + controlCounter;//create unique beginning name
+                semAn.addLabel("whileEnter", controlCounter);//add label for it
                 controlCounter++;
-                String whileExit = "whileExit" + controlCounter;
-                semAn.addLabel("whileExit", controlCounter);
+                
+                String whileExit = "whileExit" + controlCounter;//create a unique exit name
+                semAn.addLabel("whileExit", controlCounter);//add label for it
                 controlCounter++;
-                semAn.placeLabel(whileEnter);
+                
+                semAn.placeLabel(whileEnter);//place the beginning label here
                 booleanExpression();
-                semAn.branch(whileExit, "false");
+                semAn.branch(whileExit, "false");//branch to exit if condition fails
+                
                 match("MP_DO");
                 statement();
-                semAn.branch(whileEnter, "always");
-                semAn.placeLabel(whileExit);
+                semAn.branch(whileEnter, "always");//always branch back to top to check boolean again
+                semAn.placeLabel(whileExit);//branch exits and continues on with code
                 break;
 
             default: // syntaxError OR Empty-String
@@ -939,30 +928,38 @@ public class NonTerminals {
             	System.out.println(" (#61)"); // Rule #61
                 match("MP_FOR");
                 controlVariable();
-                Token controlVar = lastTok;
-                String forLoopEnter = "forEnter" + controlCounter;
-                semAn.addLabel("forEnter", controlCounter);
+                Token controlVar = lastTok;//store the control variable
+                
+                String forLoopEnter = "forEnter" + controlCounter;//create unique beginning name
+                semAn.addLabel("forEnter", controlCounter);//add label for it
                 controlCounter++;
-                String forLoopExit = "forExit" + controlCounter;
-                semAn.addLabel("forExit", controlCounter);
+                
+                String forLoopExit = "forExit" + controlCounter;//create unique exit name
+                semAn.addLabel("forExit", controlCounter);//add label for it
                 controlCounter++;
+                
                 match("MP_ASSIGN");
                 initialValue();
-                semAn.pop(controlVar, symTab);
+                semAn.pop(controlVar, symTab);//pop the initial value into the control variable
+                
                 stepValue();
-                Token ourStepVal = stepVal;
-                semAn.placeLabel(forLoopEnter);
-                finalValue();
-                semAn.pushCheck(controlVar, symTab);
-                semAn.branch(forLoopExit, "equals");
+                Token ourStepVal = stepVal;//store the step value for later
+                
+                semAn.placeLabel(forLoopEnter);//the loop starts here
+                finalValue();//final value will naturally be on the top of the stack
+                semAn.pushCheck(controlVar, symTab);//push the control variable on the stack
+                semAn.branch(forLoopExit, "equals");//check to see if they are equal, and branch if they are
+                
                 match("MP_DO");
                 statement();
-                semAn.pushCheck(controlVar, symTab);
-                semAn.stepValue(ourStepVal);
-                semAn.addOp(new Token("+", "MP_PLUS", -1, -1));
-                semAn.pop(controlVar, symTab);
-                semAn.branch(forLoopEnter, "always");
-                semAn.placeLabel(forLoopExit);
+                
+                semAn.pushCheck(controlVar, symTab);//push the control var
+                semAn.stepValue(ourStepVal);//find the step val and push it on the stack
+                semAn.addOp(new Token("+", "MP_PLUS", -1, -1));//do an add stack
+                semAn.pop(controlVar, symTab);//pop that into the control var
+                semAn.branch(forLoopEnter, "always");//loop back top to check condition
+                semAn.placeLabel(forLoopExit);//exit label goes here
+                
                 break;
 
             default: // syntaxError OR Empty-String
@@ -1068,28 +1065,9 @@ public class NonTerminals {
 
     	System.out.println(" (#67)");// Rule #67
     	Token procedure = lastTok;
-    	readParams = new ArrayList<Token>();
-    	paramTypeList = "";
+    	paramTypeList = "";//create a list of the parameter types to check for when we call the procedure
 		optionalActualParameterList();
-		semAn.functionProcedureCall(paramTypeList, symTab, procedure);
-		readParams.clear();
-		/*
-		switch (Lookahead) {
-            //case "MP_IDENTIFIER":
-            //    procedureIdentifier();
-            //    optionalActualParameterList();
-            //    break;
-        
-        	case "MP_LPAREN":
-            	System.out.println(" (#67)"); // Rule #67
-        		optionalActualParameterList();
-        		break;
-
-            default: // syntaxError OR Empty-String
-                syntaxError();
-                break;
-        }
-        */
+		semAn.functionProcedureCall(paramTypeList, symTab, procedure);//make a call to the procedure
         indent--;
     }
 
@@ -1101,11 +1079,10 @@ public class NonTerminals {
             	System.out.println(" (#68)"); // Rule #68
                 match("MP_LPAREN");
                 actualParameter();
-                paramTypeList += semAn.topOfStackType() + " ";
-                readParams.add(lastTok);
+                paramTypeList += semAn.topOfStackType() + " ";//get the type of whatever's been pushed on, and append to our parameter type list
                 actualParameterTail();
                 match("MP_RPAREN");
-                paramTypeList = paramTypeList.substring(0, paramTypeList.length() - 1);
+                paramTypeList = paramTypeList.substring(0, paramTypeList.length() - 1);//pull the last trailing space off
                 semAn.comma();
                 break;
             case "MP_AND":
@@ -1151,15 +1128,14 @@ public class NonTerminals {
                 match("MP_COMMA");
                 semAn.comma();
                 actualParameter();
-                readParams.add(lastTok);
-                paramTypeList += semAn.topOfStackType() + " ";
+                paramTypeList += semAn.topOfStackType() + " ";//append the type to our list
                 actualParameterTail();
                 break;
             case "MP_RPAREN":
             	System.out.println(" (#71)"); // Rule #71
                 break;
             default:
-                syntaxError(); // **Stephen: This used to be emptyStatement(), is that right?
+                syntaxError(); 
                 break;
         }
         indent--;
@@ -1228,9 +1204,9 @@ public class NonTerminals {
             case "MP_NEQUAL":
             	System.out.println(" (#74)"); // Rule #74
                 relationalOperator();
-                Token operator = lastTok;
+                Token operator = lastTok;//keep track of the operator used
                 simpleExpression();
-                semAn.addComp(operator);
+                semAn.addComp(operator);//add the comparison after the second half of the equation's been pushed on
                 break;
             case "MP_DO":
             case "MP_DOWNTO":
@@ -1359,12 +1335,12 @@ public class NonTerminals {
             case "MP_PLUS":
             	System.out.println(" (#85)"); // Rule #85
                 match("MP_PLUS");
-                semAn.makePos();
+                semAn.makePos();//sets a boolean so we know the next value pushed on has to change sign
                 break;
             case "MP_MINUS":
             	System.out.println(" (#86)"); // Rule #86
                 match("MP_MINUS");
-                semAn.makeNeg();
+                semAn.makeNeg();//same as makePos
                 break;
             case "MP_FALSE":
             case "MP_NOT":
@@ -1465,7 +1441,7 @@ public class NonTerminals {
                 multiplyingOperator();
                 Token operator = lastTok;
                 factor();
-                semAn.addOp(operator);
+                semAn.addOp(operator);//add the operator after the last factor has been pushed on
                 factorTail();
                 break;
             default:
@@ -1513,7 +1489,7 @@ public class NonTerminals {
             case "MP_INTEGER_LIT":
             	System.out.println(" (#99)"); // Rule #99
                 match("MP_INTEGER_LIT");
-                semAn.pushCheck(lastTok, symTab);
+                semAn.pushCheck(lastTok, symTab);//pushes the value onto the stack
                 break;
             case "MP_FLOAT_LIT":  
             	System.out.println(" (#100)"); // Rule #100
@@ -1556,20 +1532,19 @@ public class NonTerminals {
             	System.out.println(" (#106)"); // Rule #106
                 functionIdentifier();
                 Token identifier = lastTok;
-                Row funcOrVar = symTab.findVariable(lastID);
-                paramTypeList = "";
-                if(funcOrVar == null)syntaxError();
-                if(funcOrVar.getKind().equals("function")){
-                	readParams = new ArrayList<Token>();
-                	semAn.pushRoomForRetVal(funcOrVar.getType());
-                	String oldParams = paramTypeList;
-                	paramTypeList = "";
-                	optionalActualParameterList();
-                	semAn.functionProcedureCall(paramTypeList, symTab, identifier);
-                	paramTypeList = oldParams;
+                Row funcOrVar = symTab.findVariable(lastID);//we need to know if the id we grabbed is for a variable or for a function call
+                
+                if(funcOrVar == null)syntaxError();//if it doesn't come back right, the identifier isn't in a symbol table
+                
+                if(funcOrVar.getKind().equals("function")){//if it's function call
+                	semAn.pushRoomForRetVal(funcOrVar.getType());//makes room in the stack, as well as saves the type of the stack before this call is made
+                	String oldParams = paramTypeList;//store the old parameters list in case function call is used as parameter type
+                	paramTypeList = "";//reset the list
+                	optionalActualParameterList();//fill the list
+                	semAn.functionProcedureCall(paramTypeList, symTab, identifier);//make the calls and check that the parameters given fit what is needed
+                	paramTypeList = oldParams;//restore the old list
                 }
-                else if(funcOrVar.getKind().equals("retVar")){
-                	readParams = new ArrayList<Token>();
+                else if(funcOrVar.getKind().equals("retVar")){//if it's a recursive function call, the type that will come back is the returnVariable type
                 	semAn.pushRoomForRetVal(funcOrVar.getType());
                 	String oldParams = paramTypeList;
                 	paramTypeList = "";
@@ -1577,7 +1552,7 @@ public class NonTerminals {
                 	semAn.functionProcedureCall(paramTypeList, symTab.getParent(), identifier);
                 	paramTypeList = oldParams;
                 }
-                else{
+                else{// if the identifier is just a normal variable
                 	semAn.pushCheck(identifier, symTab);
                 }
                 break;
