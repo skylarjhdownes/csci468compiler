@@ -1,5 +1,6 @@
 package SemanticAnalyzer;
 
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.FileNotFoundException;
@@ -28,6 +29,10 @@ public class SemanticAnalyzer{
 	
 	public SemanticAnalyzer(){
 		try {
+			File file = new File(FILE_NAME);
+			if(!(file.exists())){
+				file.createNewFile();
+			}
 			program = new FileWriter(FILE_NAME);
 			program.write("BR L1\n");
 		} catch (IOException e) {
@@ -211,119 +216,6 @@ public class SemanticAnalyzer{
 		
 		
 	}
-	
-/*	public void functionProcedureCall(ArrayList<Token> params, SymbolTable symTab, Token call){
-		Row callInfo = symTab.findVariable(call.getLexeme());
-		String[] paramlist = callInfo.getInputParameters().split(" ");//required parameters
-		String[] paramsGiven = new String[params.size()];//given parameters
-		String[] paramValues = new String[params.size()];
-		
-		if(paramsGiven.length != paramlist.length){
-			error("Incorrect number of parameters when calling " + call.getLexeme() + " Line: " + call.getLineNumber() + " Col:" + call.getColumnNumber()
-					+ "\n found " + paramsGiven.length + " and needed " + paramlist.length);
-		}
-		for(int i = 0; i < params.size(); i++){
-			paramsGiven[i] = params.get(i).getToken();
-			if (paramsGiven[i].equals("MP_INTEGER_LIT")){
-				paramsGiven[i] = "integer";
-				paramValues[i] = "#" + params.get(i).getLexeme();
-			}
-			else if(paramsGiven[i].equals("MP_FLOAT_LIT")||paramsGiven[i].equals("MP_FIXED_LIT")){
-				paramsGiven[i] = "float";
-				paramValues[i] = "#" + params.get(i).getLexeme();
-			}
-			else if (paramsGiven[i].equals("MP_STRING_LIT")){
-				paramsGiven[i] = "string";
-				paramValues[i] = "#" + params.get(i).getLexeme();
-			}
-			else if (paramsGiven[i].equals("MP_IDENTIFIER")){
-				System.out.println(params.get(i).getLexeme());
-				paramsGiven[i] = symTab.findVariable(params.get(i).getLexeme()).getType();
-				String variableOrNot = symTab.findVariable(params.get(i).getLexeme()).getKind();
-				if(variableOrNot.equals("var") || variableOrNot.equals("param")){
-					Row info = symTab.findVariable(params.get(i).getLexeme());
-					paramValues[i] = info.getOffset() + "(D" + info.getNestingLevel() + ")";
-				}
-				else{
-					paramValues[i] = "function";
-				}
-			}
-			else if(paramsGiven[i].equals("MP_TRUE")){
-				paramsGiven[i] = "boolean";
-				paramValues[i] = "#1";
-			}
-			else if(paramsGiven[i].equals("MP_FALSE")){
-				paramsGiven[i] = "boolean";
-				paramValues[i] = "#0";
-			}
-		}
-		
-		for(int i = 0; i < paramsGiven.length; i++){
-			if(!(paramsGiven[i].equals(paramlist[i]))){
-				error("Incorrect parameter type. Looking for "+paramlist[i]+" but found "+paramsGiven[i] + " line:" + call.getLineNumber() + " col:" + call.getColumnNumber());
-			}
-		}
-		
-		//passed checks for parameter number and types
-//		String funcORproc = callInfo.getKind();
-//		if(funcORproc.equals("function")){
-//			write("PUSH #0");//room for return variable at top
-//		}
-		
-//		for(int i = 0; i < paramValues.length; i++){//pushed in the order given
-//			if(paramValues[i].equals("function")){
-//				error("Imbedded function calls as paramters not allowed at this time Line:" + call.getLineNumber()+ " col: " + call.getColumnNumber());
-//			}
-//			write("PUSH " + paramValues[i]);
-//		}
-		
-		for(int i = labelnum -1; i >= 0; i--){//make the call
-			if(labels[i][0].equals(callInfo.getID())){
-				write("CALL " + labels[i][2]);
-			}
-		}		
-		write("SUB SP #" + paramValues.length + " SP");//deconstruct the parameters leaving the return value on top, or no value
-		
-		if(symTab.findVariable(call.getLexeme()).getKind().equals("function")){
-			String type = symTab.findVariable(call.getLexeme()).getType();
-			if(topOfStackBeforeFunctionCall.equals("empty")){
-				topOfStack = type;
-				topOfStackBeforeFunctionCall = "empty";
-			}
-			else if(topOfStackBeforeFunctionCall.equals("float")){
-				if(type.equals("integer")||type.equals("boolean")){
-					topOfStack = "float";
-					write("CASTSF");
-					topOfStackBeforeFunctionCall = "empty";
-				}
-				else if(type.equals("float")){
-					topOfStack = "float";
-					topOfStackBeforeFunctionCall = "empty";
-				}
-				else{
-					error("String concatenation and stuff not implemented yet Line:" + call.getLineNumber() + " col:" + call.getColumnNumber());
-				}
-			}
-			else if(topOfStackBeforeFunctionCall.equals("integer")||topOfStackBeforeFunctionCall.equals("boolean")){
-				if(type.equals("integer")||type.equals("boolean")){
-					topOfStack = type;
-					topOfStackBeforeFunctionCall = "empty";
-				}
-				else if(type.equals("float")){
-					topOfStack = "float";
-					write("CASTSF");
-					topOfStackBeforeFunctionCall = "empty";
-				}
-				else{
-					error("String concatenation and stuff not implemented yet Line:" + call.getLineNumber() + " col:" + call.getColumnNumber());
-				}
-			}
-
-		}
-		
-		
-		
-	}*/
 	
 	public void functionProcedureCall(String paramTypesList, SymbolTable symTab, Token call){
 		Row callinfo = symTab.findVariable(call.getLexeme());

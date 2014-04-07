@@ -1562,14 +1562,20 @@ public class NonTerminals {
                 if(funcOrVar.getKind().equals("function")){
                 	readParams = new ArrayList<Token>();
                 	semAn.pushRoomForRetVal(funcOrVar.getType());
+                	String oldParams = paramTypeList;
+                	paramTypeList = "";
                 	optionalActualParameterList();
                 	semAn.functionProcedureCall(paramTypeList, symTab, identifier);
+                	paramTypeList = oldParams;
                 }
                 else if(funcOrVar.getKind().equals("retVar")){
                 	readParams = new ArrayList<Token>();
                 	semAn.pushRoomForRetVal(funcOrVar.getType());
+                	String oldParams = paramTypeList;
+                	paramTypeList = "";
                 	optionalActualParameterList();
                 	semAn.functionProcedureCall(paramTypeList, symTab.getParent(), identifier);
+                	paramTypeList = oldParams;
                 }
                 else{
                 	semAn.pushCheck(identifier, symTab);

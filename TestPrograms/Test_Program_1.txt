@@ -38,6 +38,7 @@ program lab1;
 		else
 			writeln('-1');
 		listNum(100 div 2);
+		listNum(factorial(9 div 3));
 		otherthing := 15 * 15;
 		writeln('From *main* otherthing is: ', otherthing);
 		scopeTest;
