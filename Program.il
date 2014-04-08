@@ -79,10 +79,71 @@ WRTLN #""
 SUB SP #2 SP
 POP D1
 RET
+L12:
+PUSH D4
+MOV SP D4
+ADD SP #2 SP
+MOV -3(D4) 1(D4)
+PUSH #"I am super imbedded and awesome. B is "
+WRTS
+PUSH 1(D4)
+WRTS
+WRTLN #""
+SUB SP #2 SP
+POP D4
+RET
+L11:
+PUSH D3
+MOV SP D3
+ADD SP #3 SP
+MOV -3(D3) 1(D3)
+PUSH 1(D3)
+CALL L12
+SUB SP #1 SP
+SUB SP #3 SP
+POP D3
+RET
+L10:
+PUSH D2
+MOV SP D2
+ADD SP #3 SP
+MOV -3(D2) 1(D2)
+PUSH 1(D2)
+CALL L11
+SUB SP #1 SP
+SUB SP #3 SP
+POP D2
+RET
+L9:
+PUSH D1
+MOV SP D1
+ADD SP #7 SP
+MOV -3(D1) 3(D1)
+MOV -4(D1) 2(D1)
+MOV -5(D1) 1(D1)
+PUSH #"trying the whole imbedded thing"
+WRTS
+PUSH 3(D1)
+WRTS
+WRTLN #""
+PUSH 1(D1)
+PUSH 2(D1)
+ADDSF
+CASTSI
+POP 5(D1)
+PUSH 5(D1)
+CALL L10
+SUB SP #1 SP
+PUSH #"This string was returned as a value"
+POP 4(D1)
+MOV 4(D1) -6(D1)
+SUB SP #7 SP
+POP D1
+RET
 L1:
 PUSH D0
 MOV SP D0
-ADD SP #6 SP
+ADD SP #8 SP
 PUSH #"Welcome to my program (^_^ )"
 WRTS
 WRTLN #""
@@ -90,23 +151,22 @@ PUSH #"Please enter an integer to find the factorial of:"
 WRTS
 WRTLN #""
 RD 2(D0)
-RD 1(D0)
 PUSH 2(D0)
 PUSH #1
 CMPGES
-BRFS L9
+BRFS L13
 PUSH #0
 PUSH 2(D0)
 CALL L2
 SUB SP #1 SP
 WRTS
 WRTLN #""
-BR L10
-L9:
+BR L14
+L13:
 PUSH #"-1"
 WRTS
 WRTLN #""
-L10:
+L14:
 PUSH #100
 PUSH #2
 DIVS
@@ -123,6 +183,14 @@ SUB SP #1 SP
 PUSH #15
 PUSH #15
 MULS
+PUSH #5
+DIVS
+PUSH #1
+ADDS
+PUSH #2
+PUSH #2
+MULS
+SUBS
 POP 1(D0)
 PUSH #"From *main* otherthing is: "
 WRTS
@@ -135,9 +203,39 @@ WRTS
 PUSH 1(D0)
 WRTS
 WRTLN #""
+PUSH #7.0
+PUSH #2.1
+MULSF
+PUSH #0.6
+PUSH #13
+CASTSF
+DIVSF
+SUBSF
+PUSH #0
+PUSH #13
+PUSH #11
+SUBS
+CALL L2
+SUB SP #1 SP
+CASTSF
+MULSF
+POP 3(D0)
+PUSH 3(D0)
+WRTS
+WRTLN #""
+PUSH 6(D0)
+CALL L8
+PUSH #""
+PUSH #0.001
+PUSH #1.23
+PUSH #"String as input argument"
+CALL L9
+SUB SP #3 SP
+WRTS
+WRTLN #""
 PUSH #"Thank you for using this!"
 WRTS
 WRTLN #""
-SUB SP #6 SP
+SUB SP #8 SP
 POP D0
 HLT

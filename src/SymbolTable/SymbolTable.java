@@ -133,7 +133,7 @@ public class SymbolTable {
         ListIterator<Row> myitems = items.listIterator();
         
         System.out.println("\nTable: " + tableName + " NestingLevel: " + nestLevel + "  ---------------------------------------------------------------------------------");
-        System.out.println("       ID         Kind      Type    Offset  Size    ReturnValues                                  InputParam");
+        System.out.println("            ID         Kind      Type    Offset  Size    ReturnValues                                  InputParam");
 
 
         while (myitems.hasNext()) {//prints items of current table
@@ -165,7 +165,7 @@ public class SymbolTable {
             ListIterator<Row> myitems = items.listIterator();
             
             System.out.println("\nTable: " + tableName + " NestingLevel: " + nestLevel + "  ---------------------------------------------------------------------------------");
-            System.out.println("       ID         Kind      Type    Offset  Size    ReturnValues                                  InputParam");
+            System.out.println("            ID         Kind      Type    Offset  Size    ReturnValues                                  InputParam");
             
             while (myitems.hasNext()) {//prints items of current table
                 current = myitems.next();

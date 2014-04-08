@@ -18,7 +18,7 @@ public class Row {
     
     public void printRow()
     {
-    	System.out.println(String.format("%10s %10s %10s   %4d   %4d      %10s%46s ", ID, kind, type, offset, size, returnValues, inputParameters));
+    	System.out.println(String.format("%15s %10s %10s   %4d   %4d      %10s%46s ", ID, kind, type, offset, size, returnValues, inputParameters));
     }
     public int getNestingLevel(){
     	return nestLevel;

@@ -364,6 +364,7 @@ public class SemanticAnalyzer{
 	public void pushRoomForRetVal(String type){
 		
 		topOfStackBeforeFunctionCall = topOfStack;
+		topOfStack = "empty";
 		
 		if(type.equals("float")){
 			write("PUSH #0.0");
@@ -483,7 +484,7 @@ public class SemanticAnalyzer{
 				write("MULS");
 			}
 			else{
-				error("Can't use operation " + operation.getLexeme() + " on type " + topOfStack);
+				error("Can't use operation " + operation.getLexeme() + " on type " + topOfStack + " Line:" + operation.getLineNumber() + " col:" + operation.getColumnNumber());
 			}
 		}
 		else if(topOfStack.equals("float")){
@@ -504,7 +505,7 @@ public class SemanticAnalyzer{
 				write("MULSF");
 			}
 			else{
-				error("Can't use operation " + operation.getLexeme() + " on type " + topOfStack);
+				error("Can't use operation " + operation.getLexeme() + " on type " + topOfStack + " Line:" + operation.getLineNumber() + " col:" + operation.getColumnNumber());
 			}
 		}
 		else{
