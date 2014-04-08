@@ -26,7 +26,7 @@ public class SymbolTable {
 
     public SymbolTable(String in_name) {
         parent = null;
-        nestLevel = 1;
+        nestLevel = 0;
         tableName = in_name;
     }
 
@@ -59,12 +59,19 @@ public class SymbolTable {
     }
 
     /*
-     This method is just a skeleton until I know what Skylar's row class is like
      Every variable has size 1, so size is increased by one each time we make a new row, 
      with 1 being the starting size to save room for the display register value later
      */
     public void addRow(String ID, String kind, String type, String returnValues, String inputParameters) {
-        Row newRow = new Row(ID, kind, type, size++, 1, returnValues, inputParameters);
+        Row newRow = new Row(ID, kind, type, size++, 1, returnValues, inputParameters, nestLevel);
+        items.add(newRow);
+    }
+    /*
+     * this method is to add a row for function calls and parameter calls, because their size
+     * is different from the size of a variable
+     */
+    public void addFunctionOrParameterRow(String ID, String kind, String type, String returnValues, String inputParameters, int in_size) {
+        Row newRow = new Row(ID, kind, type, size++, in_size, returnValues, inputParameters, nestLevel);
         items.add(newRow);
     }
 
@@ -79,7 +86,7 @@ public class SymbolTable {
 
         while (it.hasNext()) {
             returnRow = it.next();
-            if (returnRow.getID() == id) {
+            if (returnRow.getID().equals(id)) {
                 return returnRow;
             }
         }
@@ -96,6 +103,26 @@ public class SymbolTable {
         children.add(newTable);
         return newTable;
     }
+    
+    /*
+     * Finds all the items of kind "Parameter" and returns the list as a string
+     * This function is used in getting a list of parameter for inserting functions and parameters into the symbol tables
+     */
+    public String getParameters(){
+    	 Row current;
+         ListIterator<Row> myitems = items.listIterator();
+
+         String retString = "";
+         while (myitems.hasNext()) {//prints items of current table
+             current = myitems.next();
+             if(current.getKind().equals("param")){
+            	 retString += current.getType() + " ";
+             }
+         }
+         if(retString.length() > 0) retString = retString.substring(0, retString.length() - 1);//This it to get rid of the trailing space
+         
+         return retString;
+    }
 
     /*
      method will print from current table down, including all children, but no parent
@@ -104,6 +131,10 @@ public class SymbolTable {
 
         Row current;
         ListIterator<Row> myitems = items.listIterator();
+        
+        System.out.println("\nTable: " + tableName + " NestingLevel: " + nestLevel + "  ---------------------------------------------------------------------------------");
+        System.out.println("            ID         Kind      Type    Offset  Size    ReturnValues                                  InputParam");
+
 
         while (myitems.hasNext()) {//prints items of current table
             current = myitems.next();
@@ -133,6 +164,9 @@ public class SymbolTable {
             Row current;
             ListIterator<Row> myitems = items.listIterator();
             
+            System.out.println("\nTable: " + tableName + " NestingLevel: " + nestLevel + "  ---------------------------------------------------------------------------------");
+            System.out.println("            ID         Kind      Type    Offset  Size    ReturnValues                                  InputParam");
+            
             while (myitems.hasNext()) {//prints items of current table
                 current = myitems.next();
                 current.printRow();
@@ -159,6 +193,18 @@ public class SymbolTable {
             current = myitems.next();
             current.printRow();
         }
+    }
+    
+    public SymbolTable moveToChild(String name){
+    	SymbolTable current;
+    	ListIterator<SymbolTable> childs = children.listIterator();
+    	while(childs.hasNext()){
+    		current = childs.next();
+    		if(current.getName().equals(name)){
+    			return current;
+    		}
+    	}
+    	return null;
     }
 
 }
