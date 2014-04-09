@@ -1375,6 +1375,7 @@ public class NonTerminals {
             case "MP_OR":
             	System.out.println(" (#90)"); // Rule #90
                 match("MP_OR");
+                semAn.checkBothSides();
                 break;
             default:
                 syntaxError();
@@ -1474,6 +1475,7 @@ public class NonTerminals {
             case "MP_AND":
             	System.out.println(" (#98)"); // Rule #98
                 match("MP_AND");
+                semAn.checkBothSides();
                 break;
             default:
                 syntaxError();
@@ -1519,7 +1521,6 @@ public class NonTerminals {
             case "MP_NOT":
             	System.out.println(" (#104)"); // Rule #104
                 match("MP_NOT");
-                semAn.pushCheck(lastTok, symTab);
                 factor();
                 break;
             case "MP_LPAREN":

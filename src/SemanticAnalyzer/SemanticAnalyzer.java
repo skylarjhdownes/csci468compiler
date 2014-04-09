@@ -20,6 +20,7 @@ public class SemanticAnalyzer{
 	private static String[][] labels = new String[50][3];
 	private static String topOfStack = "empty";
 	private static String topOfStackBeforeFunctionCall = "empty";
+	private static String firstSide = "empty";
 	private static boolean makeNeg = false;
 	private static boolean makePos = false;
 	private static FileWriter program;
@@ -80,7 +81,7 @@ public class SemanticAnalyzer{
 		
 		else if(when.equals("true")){
 			if(!(topOfStack.equals("boolean"))){
-				error("Branching on term that is not a boolean on " + name + " call" );
+				error("Branching on term that is not a boolean on " + name + " call" + " value is " + topOfStack );
 			}
 			else{
 				for(int i = labelnum -1; i >= 0; i--){
@@ -92,7 +93,7 @@ public class SemanticAnalyzer{
 		}
 		else if(when.equals("false")){
 			if(!(topOfStack.equals("boolean"))){
-				error("Branching on term that is not a boolean on " + name + " call" );
+				error("Branching on term that is not a boolean on " + name + " call" + " value is " + topOfStack);
 			}
 			else{
 				for(int i = labelnum -1; i >= 0; i--){
@@ -105,7 +106,7 @@ public class SemanticAnalyzer{
 		else if(when.equals("equals")){
 			for(int i = labelnum -1; i >= 0; i--){
 				if(labels[i][0].equals(name)){
-					if(topOfStack.equals("integer")||topOfStack.equals("boolean")){
+					if(topOfStack.equals("integer")||topOfStack.equals("empty")){
 						write("CMPEQS");
 					}
 					else{
@@ -158,28 +159,9 @@ public class SemanticAnalyzer{
 				write("PUSH #\"" + variable.getLexeme().substring(1,variable.getLexeme().length() -1) + "\"");
 				topOfStack = "string";
 			}
-			else{
-				write("PUSH #" + variable.getLexeme());
-			}
-			if(variable.getToken().equals("MP_FIXED_LIT")||variable.getToken().equals("MP_FLOAT_LIT")){
+			else if(variable.getToken().equals("MP_FIXED_LIT")||variable.getToken().equals("MP_FLOAT_LIT")){
 				topOfStack = "float";
-			}
-			else if(variable.getToken().equals("MP_TRUE")||variable.getToken().equals("MP_FALSE")){
-				topOfStack = "boolean";
-			}
-			else if(variable.getToken().equals("MP_INTEGER_LIT")){
-				topOfStack = "integer";
-			}
-			else{
-				topOfStack = "string";
-			}
-		}
-		
-		else if(topOfStack.equals("integer")||topOfStack.equals("boolean")){
-			if(variable.getToken().equals("MP_FIXED_LIT")||variable.getToken().equals("MP_FLOAT_LIT")){
-				write("CASTSF");
 				write("PUSH #" + variable.getLexeme());
-				topOfStack = "float";
 			}
 			else if(variable.getToken().equals("MP_TRUE")){
 				write("PUSH #1");
@@ -190,7 +172,32 @@ public class SemanticAnalyzer{
 				topOfStack = "boolean";
 			}
 			else if(variable.getToken().equals("MP_INTEGER_LIT")){
+				topOfStack = "integer";
 				write("PUSH #" + variable.getLexeme());
+			}
+		}
+		
+		else if(topOfStack.equals("integer")||topOfStack.equals("boolean")){
+			if(variable.getToken().equals("MP_FIXED_LIT")||variable.getToken().equals("MP_FLOAT_LIT")){
+				write("CASTSF");
+				write("PUSH #" + variable.getLexeme());
+				topOfStack = "float";
+			}
+			else if(variable.getToken().equals("MP_TRUE")){
+				if(topOfStack.equals("integer")){
+					error("Can't add boolean TRUE as int value");
+				}
+				write("PUSH #1");
+			}
+			else if(variable.getToken().equals("MP_FALSE")){
+				if(topOfStack.equals("integer")){
+					error("Can't add boolean False as int value");
+				}
+				write("PUSH #0");
+			}
+			else if(variable.getToken().equals("MP_INTEGER_LIT")){
+				write("PUSH #" + variable.getLexeme());
+				topOfStack = "integer";
 			}
 			else{
 				error("Found a "+ variable.getToken()+" called "+variable.getLexeme() + "in expression");
@@ -208,13 +215,14 @@ public class SemanticAnalyzer{
 				write("PUSH #" + variable.getLexeme());
 			}
 			else if(variable.getToken().equals("MP_TRUE")){
-				write("PUSH #1");
-				write("CASTSF");
+				if(topOfStack.equals("integer")){
+					error("Can't add boolean TRUE as float value");
+				}
 			}
 			else if(variable.getToken().equals("MP_FALSE")){
-				write("PUSH #0");
-				write("CASTSF");
-
+				if(topOfStack.equals("integer")){
+					error("Can't add boolean FALSE as float value");
+				}
 			}
 			else if(variable.getToken().equals("MP_INTEGER_LIT")){
 				write("PUSH #" + variable.getLexeme());
@@ -325,7 +333,7 @@ public class SemanticAnalyzer{
 			}
 			else if(info.getType().equals("boolean")||info.getType().equals("integer")){
 				write("PUSH " + info.getOffset() + "(D" + info.getNestingLevel() + ")");
-				topOfStack = info.getType();
+				if(info.getType().equals("integer")) topOfStack = info.getType();
 			}
 			else{
 				error("String found in statement");
@@ -471,21 +479,41 @@ public class SemanticAnalyzer{
 	 */
 	public void addOp(Token operation){
 		if(topOfStack.equals("integer")||topOfStack.equals("boolean")){
-			if(operation.getLexeme().equals("+")){
-				write("ADDS");
+			//boolean operators
+			String addError = "";
+			
+			if(topOfStack.equals("boolean") && firstSide.equals("boolean") && operation.getToken().equals("MP_OR")){
+				write("ORS");
+				firstSide = "empty";
 			}
-			else if(operation.getLexeme().equals("-")){
-				write("SUBS");
+			else if(topOfStack.equals("boolean") && firstSide.equals("boolean") && operation.getToken().equals("MP_AND")){
+				write("ANDS");
+				firstSide = "empty";
 			}
-			else if(operation.getToken().equals("MP_DIV")){
-				write("DIVS");
+			//add to the error statement
+			
+			else if(operation.getToken().equals("MP_AND")||operation.getToken().equals("MP_OR")){
+				addError = " when first half is " + firstSide;
 			}
-			else if(operation.getLexeme().equals("*")){
-				write("MULS");
-			}
+			else {
+				//integer or boolean operators
+				if(operation.getLexeme().equals("+")){
+					write("ADDS");
+				}
+				else if(operation.getLexeme().equals("-")){
+					write("SUBS");
+				}
+				else if(operation.getToken().equals("MP_DIV")){
+					write("DIVS");
+				}
+				else if(operation.getLexeme().equals("*")){
+					write("MULS");
+				}
 			else{
-				error("Can't use operation " + operation.getLexeme() + " on type " + topOfStack + " Line:" + operation.getLineNumber() + " col:" + operation.getColumnNumber());
+				error("Can't use operation " + operation.getLexeme() + " on type " + topOfStack + addError + " Line:" + operation.getLineNumber() + " col:" + operation.getColumnNumber());
 			}
+			}
+			
 		}
 		else if(topOfStack.equals("float")){
 			if(operation.getLexeme().equals("+")){
@@ -513,13 +541,18 @@ public class SemanticAnalyzer{
 		}
 		
 	}
+
+	public void checkBothSides(){
+		firstSide = topOfStack;
+		topOfStack = "empty";
+	}
 	
 	/*
 	 * Add a comparison operation while enforcing stack type
 	 */
 	public void addComp(Token comparator){
 		
-		if(topOfStack.equals("integer")||topOfStack.equals("boolean")){
+		if(topOfStack.equals("integer")||topOfStack.equals("empty")){
 			if(comparator.getLexeme().equals(">")){
 				write("CMPGTS");
 			}
@@ -538,7 +571,6 @@ public class SemanticAnalyzer{
 			else if(comparator.getLexeme().equals("<>")){
 				write("CMPNES");
 			}
-			topOfStack = "boolean";
 		}
 		else if(topOfStack.equals("float")){
 			if(comparator.getLexeme().equals(">")){
@@ -559,11 +591,12 @@ public class SemanticAnalyzer{
 			else if(comparator.getLexeme().equals("<>")){
 				write("CMPNESF");
 			}
-			topOfStack = "boolean";
 		}
 		else{
 			error("Problem adding comparison on line:" + comparator.getLineNumber() + " col:" + comparator.getColumnNumber());
 		}
+		
+		topOfStack = "boolean";
 	}
 	
 	/*

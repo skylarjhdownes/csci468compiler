@@ -60,7 +60,7 @@ program lab1;
 		writeln('Welcome to my program (^_^ )');
 		writeln('Please enter an integer to find the factorial of:');
 		read(choice);
-		if choice >= 1 then	
+		if (false) and ( choice >= 1 ) then	
 			writeln(factorial(choice))
 		else
 			writeln('-1');

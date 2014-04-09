@@ -151,9 +151,11 @@ PUSH #"Please enter an integer to find the factorial of:"
 WRTS
 WRTLN #""
 RD 2(D0)
+PUSH #0
 PUSH 2(D0)
 PUSH #1
 CMPGES
+ANDS
 BRFS L13
 PUSH #0
 PUSH 2(D0)
