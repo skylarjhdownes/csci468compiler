@@ -140,9 +140,6 @@ public class SemanticAnalyzer{
 		if (info == null){
 			pushLiteral(variable);
 		}
-		else if(info.getKind().equals("function")){
-			//do nothign at the moment
-		}
 		else{
 			pushVariable(variable, symTab);
 		}
@@ -185,15 +182,23 @@ public class SemanticAnalyzer{
 			}
 			else if(variable.getToken().equals("MP_TRUE")){
 				if(topOfStack.equals("integer")){
-					error("Can't add boolean TRUE as int value");
+					error("Can't add boolean TRUE as int value Line:" + variable.getLineNumber() + " col:" + variable.getColumnNumber());
 				}
 				write("PUSH #1");
 			}
 			else if(variable.getToken().equals("MP_FALSE")){
 				if(topOfStack.equals("integer")){
-					error("Can't add boolean False as int value");
+					error("Can't add boolean False as int value Line:" + variable.getLineNumber() + " col:" + variable.getColumnNumber());
 				}
 				write("PUSH #0");
+			}
+			else if (variable.getToken().equals("MP_NOT")){
+				if(topOfStack.equals("integer")){
+					error("Can't NOT a non-boolean Line:" + variable.getLineNumber() + " col:" + variable.getColumnNumber());
+				}
+				write("PUSH #1");
+				write("SUBS");
+				write("NEGS");
 			}
 			else if(variable.getToken().equals("MP_INTEGER_LIT")){
 				write("PUSH #" + variable.getLexeme());
@@ -216,12 +221,17 @@ public class SemanticAnalyzer{
 			}
 			else if(variable.getToken().equals("MP_TRUE")){
 				if(topOfStack.equals("integer")){
-					error("Can't add boolean TRUE as float value");
+					error("Can't add boolean TRUE as float value Line:" + variable.getLineNumber() + " col:" + variable.getColumnNumber());
 				}
 			}
 			else if(variable.getToken().equals("MP_FALSE")){
 				if(topOfStack.equals("integer")){
-					error("Can't add boolean FALSE as float value");
+					error("Can't add boolean FALSE as float value Line:" + variable.getLineNumber() + " col:" + variable.getColumnNumber());
+				}
+			}
+			else if (variable.getToken().equals("MP_NOT")){
+				if(topOfStack.equals("integer")){
+					error("Can't NOT a non-boolean Line:" + variable.getLineNumber() + " col:" + variable.getColumnNumber());
 				}
 			}
 			else if(variable.getToken().equals("MP_INTEGER_LIT")){

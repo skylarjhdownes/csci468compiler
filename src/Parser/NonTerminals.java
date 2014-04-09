@@ -1521,7 +1521,9 @@ public class NonTerminals {
             case "MP_NOT":
             	System.out.println(" (#104)"); // Rule #104
                 match("MP_NOT");
+                Token not = lastTok;
                 factor();
+                semAn.pushCheck(not, symTab);
                 break;
             case "MP_LPAREN":
             	System.out.println(" (#105)"); // Rule #105
