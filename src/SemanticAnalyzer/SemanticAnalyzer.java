@@ -480,8 +480,6 @@ public class SemanticAnalyzer{
 	public void addOp(Token operation){
 		if(topOfStack.equals("integer")||topOfStack.equals("boolean")){
 			//boolean operators
-			String addError = "";
-			
 			if(topOfStack.equals("boolean") && firstSide.equals("boolean") && operation.getToken().equals("MP_OR")){
 				write("ORS");
 				firstSide = "empty";
@@ -493,7 +491,7 @@ public class SemanticAnalyzer{
 			//add to the error statement
 			
 			else if(operation.getToken().equals("MP_AND")||operation.getToken().equals("MP_OR")){
-				addError = " when first half is " + firstSide;
+				error("Can't use operation " + operation.getLexeme() + " on type " + topOfStack + " when first side is " + firstSide + " Line:" + operation.getLineNumber() + " col:" + operation.getColumnNumber());
 			}
 			else {
 				//integer or boolean operators
@@ -510,7 +508,7 @@ public class SemanticAnalyzer{
 					write("MULS");
 				}
 			else{
-				error("Can't use operation " + operation.getLexeme() + " on type " + topOfStack + addError + " Line:" + operation.getLineNumber() + " col:" + operation.getColumnNumber());
+				error("Can't use operation " + operation.getLexeme() + " on type " + topOfStack + " Line:" + operation.getLineNumber() + " col:" + operation.getColumnNumber());
 			}
 			}
 			
