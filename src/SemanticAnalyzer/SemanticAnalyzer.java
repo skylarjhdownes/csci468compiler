@@ -16,7 +16,7 @@ import SymbolTable.*;
  */
 public class SemanticAnalyzer{
 	
-	private static String FILE_NAME = "..\\Program.il";
+	private static String FILE_NAME = "uCompiler.il";
 	private static String[][] labels = new String[50][3];
 	private static String topOfStack = "empty";
 	private static String topOfStackBeforeFunctionCall = "empty";
