@@ -75,7 +75,8 @@ program lab1;
 		floatMathTest := (7.0 *2.1 - 0.6 / 13) * (factorial(13 - 11));
 		writeln(floatMathTest);
 		
-		scopeTest(scopeTest);{intersting because scopeTest has no input parameters, and it's ok because scopeTest doesn't have a value return}
+		{scopeTest(scopeTest); This has been fixed and no longer compiles.} 
+		{intersting because scopeTest has no input parameters, and it's ok because scopeTest doesn't have a value return}
 		
 		writeln(retString(0.001, 1.23, 'String as input argument'));
 		
