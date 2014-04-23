@@ -100,7 +100,7 @@ public class MicroPascalScanner implements I_Tokenizer {
 				 colNum++;
 			 }
 			 else if ( nextChar == '	' ) {
-				 colNum++;
+				 colNum += 4;
 			 }
 			 else if ( nextChar == '\r' ) {
 				 colNum++;
@@ -109,7 +109,9 @@ public class MicroPascalScanner implements I_Tokenizer {
 				 colNum++;
 			 }
 			 else if ( nextChar == '{' ) {
-					do {
+				 int commentStart = colNum;
+					int commentLine = lineNum;	
+				 do {
 						 if ( buffer.length() == 0 || colNum+tempColNum >= buffer.length() ) {
 							 buffer = getNextLine();
 						 }
@@ -118,7 +120,8 @@ public class MicroPascalScanner implements I_Tokenizer {
 						 }
 
 						 if ( !hasNextToken() ) {
-							 // TODO RUN ON COMMENT ERROR
+							 System.out.println("Run on comment Error Line:" + commentLine + " col:" + commentStart);
+							 System.exit(1);
 							 break;
 						 }
 						 nextChar = peekNextChar();

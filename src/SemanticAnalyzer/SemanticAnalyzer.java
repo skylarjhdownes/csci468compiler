@@ -172,6 +172,20 @@ public class SemanticAnalyzer{
 				topOfStack = "integer";
 				write("PUSH #" + variable.getLexeme());
 			}
+			
+			if(makePos || makeNeg){
+				makePos = false;
+				makeNeg = false;
+				if(topOfStack.equals("integer")){
+					write("NEGS");
+				}
+				else if(topOfStack.equals("float")){
+					write("NEGSF");
+				}
+				else{
+					error("Trying to make non-number negative Line:" + variable.getLineNumber() + " col:" + variable.getColumnNumber());
+				}
+			}
 		}
 		
 		else if(topOfStack.equals("boolean")){
