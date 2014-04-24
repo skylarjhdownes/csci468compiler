@@ -100,7 +100,7 @@ public class MicroPascalScanner implements I_Tokenizer {
 				 colNum++;
 			 }
 			 else if ( nextChar == '	' ) {
-				 colNum += 4;
+				 colNum ++;
 			 }
 			 else if ( nextChar == '\r' ) {
 				 colNum++;
