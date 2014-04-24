@@ -2,6 +2,7 @@ program lab1;
     var  otherthing, choice: integer;
 		floatMathTest: float;
 		booleanValue: boolean;
+		floatMathTest: string;
        
 	function factorial( b: integer):integer;
 	var x: integer;

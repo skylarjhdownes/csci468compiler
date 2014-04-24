@@ -63,6 +63,20 @@ public class SymbolTable {
      with 1 being the starting size to save room for the display register value later
      */
     public void addRow(String ID, String kind, String type, String returnValues, String inputParameters) {
+	
+	//check whether the variable name has been used already or not
+    	Row currentRow;
+        ListIterator<Row> it = items.listIterator();
+
+        while (it.hasNext()) {
+            currentRow = it.next();
+            if (currentRow.getID().equals(ID) || (ID.equals(tableName) && !(kind.equals("retVar")))) {//checks if the variable name exists, or whether you've accidentally replaced the return variable
+                printTableFromHere();
+                System.out.println("Error\nThe identifier " + ID + " already exists in the table " + tableName);
+                System.exit(1);
+            }
+        }
+    	//passed tests, add it
         Row newRow = new Row(ID, kind, type, size++, 1, returnValues, inputParameters, nestLevel);
         items.add(newRow);
     }
@@ -71,6 +85,20 @@ public class SymbolTable {
      * is different from the size of a variable
      */
     public void addFunctionOrParameterRow(String ID, String kind, String type, String returnValues, String inputParameters, int in_size) {
+	
+	//check whether the variable name has been used already or not
+    	Row currentRow;
+        ListIterator<Row> it = items.listIterator();
+
+        while (it.hasNext()) {
+            currentRow = it.next();
+            if (currentRow.getID().equals(ID) || (ID.equals(tableName) && !(kind.equals("retVar")))) {//checks if the variable name exists, or whether you've accidentally replaced the return variable
+                printTableFromHere();
+                System.out.println("Error\nThe identifier " + ID + " already exists in the table " + tableName);
+                System.exit(1);
+            }
+        }
+    	//passed tests, add it
         Row newRow = new Row(ID, kind, type, size++, in_size, returnValues, inputParameters, nestLevel);
         items.add(newRow);
     }
