@@ -80,7 +80,8 @@ public class Compiler {
 		
 		System.out.println("\n\n\nParsing...\n\n");
 		NonTerminals.start(list);
-
+		
+		reader.close();
 
 	}
 

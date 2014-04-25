@@ -1,6 +1,5 @@
 package SymbolTable;
 
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.ListIterator;
 
@@ -57,6 +56,7 @@ public class SymbolTable {
     public void setParent(SymbolTable newParent) {
         parent = newParent;
     }
+    
 
     /*
      Every variable has size 1, so size is increased by one each time we make a new row, 
@@ -77,14 +77,14 @@ public class SymbolTable {
             }
         }
     	//passed tests, add it
-        Row newRow = new Row(ID, kind, type, size++, 1, returnValues, inputParameters, nestLevel);
+        Row newRow = new Row(ID, kind, type, size++, 1, returnValues, inputParameters, nestLevel, "");
         items.add(newRow);
     }
     /*
      * this method is to add a row for function calls and parameter calls, because their size
      * is different from the size of a variable
      */
-    public void addFunctionOrParameterRow(String ID, String kind, String type, String returnValues, String inputParameters, int in_size) {
+    public void addFunctionOrParameterRow(String ID, String kind, String type, String returnValues, String inputParameters, int in_size, String paramKinds) {
 	
 	//check whether the variable name has been used already or not
     	Row currentRow;
@@ -99,7 +99,7 @@ public class SymbolTable {
             }
         }
     	//passed tests, add it
-        Row newRow = new Row(ID, kind, type, size++, in_size, returnValues, inputParameters, nestLevel);
+        Row newRow = new Row(ID, kind, type, size++, in_size, returnValues, inputParameters, nestLevel, paramKinds);
         items.add(newRow);
     }
 
@@ -143,7 +143,7 @@ public class SymbolTable {
          String retString = "";
          while (myitems.hasNext()) {//prints items of current table
              current = myitems.next();
-             if(current.getKind().equals("param")){
+             if(current.getKind().equals("param") || current.getKind().equals("varParam")){
             	 retString += current.getType() + " ";
              }
          }
@@ -151,6 +151,23 @@ public class SymbolTable {
          
          return retString;
     }
+    
+    public String getParameterKinds(){
+   	 Row current;
+     ListIterator<Row> myitems = items.listIterator();
+
+     String retString = "";
+     while (myitems.hasNext()) {//prints items of current table
+         current = myitems.next();
+         if(current.getKind().equals("param") || current.getKind().equals("varParam")){
+        	 retString += current.getKind() + " ";
+         }
+     }
+     if(retString.length() > 0) retString = retString.substring(0, retString.length() - 1);//This it to get rid of the trailing space
+     
+     return retString;
+    }
+
 
     /*
      method will print from current table down, including all children, but no parent

@@ -2,10 +2,10 @@ package SymbolTable;
 
 public class Row {
 
-	String ID, kind, type, returnValues, inputParameters;
+	String ID, kind, type, returnValues, inputParameters, paramKinds;
 	int offset, size, nestLevel;
 	
-    public Row(String ID_in, String kind_in, String type_in, int offset_in, int size_in, String returnValues_in, String inputParameters_in, int nestLevel) {
+    public Row(String ID_in, String kind_in, String type_in, int offset_in, int size_in, String returnValues_in, String inputParameters_in, int nestLevel, String paramKinds) {
     	ID = ID_in;
     	kind = kind_in;
     	type = type_in;
@@ -13,6 +13,7 @@ public class Row {
     	size = size_in;
     	returnValues = returnValues_in;
     	inputParameters = inputParameters_in;
+    	this.paramKinds = paramKinds;
     	this.nestLevel = nestLevel;
     }
     
@@ -48,6 +49,10 @@ public class Row {
     }
     public String getInputParameters() {
     	return inputParameters;
+    }
+    
+    public String getParameterKinds(){
+    	return paramKinds;
     }
     
     public void setID(String ID_in) {
