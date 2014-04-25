@@ -77,18 +77,20 @@ public class NonTerminals {
     private static void addProcedureToParent(SymbolTable myTable){
     	
     	String paramList = myTable.getParameters();
-    	String retType = "proc";//Jon:Procedures don't have a return type
+    	String paramKinds = myTable.getParameterKinds();
+    	String retType = "procedure";//Jon:Procedures don't have a return type
     	
-    	myTable.getParent().addFunctionOrParameterRow(myTable.getName(), "procedure", retType, retType, paramList, myTable.getSize()); 	
+    	myTable.getParent().addFunctionOrParameterRow(myTable.getName(), "procedure", retType, retType, paramList, myTable.getSize(), paramKinds); 	
     	
     }
     
     private static void addFunctionToParent(SymbolTable myTable){
     	
     	String paramList = myTable.getParameters();
+    	String paramKinds = myTable.getParameterKinds();
     	String retType = myTable.findVariable(myTable.getName()).getType();//Jon: find the return variable, and get its type. It will be the return type
     	
-    	myTable.getParent().addFunctionOrParameterRow(myTable.getName(), "function", retType, retType, paramList, myTable.getSize()); 	
+    	myTable.getParent().addFunctionOrParameterRow(myTable.getName(), "function", retType, retType, paramList, myTable.getSize(), paramKinds); 	
     }
     
     public static void start(LinkedList<Token> list) {
@@ -470,7 +472,7 @@ public class NonTerminals {
                 match("MP_COLON");
                 type();
                 for(int i = 0; i < idListIndex; i++){//Jon: go through our list of identifiers and add them to the symbol table now that we know their type
-                	symTab.addRow(idList[i], "param", lastID, "none", "none");//Jon: lastID should be set to the last type matched in type()
+                	symTab.addRow(idList[i], "varParam", lastID, "none", "none");//Jon: lastID should be set to the last type matched in type()
                 	idList[i] = "";//Jon: empty the spot after we've added it to the table
                 }
                 idListIndex = 0;//Jon: reset the index now that we're done with the array
@@ -1082,6 +1084,7 @@ public class NonTerminals {
             	System.out.println(" (#68)"); // Rule #68
                 match("MP_LPAREN");
                 actualParameter();
+                semAn.pushAddress(lastTok, symTab);
                 paramTypeList += semAn.topOfStackType() + " ";//get the type of whatever's been pushed on, and append to our parameter type list
                 actualParameterTail();
                 match("MP_RPAREN");
@@ -1131,6 +1134,7 @@ public class NonTerminals {
                 match("MP_COMMA");
                 semAn.comma();
                 actualParameter();
+                semAn.pushAddress(lastTok, symTab);
                 paramTypeList += semAn.topOfStackType() + " ";//append the type to our list
                 actualParameterTail();
                 break;
