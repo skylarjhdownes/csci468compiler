@@ -360,6 +360,9 @@ public class SemanticAnalyzer{
 			write("ADDS");
 			paramTypes += "variable ";
 		}
+		else if(info.getKind().equals("varParam")){
+			write("PUSH " + info.getOffset() + "(D" + info.getNestingLevel() + ")");
+		}
 	}
 	
 	/*
@@ -367,6 +370,31 @@ public class SemanticAnalyzer{
 	 */
 	public void comma(){
 		topOfStack = "empty";
+	}
+	
+	public void addStepVal(Token stepVal){
+		String value = stepVal.getLexeme();
+		if(topOfStack.equals("integer")|| topOfStack.equals("boolean")){
+			if(value.equals("to")){
+				write("PUSH #1");
+				write("ADDS");
+			}
+			else{
+				write("PUSH #-1");
+				write("ADDS");
+			}
+		}
+		else{
+			if(value.equals("to")){
+				write("PUSH #1.0");
+				write("ADDSF");
+			}
+			else{
+				write("PUSH #-1.0");
+				write("ADDSF");
+			}
+		}
+		
 	}
 	
 	public void forCheck(Token controlVar, String exit, SymbolTable symTab){

@@ -66,10 +66,18 @@ program lab1;
 	end;
 	
 	procedure refCheck2(z: integer; var x, y: float);
-	
+		
+		procedure refCheck3(var chicken: float);
+		
+		begin
+			writeln('In refCheck 3 value is: ', chicken);
+			writeln('');
+		end;
+		
 	begin
 		x := x + y;
 		writeln('X in refcheck2 is ', x);
+		refCheck3(y);
 	end;
     
   begin
@@ -114,7 +122,8 @@ program lab1;
 			end;
 		until (otherthing < 0);
 		
-		for otherthing := (-5) to (otherthing + 10) do
+		for otherthing := (-5) to (otherthing + 20) do
+		
 			writeln('otherthing is ', otherthing);
 		
 		booleanValue := true;

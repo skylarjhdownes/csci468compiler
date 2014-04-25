@@ -951,6 +951,7 @@ public class NonTerminals {
                 
                
                 finalValue();//final value will naturally be on the top of the stack
+                semAn.addStepVal(ourStepVal);
                 semAn.comma();
                 semAn.placeLabel(forLoopEnter);//the loop starts here
                 semAn.forCheck(controlVar, forLoopExit, symTab);//push the control variable on the stack
