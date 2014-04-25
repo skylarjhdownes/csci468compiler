@@ -14,6 +14,7 @@ public class MicroPascalScanner implements I_Tokenizer {
 	private int tempColNum = 0;
 	private int lineNum = 0;
 	private String buffer = null;
+	private int numLeftParens = 0;
 	private boolean hasNextChar = true;
 	private FileReader fr;
 	LinkedList<Token> tokenList = new LinkedList<Token>();
@@ -110,7 +111,7 @@ public class MicroPascalScanner implements I_Tokenizer {
 			 }
 			 else if ( nextChar == '{' ) {
 				 int commentStart = colNum;
-					int commentLine = lineNum;	
+					int commentLine = lineNum;
 				 do {
 						 if ( buffer.length() == 0 || colNum+tempColNum >= buffer.length() ) {
 							 buffer = getNextLine();
@@ -126,7 +127,13 @@ public class MicroPascalScanner implements I_Tokenizer {
 						 }
 						 nextChar = peekNextChar();
 						 colNum++;
-					} while (nextChar != '}');
+						 if(nextChar == '{'){
+							 numLeftParens++;
+						 }
+						 else if(nextChar == '}'){
+							 numLeftParens--;
+						 }
+					} while (numLeftParens > 0);
 
 			 }
 			 else break;

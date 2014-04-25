@@ -155,6 +155,8 @@ MOV SP D1
 ADD SP #2 SP
 MOV -3(D1) 1(D1)
 PUSH #5
+PUSH @1(D1)
+ADDS
 POP @1(D1)
 PUSH #"Variable x should be changed to "
 WRTS
@@ -164,10 +166,29 @@ WRTLN #""
 SUB SP #2 SP
 POP D1
 RET
+L14:
+PUSH D1
+MOV SP D1
+ADD SP #4 SP
+MOV -3(D1) 3(D1)
+MOV -5(D1) 2(D1)
+MOV -8(D1) 1(D1)
+PUSH @2(D1)
+PUSH @3(D1)
+ADDSF
+POP @2(D1)
+PUSH #"X in refcheck2 is "
+WRTS
+PUSH @2(D1)
+WRTS
+WRTLN #""
+SUB SP #4 SP
+POP D1
+RET
 L1:
 PUSH D0
 MOV SP D0
-ADD SP #11 SP
+ADD SP #12 SP
 PUSH #"Welcome to my program (^_^ )"
 WRTS
 WRTLN #""
@@ -179,7 +200,7 @@ PUSH #0
 PUSH #1
 SUBS
 NEGS
-BRFS L14
+BRFS L15
 PUSH #0
 PUSH 2(D0)
 PUSH D0
@@ -189,12 +210,12 @@ CALL L2
 SUB SP #2 SP
 WRTS
 WRTLN #""
-BR L15
-L14:
+BR L16
+L15:
 PUSH #"-1"
 WRTS
 WRTLN #""
-L15:
+L16:
 PUSH #100
 PUSH #2
 DIVS
@@ -284,9 +305,35 @@ WRTS
 PUSH #" in main"
 WRTS
 WRTLN #""
+PUSH #"floatMathTest start: "
+WRTS
+PUSH 3(D0)
+WRTS
+WRTLN #""
+PUSH #10
+PUSH #3
+DIVS
+PUSH #-1
+PUSH 3(D0)
+PUSH D0
+PUSH #3
+ADDS
+PUSH 3(D0)
+PUSH D0
+PUSH #3
+ADDS
+CALL L14
+SUB SP #6 SP
+PUSH #"floatMathTest is now "
+WRTS
+PUSH 3(D0)
+WRTS
+PUSH #" in main"
+WRTS
+WRTLN #""
 PUSH #5
 POP 1(D0)
-L16:
+L17:
 PUSH 1(D0)
 WRTS
 PUSH #" "
@@ -298,15 +345,15 @@ POP 1(D0)
 PUSH 1(D0)
 PUSH #0
 CMPLTS
-BRFS L16
+BRFS L17
 PUSH #5
 NEGS
 POP 1(D0)
 PUSH 1(D0)
 PUSH #10
 ADDS
-L17:
-BEQ 1(D0) -1(SP) L18
+L18:
+BEQ 1(D0) -1(SP) L19
 PUSH #"otherthing is "
 WRTS
 PUSH 1(D0)
@@ -316,8 +363,8 @@ PUSH 1(D0)
 PUSH #1
 ADDS
 POP 1(D0)
-BR L17
-L18:
+BR L18
+L19:
 CASTSI
 POP 1(D0)
 PUSH #1
@@ -331,6 +378,6 @@ WRTLN #""
 PUSH #"Thank you for using this!"
 WRTS
 WRTLN #""
-SUB SP #11 SP
+SUB SP #12 SP
 POP D0
 HLT

@@ -28,6 +28,8 @@ public class NonTerminals {
     static String paramTypeList = "";
     static int controlCounter = 0;
     static Token stepVal;
+    static String litVarList = "";
+    static String litOrVar = "";
     
     // Variables for the parse-tree print
     static int indent = 0;
@@ -1071,8 +1073,9 @@ public class NonTerminals {
     	System.out.println(" (#67)");// Rule #67
     	Token procedure = lastTok;
     	paramTypeList = "";//create a list of the parameter types to check for when we call the procedure
+    	litVarList = "";
 		optionalActualParameterList();
-		semAn.functionProcedureCall(paramTypeList, symTab, procedure);//make a call to the procedure
+		semAn.functionProcedureCall(paramTypeList, litVarList, symTab, procedure);//make a call to the procedure
         indent--;
     }
 
@@ -1083,12 +1086,15 @@ public class NonTerminals {
             case "MP_LPAREN":
             	System.out.println(" (#68)"); // Rule #68
                 match("MP_LPAREN");
+                litOrVar = "variable";
                 actualParameter();
                 semAn.pushAddress(lastTok, symTab);
                 paramTypeList += semAn.topOfStackType() + " ";//get the type of whatever's been pushed on, and append to our parameter type list
+                litVarList += litOrVar + " ";
                 actualParameterTail();
                 match("MP_RPAREN");
                 paramTypeList = paramTypeList.substring(0, paramTypeList.length() - 1);//pull the last trailing space off
+                litVarList = litVarList.substring(0, litVarList.length() - 1);
                 semAn.comma();
                 break;
             case "MP_AND":
@@ -1133,9 +1139,11 @@ public class NonTerminals {
             	System.out.println(" (#70)"); // Rule #70
                 match("MP_COMMA");
                 semAn.comma();
+                litOrVar = "variable";
                 actualParameter();
                 semAn.pushAddress(lastTok, symTab);
                 paramTypeList += semAn.topOfStackType() + " ";//append the type to our list
+                litVarList += litOrVar + " ";
                 actualParameterTail();
                 break;
             case "MP_RPAREN":
@@ -1499,31 +1507,37 @@ public class NonTerminals {
             	System.out.println(" (#99)"); // Rule #99
                 match("MP_INTEGER_LIT");
                 semAn.pushCheck(lastTok, symTab);//pushes the value onto the stack
+                litOrVar = "literal";
                 break;
             case "MP_FLOAT_LIT":  
             	System.out.println(" (#100)"); // Rule #100
                 match("MP_FLOAT_LIT");
                 semAn.pushCheck(lastTok, symTab);
+                litOrVar = "literal";
                 break;
             case "MP_FIXED_LIT":// **Stephen: Added FIXED_LIT
             	System.out.println(" (#100)"); // Rule #100
                 match("MP_FIXED_LIT");
                 semAn.pushCheck(lastTok, symTab);
+                litOrVar = "literal";
                 break;
             case "MP_STRING_LIT":
             	System.out.println(" (#101)"); // Rule #101
                 match("MP_STRING_LIT");
                 semAn.pushCheck(lastTok, symTab);
+                litOrVar = "literal";
                 break;
             case "MP_TRUE":
             	System.out.println(" (#102)"); // Rule #102
                 match("MP_TRUE");
                 semAn.pushCheck(lastTok, symTab);
+                litOrVar = "literal";
                 break;
             case "MP_FALSE":
             	System.out.println(" (#103)"); // Rule #103
                 match("MP_FALSE");
                 semAn.pushCheck(lastTok, symTab);
+                litOrVar = "literal";
                 break;
             case "MP_NOT":
             	System.out.println(" (#104)"); // Rule #104
@@ -1531,12 +1545,14 @@ public class NonTerminals {
                 Token not = lastTok;
                 factor();
                 semAn.pushCheck(not, symTab);
+                litOrVar = "literal";
                 break;
             case "MP_LPAREN":
             	System.out.println(" (#105)"); // Rule #105
                 match("MP_LPAREN");
                 expression();
                 match("MP_RPAREN");
+                litOrVar = "literal";
                 break;
             case "MP_IDENTIFIER":
             	System.out.println(" (#106)"); // Rule #106
@@ -1549,18 +1565,24 @@ public class NonTerminals {
                 if(funcOrVar.getKind().equals("function")){//if it's function call
                 	semAn.pushRoomForRetVal(funcOrVar.getType());//makes room in the stack, as well as saves the type of the stack before this call is made
                 	String oldParams = paramTypeList;//store the old parameters list in case function call is used as parameter type
-                	paramTypeList = "";//reset the list
+                	String oldLitVar = litVarList;
+                	paramTypeList = litVarList = "";//reset the list
                 	optionalActualParameterList();//fill the list
-                	semAn.functionProcedureCall(paramTypeList, symTab, identifier);//make the calls and check that the parameters given fit what is needed
+                	semAn.functionProcedureCall(paramTypeList, litVarList, symTab, identifier);//make the calls and check that the parameters given fit what is needed
                 	paramTypeList = oldParams;//restore the old list
+                	litVarList = oldLitVar;
+                    litOrVar = "literal";
                 }
                 else if(funcOrVar.getKind().equals("retVar")){//if it's a recursive function call, the type that will come back is the returnVariable type
                 	semAn.pushRoomForRetVal(funcOrVar.getType());
                 	String oldParams = paramTypeList;
-                	paramTypeList = "";
+                	String oldLitVar = litVarList;
+                	paramTypeList = litVarList = "";//reset the list
                 	optionalActualParameterList();
-                	semAn.functionProcedureCall(paramTypeList, symTab.getParent(), identifier);
+                	semAn.functionProcedureCall(paramTypeList, litVarList, symTab.getParent(), identifier);
                 	paramTypeList = oldParams;
+                	litVarList = oldLitVar;
+                    litOrVar = "literal";
                 }
                 else{// if the identifier is just a normal variable
                 	semAn.pushCheck(identifier, symTab);

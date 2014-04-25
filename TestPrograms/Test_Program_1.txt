@@ -61,8 +61,15 @@ program lab1;
 	procedure refCheck(var x: integer);
 	
 	begin
-		x := 5;
+		x := 5 + x;
 		writeln('Variable x should be changed to ', x);
+	end;
+	
+	procedure refCheck2(z: integer; var x, y: float);
+	
+	begin
+		x := x + y;
+		writeln('X in refcheck2 is ', x);
 	end;
     
   begin
@@ -84,7 +91,7 @@ program lab1;
 		floatMathTest := (7.0 *2.1 - 0.6 / 13) * (factorial(13 - 11));
 		writeln(floatMathTest);
 		
-		{scopeTest(scopeTest); This has been fixed and no longer compiles.} 
+		{scopeTest(scopeTest); This has been fixed and no longer compiles.}
 		{intersting because scopeTest has no input parameters, and it's ok because scopeTest doesn't have a value return}
 		
 		writeln(retString(0.001, 1.23, 'String as input argument'));
@@ -92,6 +99,12 @@ program lab1;
 		writeln('X starts at ', otherthing);
 		refCheck(otherthing);
 		writeln('X is now ', otherthing, ' in main');
+		
+		writeln('floatMathTest start: ', floatMathTest);
+		
+		refCheck2(10 div 3, floatMathTest, floatMathTest);
+		
+		writeln('floatMathTest is now ', floatMathTest, ' in main');
 		
 		otherthing := 5;
 		repeat

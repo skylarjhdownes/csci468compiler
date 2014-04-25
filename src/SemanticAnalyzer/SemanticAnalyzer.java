@@ -141,9 +141,6 @@ public class SemanticAnalyzer{
 		if (info == null){
 			pushLiteral(variable);
 		}
-		else if(info.getKind().equals("varParam")){
-			write("PUSH @" + info.getOffset() + "(D" + info.getNestingLevel() + ")");
-		}
 		else{
 			pushVariable(variable, symTab);
 		}
@@ -280,11 +277,12 @@ public class SemanticAnalyzer{
 	/*
 	 * Creates the call to a function or procedure, given a list of the parameters given, the current symbol table, and the token of the procedure or function to call to
 	 */
-	public void functionProcedureCall(String paramTypesList, SymbolTable symTab, Token call){
+	public void functionProcedureCall(String paramTypesList, String paramKindsList, SymbolTable symTab, Token call){
 		Row callinfo = symTab.findVariable(call.getLexeme());
 		String[] paramsGiven = paramTypesList.split(" ");
 		String[] actualParams = callinfo.getInputParameters().split(" ");
 		String[] paramKinds = callinfo.getParameterKinds().split(" ");
+		String[] paramKindsGiven = paramKindsList.split(" ");
 		
 		if(paramsGiven.length != actualParams.length){
 			error("Wrong number of parameters for call " + call.getLexeme() + " at line:" + call.getLineNumber() + " col:" + call.getColumnNumber());
@@ -296,11 +294,11 @@ public class SemanticAnalyzer{
 			}
 		}
 		
-//		for(int i = 0; i < paramsGiven.length; i++){
-//			if(!(paramKinds[i].equals(actualParams[i]))){
-//				error("Incorrect parameter type. Looking for "+actualParams[i]+" but found "+paramsGiven[i] + " line:" + call.getLineNumber() + " col:" + call.getColumnNumber());
-//			}
-//		}
+		for(int i = 0; i < paramsGiven.length; i++){
+			if(paramKinds[i].equals("varParam") && !(paramKindsGiven[i].equals("variable"))){
+				error("Incorrect parameter kind. Looking for variable identifier but found " + paramKindsGiven[i] + " line:" + call.getLineNumber() + " col:" + call.getColumnNumber());
+			}
+		}
 		
 		
 		for(int i = labelnum -1; i >= 0; i--){//make the call
@@ -399,6 +397,54 @@ public class SemanticAnalyzer{
 		
 		Row info = symTab.findVariable(variable.getLexeme());
 		
+		if(info.getKind().equals("varParam")){
+			if (topOfStack.equals("empty")){
+				write("PUSH @" + info.getOffset() + "(D" + info.getNestingLevel() + ")");
+				topOfStack =info.getType();
+			}
+			else if(topOfStack.equals("integer")||topOfStack.equals("boolean")){
+				
+				if(info.getType().equals("float")){
+					write("CASTSF");
+					write("PUSH @" + info.getOffset() + "(D" + info.getNestingLevel() + ")");
+					topOfStack =info.getType();
+				}
+				else if(info.getType().equals("boolean")||info.getType().equals("integer")){
+					write("PUSH @" + info.getOffset() + "(D" + info.getNestingLevel() + ")");
+					if(info.getType().equals("integer")) topOfStack = info.getType();
+				}
+				else{
+					error("String found in statement");
+				}
+				
+				if(makeNeg || makePos){
+					write("NEGS");
+					makeNeg = false;
+					makePos = false;
+				}
+				
+			}
+			else if(topOfStack.equals("float")){
+				if(info.getType().equals("boolean")||info.getType().equals("integer")){
+					write("PUSH @" + info.getOffset() + "(D" + info.getNestingLevel() + ")");
+					write("CASTSF");
+				}
+				else if(info.getType().equals("float")){
+					write("PUSH @" + info.getOffset() + "(D" + info.getNestingLevel() + ")");
+				}
+				else{
+					error("String found in statement");
+				}
+				if(makeNeg || makePos){
+					write("NEGSF");
+					makeNeg = false;
+					makePos = false;
+				}
+				
+			}
+		}
+		
+		else{
 		if (topOfStack.equals("empty")){
 			write("PUSH " + info.getOffset() + "(D" + info.getNestingLevel() + ")");
 			topOfStack =info.getType();
@@ -442,6 +488,7 @@ public class SemanticAnalyzer{
 				makePos = false;
 			}
 			
+		}
 		}
 	}
 	
