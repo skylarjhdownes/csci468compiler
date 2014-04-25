@@ -2,7 +2,7 @@ program lab1;
     var  otherthing, choice: integer;
 		floatMathTest: float;
 		booleanValue: boolean;
-		floatMathTest: string;
+		float_MathTest: string;
        
 	function factorial( b: integer):integer;
 	var x: integer;
@@ -90,7 +90,7 @@ program lab1;
 			end;
 		until (otherthing < 0);
 		
-		for otherthing := (-5) to 5 do
+		for otherthing := (-5) to (otherthing + 10) do
 			writeln('otherthing is ', otherthing);
 		
 		booleanValue := true;

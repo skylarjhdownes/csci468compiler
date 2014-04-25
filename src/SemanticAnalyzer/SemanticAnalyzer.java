@@ -344,6 +344,27 @@ public class SemanticAnalyzer{
 		topOfStack = "empty";
 	}
 	
+	public void forCheck(Token controlVar, String exit, SymbolTable symTab){
+		
+		Row info = symTab.findVariable(controlVar.getLexeme());
+		
+		for(int i = labelnum - 1; i > 0; i--){
+			if(labels[i][0].equals(exit)){
+				if(info.getType().equals("integer")){
+					write("BEQ " + info.getOffset() + "(D" + info.getNestingLevel() + ") -1(SP) " + labels[i][2]);
+				}
+				
+				else if(info.getType().equals("float")){
+					write("BEQF " + info.getOffset() + "(D" + info.getNestingLevel() + ") -1(SP) " + labels[i][2]);
+				}
+				
+				else{
+					error("Trying to compare items in loop that aren't either a float or int Line:" + controlVar.getLineNumber() + " col:" + controlVar.getColumnNumber());
+				}
+			}
+		}
+	}
+	
 	/*
 	 * Push a variable onto the stack, given the current symbol table, and enforce the stack type
 	 */
@@ -473,6 +494,19 @@ public class SemanticAnalyzer{
 			topOfStack = "empty";
 		}
 		
+	}
+	
+	public void popSpecial(Token variable, SymbolTable symTab){
+		Row info = symTab.findVariable(variable.getLexeme());
+		
+		if (info.getType().equals("integer")){
+			write("CASTSI");
+			write("POP " + info.getOffset() + "(D" + info.getNestingLevel() + ")");
+		}
+		else{
+			write("CASTSF");
+			write("POP " + info.getOffset() + "(D" + info.getNestingLevel() + ")");
+		}
 	}
 	
 	/*

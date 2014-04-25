@@ -945,10 +945,12 @@ public class NonTerminals {
                 stepValue();
                 Token ourStepVal = stepVal;//store the step value for later
                 
-                semAn.placeLabel(forLoopEnter);//the loop starts here
+               
                 finalValue();//final value will naturally be on the top of the stack
-                semAn.pushCheck(controlVar, symTab);//push the control variable on the stack
-                semAn.branch(forLoopExit, "equals");//check to see if they are equal, and branch if they are
+                semAn.comma();
+                semAn.placeLabel(forLoopEnter);//the loop starts here
+                semAn.forCheck(controlVar, forLoopExit, symTab);//push the control variable on the stack
+                //semAn.branch(forLoopExit, "equals");//check to see if they are equal, and branch if they are
                 
                 match("MP_DO");
                 statement();
@@ -959,6 +961,7 @@ public class NonTerminals {
                 semAn.pop(controlVar, symTab);//pop that into the control var
                 semAn.branch(forLoopEnter, "always");//loop back top to check condition
                 semAn.placeLabel(forLoopExit);//exit label goes here
+                semAn.popSpecial(controlVar, symTab);
                 
                 break;
 
