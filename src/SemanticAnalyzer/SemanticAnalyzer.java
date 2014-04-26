@@ -360,6 +360,9 @@ public class SemanticAnalyzer{
 			write("ADDS");
 			paramTypes += "variable ";
 		}
+		else if(info.getKind().equals("varParam")){
+			write("PUSH " + info.getOffset() + "(D" + info.getNestingLevel() + ")");
+		}
 	}
 	
 	/*
@@ -367,6 +370,31 @@ public class SemanticAnalyzer{
 	 */
 	public void comma(){
 		topOfStack = "empty";
+	}
+	
+	public void addStepVal(Token stepVal){
+		String value = stepVal.getLexeme();
+		if(topOfStack.equals("integer")|| topOfStack.equals("boolean")){
+			if(value.equals("to")){
+				write("PUSH #1");
+				write("ADDS");
+			}
+			else{
+				write("PUSH #-1");
+				write("ADDS");
+			}
+		}
+		else{
+			if(value.equals("to")){
+				write("PUSH #1.0");
+				write("ADDSF");
+			}
+			else{
+				write("PUSH #-1.0");
+				write("ADDSF");
+			}
+		}
+		
 	}
 	
 	public void forCheck(Token controlVar, String exit, SymbolTable symTab){
@@ -447,7 +475,18 @@ public class SemanticAnalyzer{
 		else{
 		if (topOfStack.equals("empty")){
 			write("PUSH " + info.getOffset() + "(D" + info.getNestingLevel() + ")");
-			topOfStack =info.getType();
+			topOfStack = info.getType();
+			if(makeNeg || makePos){
+				
+				if(topOfStack.equals("float")){
+					write("NEGSF");
+				}
+				else{
+					write("NEGS");
+				}
+				makeNeg = false;
+				makePos = false;
+			}
 		}
 		else if(topOfStack.equals("integer")||topOfStack.equals("boolean")){
 			
@@ -657,7 +696,14 @@ public class SemanticAnalyzer{
 	 * Simply flips a boolean, so we no to make whatever is pushed on next into a negative
 	 */
 	public void makeNeg(){
-		makeNeg = true;
+		if(topOfStack.equals("float")){
+			write("NEGSF");
+		}
+		else
+		{
+			write("NEGS");
+		}
+		
 		
 	}
 	
@@ -665,7 +711,6 @@ public class SemanticAnalyzer{
 	 * Same as makeNeg semantically, this is just an alias for readability's sake
 	 */
 	public void makePos(){
-		makePos = true;
 		
 	}
 	
@@ -674,19 +719,15 @@ public class SemanticAnalyzer{
 	 */
 	public void addOp(Token operation){
 		
-		if(topOfStack.equals("boolean")){
-			error("trying math operation on boolean value Line" + operation.getLineNumber() + " col" + operation.getColumnNumber());
-		}
-		
-		else if(topOfStack.equals("integer")){
+		if(topOfStack.equals("integer") || topOfStack.equals("boolean")){
 			//boolean operators
 			if(topOfStack.equals("boolean") && firstSide.equals("boolean") && operation.getToken().equals("MP_OR")){
 				write("ORS");
-				firstSide = "empty";
+				//firstSide = "empty";
 			}
 			else if(topOfStack.equals("boolean") && firstSide.equals("boolean") && operation.getToken().equals("MP_AND")){
 				write("ANDS");
-				firstSide = "empty";
+				//firstSide = "empty";
 			}
 			//add to the error statement
 			
@@ -706,6 +747,9 @@ public class SemanticAnalyzer{
 				}
 				else if(operation.getLexeme().equals("*")){
 					write("MULS");
+				}
+				else if(operation.getLexeme().equals("mod")){
+					write("MODS");
 				}
 			else{
 				error("Can't use operation " + operation.getLexeme() + " on type " + topOfStack + " Line:" + operation.getLineNumber() + " col:" + operation.getColumnNumber());
@@ -729,6 +773,9 @@ public class SemanticAnalyzer{
 			}
 			else if(operation.getLexeme().equals("*")){
 				write("MULSF");
+			}
+			else if(operation.getLexeme().equals("mod")){
+				write("MODSF");
 			}
 			else{
 				error("Can't use operation " + operation.getLexeme() + " on type " + topOfStack + " Line:" + operation.getLineNumber() + " col:" + operation.getColumnNumber());
@@ -806,6 +853,18 @@ public class SemanticAnalyzer{
 			current = symTab.findVariable(params.get(i).getLexeme());
 			if (current == null){
 				error("Can't read into variable " + params.get(i).getLexeme() + " at line:"+ params.get(i).getLineNumber() + " col:" + params.get(i).getColumnNumber());
+			}
+			else if(current.getKind().equals("varParam")){
+				String type = current.getType();
+				if(type.equals("integer")||type.equals("boolean")){
+					write("RD @" + current.getOffset() +"(D" + current.getNestingLevel() + ")");
+				}
+				else if(type.equals("float")){
+					write("RDF @" + current.getOffset() + "(D" + current.getNestingLevel() + ")");
+				}
+				else{
+					write("RDS @" + current.getOffset() + "(D" + current.getNestingLevel() + ")");
+				}
 			}
 			else{
 				String type = current.getType();

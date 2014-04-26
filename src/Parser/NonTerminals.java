@@ -30,6 +30,7 @@ public class NonTerminals {
     static Token stepVal;
     static String litVarList = "";
     static String litOrVar = "";
+    static boolean makeNeg = false;
     
     // Variables for the parse-tree print
     static int indent = 0;
@@ -951,6 +952,7 @@ public class NonTerminals {
                 
                
                 finalValue();//final value will naturally be on the top of the stack
+                semAn.addStepVal(ourStepVal);
                 semAn.comma();
                 semAn.placeLabel(forLoopEnter);//the loop starts here
                 semAn.forCheck(controlVar, forLoopExit, symTab);//push the control variable on the stack
@@ -1294,7 +1296,13 @@ public class NonTerminals {
             case "MP_PLUS":
             	System.out.println(" (#82)"); // Rule #82
                 optionalSign();
+                boolean ourNeg = makeNeg;
+                makeNeg = false;
                 term();
+                if(ourNeg){
+                	semAn.makeNeg();
+                	makeNeg = false;
+                }
                 termTail();
                 break;
             default:
@@ -1350,12 +1358,12 @@ public class NonTerminals {
             case "MP_PLUS":
             	System.out.println(" (#85)"); // Rule #85
                 match("MP_PLUS");
-                semAn.makePos();//sets a boolean so we know the next value pushed on has to change sign
+                //semAn.makePos();//sets a boolean so we know the next value pushed on has to change sign
                 break;
             case "MP_MINUS":
             	System.out.println(" (#86)"); // Rule #86
                 match("MP_MINUS");
-                semAn.makeNeg();//same as makePos
+                makeNeg = true;//same as makePos
                 break;
             case "MP_FALSE":
             case "MP_NOT":

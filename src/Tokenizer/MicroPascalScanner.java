@@ -35,6 +35,7 @@ public class MicroPascalScanner implements I_Tokenizer {
 		if ( hasNextToken() ) {
 			scanAllTokens();
 		}
+		
 		return tokenList;
 	}
 	
@@ -62,28 +63,7 @@ public class MicroPascalScanner implements I_Tokenizer {
 		
 		
 		Token tok;
-		if ( Character.isLetter(nextChar) || nextChar == '_' ) 
-		{
-			tok = iden.getToken();
-		}
-		else if ( Character.isDigit(nextChar) ) 
-		{
-			tok = lit.getToken();
-		}
-		else 
-		{
-			tok = strSym.getToken();
-		}
 		
-		
-		
-		
-		
-		
-		// Update the column numbers
-		colNum += tok.getLexeme().length();
-		if ( tok.getLexeme().length() == 0 ) colNum += 1;
-		tempColNum = 0;
 
 		// Update the Line buffer.
 		do {
@@ -141,6 +121,33 @@ public class MicroPascalScanner implements I_Tokenizer {
 
 
 		} while (true);
+		
+		
+		
+		
+		
+		if ( Character.isLetter(nextChar) || nextChar == '_' ) 
+		{
+			tok = iden.getToken();
+		}
+		else if ( Character.isDigit(nextChar) ) 
+		{
+			tok = lit.getToken();
+		}
+		else 
+		{
+			tok = strSym.getToken();
+		}
+		
+		
+		
+		
+		
+		
+		// Update the column numbers
+		colNum += tok.getLexeme().length();
+		if ( tok.getLexeme().length() == 0 ) colNum += 1;
+		tempColNum = 0;
 		
 		
 		// Add the token to the list of already found tokens
