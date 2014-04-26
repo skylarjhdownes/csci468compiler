@@ -1,8 +1,13 @@
+
+
+{ak;djfa;slkjfd;alskjd}
+
 program lab1;
-    var  otherthing, choice: integer;
-		floatMathTest: float;
+    var  otherThing, choice: integer;
+		floatMathTest: Float;
 		booleanValue: boolean;
 		float_MathTest: string;
+		bob, fred: boolean;
        
 	function factorial( b: integer):integer;
 	var x: integer;
@@ -92,6 +97,23 @@ program lab1;
 		listNum(100 div 2);
 		listNum(factorial(9 div 3));
 		
+		otherthing := 5 mod 2;
+		writeln(-otherthing);
+		
+		
+		bob := true;
+		fred := false;
+		
+		
+		writeln(bob,fred);
+		
+		fred := fred and bob;
+		writeln(fred);
+		fred := fred or bob;
+		writeln(fred);
+		
+		writeln(-(1 + 2));
+		
 		otherthing := 15 * 15 div 5 + 1 - 2 * 2;
 		writeln('From *main* otherthing is: ', otherthing);
 		scopeTest;
@@ -132,3 +154,4 @@ program lab1;
 		
 		writeln('Thank you for using this!');
   end.
+  

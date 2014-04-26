@@ -78,6 +78,8 @@ public class Compiler {
 			
 		}
 		
+		list.remove(list.size() - 1);
+		
 		System.out.println("\n\n\nParsing...\n\n");
 		NonTerminals.start(list);
 		
