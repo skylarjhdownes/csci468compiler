@@ -77,43 +77,170 @@ Compilers 2014
 <h1>Scanner Commentary</h1>
 <h3 class="centered">By Skylar Downes</h3>
 <h2>Purpose of the Scanner</h2>
-<p>Discuss the purpose of the scanner in the context of the entire compiler.</p>
-
-
+<p>The scanner portion of the compiler is meant to classify the lexemes in the input file into micropascal tokens for the parser to parse.  </p>
 
 <h2>Theory Behind Scanning</h2>
-<p>A short paragraph here that just names the theories that underlie how a scanner can be desiged and implemented</p>
+<p>A scanner is the portion of the compiler meant to identify and classify tokens.  Our scanner is essentially a large FSA which takes input from the main program string and outputs tokens as it determines them.</p>
+
 <h2>Dispatcher</h2>
-<p>Describe here how your dispatcher works. Use an abbreviated diagram that shows how this works, and list the preconditions and post-conditions</p>
+<p>The dispatcher requires the input of a program string which contains valid tokens, and should always output a set of tokens.  The string must have then been fully processed by the scanner and have had no invalid tokens.</p>
 
 <h2>Tokens</h2>
-<p>Discuss what tokens are.</p>
+<p>Tokens are strings of characters with an association.  In parsing, they are used to create parse trees.</p>
 
 <h3>Interesting Token Example</h3>
-<p>Give the name of a particularly interesting token&nbsp;for micropascal&nbsp;along with a brief discussion in English that match this token.o</p>
+<p>Here we will describe the float literal, because it’s just so darn fascinating.</p>
 
-<h3>Regular Expression for Tokens</h3>
+<h3>Regular Expression for Token</h3>
 
-<p>Give a regular expression for the interesting token you chose.</p>
-<ul>
-  <li>Define any necessary helper expressions you need, such as<strong> digit</strong> = 0 | 2 |&nbsp;...| 9 </li>
-  <li>Define the regular expression for your token using only the operators
-    <ul>
-      <li>* for <em>zero or more</em></li>
-      <li>a space  for <em>concatenation</em> between parts of the regular expression</li>
-      <li> | for <em>or</em>, where operator precedence from highest to lowest is ( ), *, concatenation, and </li>
-      </ul>
-  </li>
-  </ul>
-<p>An example is <strong>letter (letter | digit)*</strong> for identifier, if an identifier can be any string that starts with a letter and has zero or more letters&nbsp;and/or digits thereafter.</p>
+<p>Regular expression for float lit:  digit = 0 | 2 |...| 9  digit digit* [“.” digit digit] [e|E[+|-]] digit digit*</p>
 
 <h3>Finite State Automaton for Token, Extended for Scanning</h3>
 
-<p>Use the finite state automaton animator of Lab 2 to create an FSA for the token above. Do a screen capture of the FSA. Annotate the FSA with text in a word processor that describes what your scanner does at the various states in the FSA, such a setting the token, lexeme, etc.</p>
+<img src="001.jpg" alt="hurrdurr">
+
+Here we see the finite state automaton of the float literal in it’s natural habitat.  Nearby the FSA’s of the closely related fixed literal and integer may also be seen.
 
 <h3>Implementing the Finite State Automaton</h3>
-<p>Give the code in your scanner that implements this finite state automaton.</p>
+<p> Our scanner is implemented using a static java class that calls our FSAs. Our FSAs are implemented as separate classes themselves that return an instance of a Token class, which contains the lexeme, line number, column number, and token that has been been found. The states of the FSA are represented by switch statements with an imbedded if-elseif-if structure that defines the actions taken while in a state.  The default case points to the MP_ERROR state.
+When creating our FSAs we split the workload into three sets: Driver/Identifier FSAs, scanner/number FSAs, and symbol/string FSAs.  Each group member implemented one of these sections in accordance with our design</p>
+
+<pre class="prettyprint" ><code class="language-java">
+while(true)
+		{
+			switch(t)
+			{
+			case firstDigit:
+				if ( Character.isDigit(nextChar) ) {
+					lexeme = lexeme + nextChar;
+					token = "MP_INTEGER_LIT";
+					t = State.secondAndOnDigit;
+					break;
+				}
+				else {
+					// Invalid character
+					t = State.RETURN;
+					break;
+				}
+
+
+
+			case secondAndOnDigit:
+				// This state is a valid accept state;
+				lastAcceptableType = token;
+				lastAcceptableLexeme = lexeme;
+
+				if ( Character.isDigit(nextChar) ) {
+					lexeme = lexeme + nextChar;
+					t = State.secondAndOnDigit;
+					break;
+				}
+				else if ( nextChar == '.' ) {
+					lexeme = lexeme + nextChar;
+					t = State.justPassedDecimal;
+					token = "MP_FIXED_LIT";
+					break;					
+				}
+				else if ( nextChar == 'e' || nextChar == 'E' ) {
+					lexeme = lexeme + nextChar;
+					t = State.justPassedExponent;
+					token = "MP_FLOAT_LIT";
+					break;					
+				}
+				else {
+					// Invalid character
+					t = State.RETURN;
+					break;
+				}
+
+
+			case justPassedDecimal:
+				if ( Character.isDigit(nextChar) ) {
+					lexeme = lexeme + nextChar;
+					t = State.fixedOrFloat;
+					break;
+				}
+				else {
+					// Invalid character
+					t = State.RETURN;
+					break;
+				}
+
+			case fixedOrFloat:
+				// This state is a valid accept state;
+				lastAcceptableType = token;
+				lastAcceptableLexeme = lexeme;
+
+				if ( Character.isDigit(nextChar) ) {
+					lexeme = lexeme + nextChar;
+					t = State.fixedOrFloat;
+					break;
+				}
+				else if ( nextChar == 'e' || nextChar == 'E' ) {
+					lexeme = lexeme + nextChar;
+					t = State.justPassedExponent;
+					token = "MP_FLOAT_LIT";
+					break;					
+				}
+				else {
+					// Invalid character
+					t = State.RETURN;
+					break;
+				}
+
+			case finalDigits:
+				// This state is a valid accept state;
+				lastAcceptableType = token;
+				lastAcceptableLexeme = lexeme;
+
+				if ( Character.isDigit(nextChar) ) {
+					lexeme = lexeme + nextChar;
+					t = State.finalDigits;
+					break;
+				}
+				else {
+					// Invalid character
+					t = State.RETURN;
+					break;
+				}
+
+			case justPassedExponent:
+				if ( Character.isDigit(nextChar) ) {
+					lexeme = lexeme + nextChar;
+					t = State.finalDigits;
+					break;
+				}
+				else if ( nextChar == '+' || nextChar == '-' ) {
+					lexeme = lexeme + nextChar;
+					t = State.justPassedPlusOrMinus;
+					break;					
+				}
+				else {
+					// Invalid character
+					t = State.RETURN;
+					break;
+				}
+
+
+			case justPassedPlusOrMinus:
+				if ( Character.isDigit(nextChar) ) {
+					lexeme = lexeme + nextChar;
+					t = State.finalDigits;
+					break;
+				}
+				else {
+					// Invalid character
+					t = State.RETURN;
+					break;
+				}
+
+
+			default:
+				break;
+			}
+</code></pre>
 <!-- InstanceEndEditable -->
+
 
 </article>
 </div>

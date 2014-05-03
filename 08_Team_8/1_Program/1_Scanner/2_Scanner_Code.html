@@ -37,7 +37,7 @@
   <div id="headMatter">
     <span id="headTitle1">
       <!-- InstanceBeginEditable name="Header" -->
-        Team 0
+        Team 8
 	  <!-- InstanceEndEditable --> 
     </span>
     <span id="headTitle2">
@@ -85,8 +85,917 @@ Click <a href="../../../../01_Introduction/2_Project_Specifications/1_Scanner_Sp
 
 <pre class="prettyprint"><code class="language-java">
 
-Replace this line with your scanner source code.
+package Tokenizer;
 
+public class FSA_Identifier extends Tokenizer {
+
+    		/* INHERITED VARIABLES FROM TOKENIZER
+	private Token token;
+	private Scanner myScanner;
+     		*/
+
+	public FSA_Identifier(MicroPascalScanner in) {
+		super(in);
+	}
+
+
+	public enum State {
+		firstChar,
+		nextChar,
+		nonUnderscore,
+
+		RETURN,
+		ERROR
+	}
+	@Override
+	public Token getToken() {
+
+		String lexeme = "";
+		String lastAcceptableLexeme = "";
+		String token = "MP_IDENTIFIER";
+		String errorMsg = "";
+		State t = State.firstChar;
+		int lineNum = myScanner.getLineNum();
+		int colNum = myScanner.getColNum();
+
+
+		char nextChar = '0';
+		if ( myScanner.hasNextToken() ) nextChar = myScanner.getNextChar();
+		else t = State.RETURN;
+
+		while (true) {
+			// Process this character depending on what state i'm in
+			switch(t) {
+			case firstChar:
+				// In this state, i am only able to accept a LETTER or an UNDERSCORE
+				if ( Character.isLetter(nextChar) ) {
+					// If the next character is a letter, record it and change states.
+					lexeme = lexeme + nextChar;
+					t = State.nextChar;
+					break;
+				}
+				else if ( nextChar == '_' ) {
+					// If the next character is a letter, record it and change states.
+					lexeme = lexeme + nextChar;					
+					t = State.nonUnderscore;
+					break;
+				}
+				else {
+					t = State.RETURN;
+					// Invalid character
+					break;
+				}
+
+			case nextChar:
+				// This state is a valid accept state;
+				lastAcceptableLexeme = lexeme;
+
+				// In this state, i am able to accept a LETTER, DIGIT or an UNDERSCORE
+				if ( Character.isLetter(nextChar) ) {
+					// If the next character is a letter, record it and change states.
+					lexeme = lexeme + nextChar;
+					t = State.nextChar;
+					break;
+				}
+				else if ( Character.isDigit(nextChar) ) {
+					// If the next character is a letter, record it and change states.
+					lexeme = lexeme + nextChar;
+					t = State.nextChar;
+					break;
+				}
+				else if ( nextChar == '_' ) {
+					// If the next character is a letter, record it and change states.
+					lexeme = lexeme + nextChar;					
+					t = State.nonUnderscore;
+					break;
+				}
+				else {
+					t = State.RETURN;
+					// Invalid character
+					break;
+				}
+
+			case nonUnderscore:
+				// In this state, i am able to accept a LETTER or DIGIT
+				if ( Character.isLetter(nextChar) ) {
+					// If the next character is a letter, record it and change states.
+					lexeme = lexeme + nextChar;
+					t = State.nextChar;
+					break;
+				}
+				else if ( Character.isDigit(nextChar) ) {
+					// If the next character is a letter, record it and change states.
+					lexeme = lexeme + nextChar;
+					t = State.nextChar;
+					break;
+				}
+				else if ( nextChar == '_' ) {
+					// ERROR, not an acceptable character.
+					errorMsg = "Underscores cannot follow an underscore in an Identifier.";
+					t = State.ERROR;
+					break;
+				}
+				else {
+					t = State.RETURN;
+					// Invalid character
+					break;
+				}
+
+			default:
+				break;
+
+			}
+
+			if ( t == State.ERROR ) {
+				myScanner.throwError(errorMsg);
+				t = State.RETURN;
+			}
+
+			if ( t == State.RETURN ) {
+
+				if ( lastAcceptableLexeme.length() == 0 ) {
+					myScanner.throwError("Invalid Identifier Syntax: "+'"'+lexeme+'"');
+				}
+
+				lastAcceptableLexeme = lastAcceptableLexeme.toLowerCase();
+
+				// Check this token against a list of known strings
+				if ( lastAcceptableLexeme.toLowerCase().equals("begin") ) token = "MP_BEGIN";
+				else if ( lastAcceptableLexeme.toLowerCase().equals("boolean") ) token = "MP_BOOLEAN";
+				else if ( lastAcceptableLexeme.toLowerCase().equals("and") ) token = "MP_AND";
+				else if ( lastAcceptableLexeme.toLowerCase().equals("div") ) token = "MP_DIV";
+				else if ( lastAcceptableLexeme.toLowerCase().equals("do") ) token = "MP_DO";
+				else if ( lastAcceptableLexeme.toLowerCase().equals("downto") ) token = "MP_DOWNTO";
+				else if ( lastAcceptableLexeme.toLowerCase().equals("else") ) token = "MP_ELSE";
+				else if ( lastAcceptableLexeme.toLowerCase().equals("end") ) token = "MP_END";
+				else if ( lastAcceptableLexeme.toLowerCase().equals("false") ) token = "MP_FALSE";
+				else if ( lastAcceptableLexeme.toLowerCase().equals("fixed") ) token = "MP_FIXED";
+				else if ( lastAcceptableLexeme.toLowerCase().equals("float") ) token = "MP_FLOAT";
+				else if ( lastAcceptableLexeme.toLowerCase().equals("for") ) token = "MP_FOR";
+				else if ( lastAcceptableLexeme.toLowerCase().equals("function") ) token = "MP_FUNCTION";
+				else if ( lastAcceptableLexeme.toLowerCase().equals("if") ) token = "MP_IF";
+				else if ( lastAcceptableLexeme.toLowerCase().equals("integer") ) token = "MP_INTEGER";
+				else if ( lastAcceptableLexeme.toLowerCase().equals("mod") ) token = "MP_MOD";
+				else if ( lastAcceptableLexeme.toLowerCase().equals("not") ) token = "MP_NOT";
+				else if ( lastAcceptableLexeme.toLowerCase().equals("or") ) token = "MP_OR";
+				else if ( lastAcceptableLexeme.toLowerCase().equals("procedure") ) token = "MP_PROCEDURE";
+				else if ( lastAcceptableLexeme.toLowerCase().equals("program") ) token = "MP_PROGRAM";
+				else if ( lastAcceptableLexeme.toLowerCase().equals("read") ) token = "MP_READ";
+				else if ( lastAcceptableLexeme.toLowerCase().equals("repeat") ) token = "MP_REPEAT";
+				else if ( lastAcceptableLexeme.toLowerCase().equals("string") ) token = "MP_STRING";
+				else if ( lastAcceptableLexeme.toLowerCase().equals("then") ) token = "MP_THEN";
+				else if ( lastAcceptableLexeme.toLowerCase().equals("true") ) token = "MP_TRUE";
+				else if ( lastAcceptableLexeme.toLowerCase().equals("to") ) token = "MP_TO";
+				else if ( lastAcceptableLexeme.toLowerCase().equals("until") ) token = "MP_UNTIL";
+				else if ( lastAcceptableLexeme.toLowerCase().equals("var") ) token = "MP_VAR";
+				else if ( lastAcceptableLexeme.toLowerCase().equals("while") ) token = "MP_WHILE";
+				else if ( lastAcceptableLexeme.toLowerCase().equals("write") ) token = "MP_WRITE";
+				else if ( lastAcceptableLexeme.toLowerCase().equals("writeln") ) token = "MP_WRITELN";						
+
+
+				return new Token(lastAcceptableLexeme,token,lineNum,colNum);
+			}
+
+			// Get the next char
+			if ( myScanner.hasNextToken() ) nextChar = myScanner.getNextChar();
+			else t = State.RETURN;
+
+			//System.out.println("Processing "+nextChar+", Entering state  "+t);
+		}
+		// Something went wrong, unable to parse a token.
+		//return null;
+	}
+
+
+
+}
+
+public class FSA_Literal extends Tokenizer {
+
+
+	/* INHERITED VARIABLES FROM TOKENIZER
+	private Token token;
+	private Scanner myScanner;
+	 */
+
+	public FSA_Literal(MicroPascalScanner in) {
+		super(in);
+	}
+
+	public enum State {
+		firstDigit,
+		secondAndOnDigit,
+		justPassedDecimal,
+		fixedOrFloat,
+		justPassedExponent,
+		justPassedPlusOrMinus,
+		finalDigits,
+
+		RETURN,
+		ERROR
+	}
+
+	public Token getToken()
+	{
+		String lexeme = "";
+		String lastAcceptableLexeme = "";
+		String token = "Not yet determined";
+		String lastAcceptableType = "Not yet determined";
+		String errorMsg = "";
+		State t = State.firstDigit;
+		int lineNum = myScanner.getLineNum();
+		int colNum = myScanner.getColNum();
+
+		char nextChar = '0';
+		if ( myScanner.hasNextToken() ) nextChar = myScanner.getNextChar();
+		else t = State.RETURN;
+
+		while(true)
+		{
+			switch(t)
+			{
+			case firstDigit:
+				if ( Character.isDigit(nextChar) ) {
+					lexeme = lexeme + nextChar;
+					token = "MP_INTEGER_LIT";
+					t = State.secondAndOnDigit;
+					break;
+				}
+				else {
+					// Invalid character
+					t = State.RETURN;
+					break;
+				}
+
+
+
+			case secondAndOnDigit:
+				// This state is a valid accept state;
+				lastAcceptableType = token;
+				lastAcceptableLexeme = lexeme;
+
+				if ( Character.isDigit(nextChar) ) {
+					lexeme = lexeme + nextChar;
+					t = State.secondAndOnDigit;
+					break;
+				}
+				else if ( nextChar == '.' ) {
+					lexeme = lexeme + nextChar;
+					t = State.justPassedDecimal;
+					token = "MP_FIXED_LIT";
+					break;					
+				}
+				else if ( nextChar == 'e' || nextChar == 'E' ) {
+					lexeme = lexeme + nextChar;
+					t = State.justPassedExponent;
+					token = "MP_FLOAT_LIT";
+					break;					
+				}
+				else {
+					// Invalid character
+					t = State.RETURN;
+					break;
+				}
+
+
+			case justPassedDecimal:
+				if ( Character.isDigit(nextChar) ) {
+					lexeme = lexeme + nextChar;
+					t = State.fixedOrFloat;
+					break;
+				}
+				else {
+					// Invalid character
+					t = State.RETURN;
+					break;
+				}
+
+			case fixedOrFloat:
+				// This state is a valid accept state;
+				lastAcceptableType = token;
+				lastAcceptableLexeme = lexeme;
+
+				if ( Character.isDigit(nextChar) ) {
+					lexeme = lexeme + nextChar;
+					t = State.fixedOrFloat;
+					break;
+				}
+				else if ( nextChar == 'e' || nextChar == 'E' ) {
+					lexeme = lexeme + nextChar;
+					t = State.justPassedExponent;
+					token = "MP_FLOAT_LIT";
+					break;					
+				}
+				else {
+					// Invalid character
+					t = State.RETURN;
+					break;
+				}
+
+			case finalDigits:
+				// This state is a valid accept state;
+				lastAcceptableType = token;
+				lastAcceptableLexeme = lexeme;
+
+				if ( Character.isDigit(nextChar) ) {
+					lexeme = lexeme + nextChar;
+					t = State.finalDigits;
+					break;
+				}
+				else {
+					// Invalid character
+					t = State.RETURN;
+					break;
+				}
+
+			case justPassedExponent:
+				if ( Character.isDigit(nextChar) ) {
+					lexeme = lexeme + nextChar;
+					t = State.finalDigits;
+					break;
+				}
+				else if ( nextChar == '+' || nextChar == '-' ) {
+					lexeme = lexeme + nextChar;
+					t = State.justPassedPlusOrMinus;
+					break;					
+				}
+				else {
+					// Invalid character
+					t = State.RETURN;
+					break;
+				}
+
+
+			case justPassedPlusOrMinus:
+				if ( Character.isDigit(nextChar) ) {
+					lexeme = lexeme + nextChar;
+					t = State.finalDigits;
+					break;
+				}
+				else {
+					// Invalid character
+					t = State.RETURN;
+					break;
+				}
+
+
+			default:
+				break;
+			}
+
+			if ( t == State.ERROR ) 
+			{
+				myScanner.throwError(errorMsg);
+				t = State.RETURN;
+			}
+
+			if ( t == State.RETURN ) 
+			{
+				return new Token(lastAcceptableLexeme,lastAcceptableType,lineNum,colNum);
+			}
+
+			if ( myScanner.hasNextToken() ) nextChar = myScanner.getNextChar();
+			else t = State.RETURN;
+		}
+	}
+}
+
+public class FSA_StrSymbol extends Tokenizer {
+
+	public FSA_StrSymbol(MicroPascalScanner in) {
+		super(in);
+	}
+
+	public Token getToken() {
+		Token retTok = new Token();
+		String lex = "";
+		int line = myScanner.getLineNum();
+		int col = myScanner.getColNum();
+
+		char nextChar = myScanner.getNextChar();
+
+		boolean foundToken = false;
+
+			switch (nextChar) {
+			case ':':
+				lex += nextChar;
+				nextChar = myScanner.getNextChar();
+				if (nextChar == '=') {
+					lex += nextChar;
+					retTok = new Token(lex, "MP_ASSIGN", line, col);
+				} else {
+					retTok = new Token(lex, "MP_COLON", line, col);
+				}
+				foundToken = true;
+				break;
+
+
+			case ',':
+				lex += nextChar;
+				retTok = new Token(lex, "MP_COMMA", line, col);
+				foundToken = true;
+				break;
+
+
+			case '=':
+				lex += nextChar;
+				retTok = new Token(lex, "MP_EQUAL", line, col);
+				foundToken = true;
+				break;
+
+
+			case '/':
+				lex += nextChar;
+				retTok = new Token(lex, "MP_FLOAT_DIVIDE", line, col);
+				foundToken = true;
+				break;
+
+
+			case '>':
+				lex += nextChar;
+				nextChar = myScanner.getNextChar();
+				if (nextChar == '=') {
+					lex += nextChar;
+					retTok = new Token(lex, "MP_GEQUAL", line, col);
+				} else {
+					retTok = new Token(lex, "MP_GTHAN", line, col);
+				}
+				foundToken = true;
+				break;
+
+
+			case '<':
+				lex += nextChar;
+				nextChar = myScanner.getNextChar();
+				if (nextChar == '=') {
+					lex += nextChar;
+					retTok = new Token(lex, "MP_LEQUAL", line, col);
+				} else if (nextChar == '>') {
+					lex += nextChar;
+					retTok = new Token(lex, "MP_NEQUAL", line, col);
+				} else {
+					retTok = new Token(lex, "MP_LTHAN", line, col);
+				}
+				foundToken = true;
+				break;
+
+
+			case '.':
+				lex += nextChar;
+				retTok = new Token(lex, "MP_PERIOD", line, col);
+				foundToken = true;
+				break;
+
+
+			case '+':
+				lex += nextChar;
+				retTok = new Token(lex, "MP_PLUS", line, col);
+				foundToken = true;
+				break;
+
+
+			// **Stephen**: Added this case for the Minus symbol, it got left out somehow
+			case '-':
+				lex += nextChar;
+				retTok = new Token(lex, "MP_MINUS", line, col);
+				foundToken = true;
+				break;
+
+
+			case '(':
+				lex += nextChar;
+				retTok = new Token(lex, "MP_LPAREN", line, col);
+				foundToken = true;
+				break;
+
+
+			case ')':
+				lex += nextChar;
+				retTok = new Token(lex, "MP_RPAREN", line, col);
+				foundToken = true;
+				break;
+
+
+			case ';':
+				lex += nextChar;
+				retTok = new Token(lex, "MP_SCOLON", line, col);
+				foundToken = true;
+				break;
+
+
+			case '*':
+				lex += nextChar;
+				retTok = new Token(lex, "MP_TIMES", line, col);
+				foundToken = true;
+				break;
+
+
+			case'\'':
+				lex+= nextChar;
+				try{
+					nextChar = myScanner.getNextChar();
+					while(nextChar != '\''){
+						if (nextChar == '\r' || nextChar == '\n' ) {
+							throw new IndexOutOfBoundsException();
+						}
+						lex+=nextChar;
+						nextChar = myScanner.getNextChar();
+					}
+					lex+= nextChar;
+					retTok = new Token(lex, "MP_STRING_LIT", line, col);
+					foundToken = true;
+				}
+				catch(IndexOutOfBoundsException e){//if hit end of line while looking for string
+					retTok = new Token(lex, "MP_RUN_STRING", line, col);
+					foundToken = true;
+				}
+				break;
+
+			default:
+				System.out.println("StrSymFSA asked to scan for item that was not string or symbol:\t"+nextChar+" == "+(int)nextChar);
+				foundToken = true;
+				retTok = new Token("","MP_ERROR", line, col);
+			}//end switch
+		return retTok;
+	}
+}
+
+public interface I_Tokenizer {
+
+	public Token getToken();
+
+}
+
+public class MicroPascalScanner implements I_Tokenizer {
+
+	private File input;
+	private int colNum = 0;
+	private int tempColNum = 0;
+	private int lineNum = 0;
+	private String buffer = null;
+	private int numLeftParens = 0;
+	private boolean hasNextChar = true;
+	private FileReader fr;
+	LinkedList<Token> tokenList = new LinkedList<Token>();
+	Tokenizer iden = new FSA_Identifier(this);
+	Tokenizer strSym = new FSA_StrSymbol(this);
+	Tokenizer lit = new FSA_Literal(this);
+
+	public MicroPascalScanner(File in) {
+		input = in;
+		try {
+			fr = new FileReader(input);
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+	}
+
+	public LinkedList<Token> getAllTokens() {
+		if ( hasNextToken() ) {
+			scanAllTokens();
+		}
+
+		return tokenList;
+	}
+
+	private void scanAllTokens() {
+		while ( hasNextToken() ) 
+		{
+			getToken();
+			//System.out.println("Token>>  "+"Ln:   "+current.getLineNumber()+"\tCl: "+current.getColumnNumber()+"\t\tType:  "+current.getToken()+"\t\tLex:  "+current.getLexeme());
+			//tokenList.add(current);
+		}
+	}
+
+
+	@Override
+	public Token getToken() {
+
+		// Set up the Line Buffer
+		if ( buffer == null ) buffer = getNextLine();
+
+
+
+		// Dispatch the token FSA's
+
+		char nextChar = peekNextChar();
+
+
+		Token tok;
+
+
+		// Update the Line buffer.
+		do {
+			 if ( buffer.length() == 0 || colNum+tempColNum >= buffer.length() ) {
+				 buffer = getNextLine();
+			 }
+			 if ( buffer == null ) {
+				 hasNextChar = false;
+			 }
+
+			 if ( !hasNextToken() ) break;
+			 nextChar = peekNextChar();
+			// Eat up whitespace
+			 if ( nextChar == ' ' ) {
+				 colNum++;
+			 }
+			 else if ( nextChar == '	' ) {
+				 colNum ++;
+			 }
+			 else if ( nextChar == '\r' ) {
+				 colNum++;
+			 }
+			 else if ( nextChar == '\n' ) {
+				 colNum++;
+			 }
+			 else if ( nextChar == '{' ) {
+				 int commentStart = colNum;
+					int commentLine = lineNum;
+				 do {
+						 if ( buffer.length() == 0 || colNum+tempColNum >= buffer.length() ) {
+							 buffer = getNextLine();
+						 }
+						 if ( buffer == null ) {
+							 hasNextChar = false;
+						 }
+
+						 if ( !hasNextToken() ) {
+							 System.out.println("Run on comment Error Line:" + commentLine + " col:" + commentStart);
+							 System.exit(1);
+							 break;
+						 }
+						 nextChar = peekNextChar();
+						 colNum++;
+						 if(nextChar == '{'){
+							 numLeftParens++;
+						 }
+						 else if(nextChar == '}'){
+							 numLeftParens--;
+						 }
+					} while (numLeftParens > 0);
+
+			 }
+			 else break;
+
+
+
+		} while (true);
+
+
+
+
+
+		if ( Character.isLetter(nextChar) || nextChar == '_' ) 
+		{
+			tok = iden.getToken();
+		}
+		else if ( Character.isDigit(nextChar) ) 
+		{
+			tok = lit.getToken();
+		}
+		else 
+		{
+			tok = strSym.getToken();
+		}
+
+
+
+
+
+
+		// Update the column numbers
+		colNum += tok.getLexeme().length();
+		if ( tok.getLexeme().length() == 0 ) colNum += 1;
+		tempColNum = 0;
+
+
+		// Add the token to the list of already found tokens
+		tokenList.add(tok);
+
+		return tok;
+	}
+
+
+	public int getLineNum() { return lineNum; }
+	public int getColNum() { return 1+colNum+tempColNum; }
+
+	public boolean hasNextToken() {
+		return hasNextChar;
+	}
+
+	public char getNextChar() {
+		if ( buffer == null || colNum+tempColNum == buffer.length() ) { return '\n'; }
+		char nextChar = buffer.charAt(colNum+tempColNum);
+		tempColNum++;
+		return nextChar;
+	}
+
+	public char peekNextChar() {
+		if ( colNum+tempColNum == buffer.length() ) { return (char)(-1); }
+		char nextChar = buffer.charAt(colNum+tempColNum);
+		return nextChar;
+	}
+
+	private String getNextLine() {
+		String result = "";
+		lineNum++;
+		tempColNum = 0;
+		colNum = 0;
+
+		int nextChar = 0;
+		while (true) {
+			try {
+				nextChar = fr.read();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+
+			// If it is a carriage return or a new line char, return.
+			if ( nextChar == 10 ) break;
+
+			// If it is an End-Of-File char, do stuff.
+			if ( nextChar == -1 ) {
+				// If the running string is empty, this is the end of the file.
+				if ( result.length() == 0 ) return null;
+
+				// Otherwise, the end-of-file character has been reached, but there is still some data to parse.
+				break;
+			}
+
+			// Otherwise, append it to the string
+			result += (char)nextChar;
+		}
+
+		// If this line is empty, for example if there are multiple line breaks, then recursively return the next non-empty line.
+		if ( result.length() == 0 ) return getNextLine(); 
+
+		return result;
+	}
+
+	public void throwError(String errorMsg) {
+		System.out.println("Scanning Error on line "+lineNum+", col "+colNum+"\r\n  >> "+errorMsg);		
+	}
+}
+
+public class Token {
+    
+    public String lexeme;
+    protected String token;
+    protected int lineNum;
+    protected int colNum;
+    
+    public Token(String in_lex, String in_token, int lnum, int colnum){
+        lexeme = in_lex;
+        token = in_token;
+        lineNum = lnum;
+        colNum = colnum;
+    }
+    
+    public Token(){
+        lexeme = "";
+        token = "EMPTY_TOKEN";
+        lineNum = 0;
+        colNum = 0;
+    }
+    
+    public String getLexeme(){
+        return lexeme;
+    }
+    
+    public String getToken(){
+        return token;
+    }
+    
+    public int getLineNumber(){
+        return lineNum;
+    }
+    
+    public int getColumnNumber(){
+        return colNum;
+    }
+}
+
+public abstract class Tokenizer implements I_Tokenizer {
+
+	protected Token token;
+	protected MicroPascalScanner myScanner;
+
+
+	public Tokenizer(MicroPascalScanner in) {
+		myScanner = in;
+	}
+
+}
+
+public class testDriver 
+{
+	public static void main(String[] args) throws java.io.IOException
+	{
+		File testFile = new File("TestPrograms\\derpFile.derp");
+		Scanner reader = new Scanner(System.in);
+		int userChoice = 0;
+
+		if( args.length == 0 )
+		{
+			File folder = new File("TestPrograms");
+			File[] listOfFiles = folder.listFiles();
+
+			System.out.println("No input file given, ALL IS LOST. ABANDON SHIP!!!!!!!!!!!!!!!!");
+			System.out.println("Actually, lets use a local test file.  Let's see...");
+
+
+			System.out.println("Try picking from this list:");
+			for (int i = 0; i < listOfFiles.length; i++) 
+		    {
+		    	if (listOfFiles[i].isFile()) {
+		    		System.out.println((i+1) + ": " + listOfFiles[i].getName());
+		    	}
+		    }
+
+			System.out.print ("Enter an integer:");
+
+			boolean goodInput = false;
+			while(!goodInput)
+			{
+				try
+				{
+					userChoice = reader.nextInt();
+					testFile = new File("TestPrograms\\" + listOfFiles[userChoice-1].getName());
+					goodInput = true;
+				}
+				catch (java.util.InputMismatchException e)
+				{
+					System.out.println("That's not an int.  Please enter an integer from the list.");
+				}
+				catch (ArrayIndexOutOfBoundsException e)
+				{
+					System.out.println("That's not in the list.  Please enter an integer from the list.");
+				}
+			}			
+
+			MicroPascalScanner sc = new MicroPascalScanner(testFile);
+			System.out.println(testFile);
+			Token current;
+			while ( sc.hasNextToken() ) 
+			{
+				current = sc.getToken();
+				System.out.println("Token>>  "+"Ln:   "+current.getLineNumber()+"\tCl: "+current.getColumnNumber()+"\t\tType:  "+current.getToken()+"\t\tLex:  "+current.getLexeme());
+				current.getToken();
+			}
+		}
+		else
+		{
+			testFile = new File(args[0]);
+
+			MicroPascalScanner sc = new MicroPascalScanner(testFile);
+
+			Token current;
+			while ( sc.hasNextToken() ) 
+			{
+				current = sc.getToken();
+				System.out.println("Token>>  "+"Ln:   "+current.getLineNumber()+"\tCl: "+current.getColumnNumber()+"\t\tType:  "+current.getToken()+"\t\tLex:  "+current.getLexeme());
+			}
+		}
+	}
+}
+
+public class testDriver_ScanAllTokens {
+
+	public static void main(String[] args) {
+		File testFile;
+
+		if( args.length == 0 )
+		{
+			System.out.println("No input file given, ALL IS LOST. ABANDON SHIP!!!!!!!!!!!!!!!!");
+			testFile = new File("C:\\Users\\Stephen Bush\\Documents\\Test.txt");
+			//testFile = new File("C:\\Users\\Stephen Bush\\workspace\\HashList\\src\\hashList\\HashList.java");
+		}
+		else
+		{
+			testFile = new File(args[0]);
+		}
+
+		MicroPascalScanner sc = new MicroPascalScanner(testFile);
+
+		//Token current;
+		//while ( sc.hasNextToken() ) 
+		//{
+		//	current = sc.getToken();
+		//	System.out.println("Token>>  "+"Ln:   "+current.getLineNumber()+"\tCl: "+current.getColumnNumber()+"\t\tType:  "+current.getToken()+"\t\tLex:  "+current.getLexeme());
+		//}
+
+		LinkedList<Token> list = new LinkedList<Token>();
+		list = sc.getAllTokens();
+
+		System.out.println("Token List:");
+		for ( Token current : list ) {
+			System.out.println("  >>  "+"Ln:   "+current.getLineNumber()+"\tCl: "+current.getColumnNumber()+"\t\tType:  "+current.getToken()+"\t\tLex:  "+current.getLexeme());
+		}
+
+	}
+}
 </code></pre>
 <!-- InstanceEndEditable -->
 

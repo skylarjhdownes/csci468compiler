@@ -75,21 +75,296 @@ Compilers 2014
 <article id="mainContent">
 <!-- InstanceBeginEditable name="Main" -->
 <h1>Symbol Table Commentary</h1>
-<h3 class="centered">By ***Your Name Here without the stars***</h3>
+<h3 class="centered">By Skylar Downes</h3>
 <h2>Purpose of the Symbol Table</h2>
-<p>Describe</p>
+<p>We use a symbol table to store scope data.  Our table contains information on the ID, kind, type, offset, size, return values, and input parameters of variables, functions, and procedures.</p>
 <h2>Scopes</h2>
-<p>Discuss for microPascsl</p>
+<p>microPascal uses scoping similar to many other programming languages, where variables from higher scope may be manipulated or masked, but variables from lower scope may not.</p>
 <h2>Symbol Table per Scope, One-Pass Approach</h2>
-<p>Discuss for MicroPascal</p>
-<h2>Example</h2>
-<p>Give an example of how the symbol table would look for a program with at least one procedure or function when a snapshot is taken while parsing in a procedure or function</p>
-<h2>Code</h2>
-<p>You can copy&nbsp;and paste just the symbol table code or one of the methods, such as looking up a name in the symbol table.</p>
-<p>&nbsp;</p>
-<p></p>
+<p>A new symbol table is created for each level of scope, with a reference to it’s parent.  Symbol tables are removed once they are outside of the relevant scope.</p>
+<h2>Example Symbol Table</h2>
+program ExampleProgram;
+    var  apple, candy: integer;
+       y: float;
+       zebra, xyz: integer;
+       
+   procedure mixit(a, b: integer; var x: float);
+      var pony: integer;
+      
+      function fred(var q: float) returns integer;
+      
+     begin 
+           fred := q + 1;
+     end;
+     
+     function mary(x: integer) returns integer;
+     
+        begin
+           mary := x - 1;
+        end;
 
+    begin
+        pony := a + b;
+    end;
+    
+  begin
+        write(zebra)
+  end. 
+
+  <img src="st.jpg">
+
+
+<h2>Code</h2>
+<pre class="prettyprint" ><code class="language-java">
+public class SymbolTable {
+
+    LinkedList<Row> items = new LinkedList<>();
+    LinkedList<SymbolTable> children = new LinkedList<>();
+    SymbolTable parent;
+    int nestLevel;
+    int size = 1;
+    String tableName;
+
+    //main constructor needs a parent, the nesting level, and the name of the table
+    private SymbolTable(SymbolTable in_parent, int in_nest, String name) {
+        parent = in_parent;
+        nestLevel = in_nest;
+        tableName = name;
+    }
+
+    public SymbolTable(String in_name) {
+        parent = null;
+        nestLevel = 0;
+        tableName = in_name;
+    }
+
+    public String getName() {
+        return tableName;
+    }
+    
+    public int getNestingLevel() {
+        return nestLevel;
+    }
+
+    public SymbolTable getParent() {
+        return parent;
+    }
+
+    public int getSize() {
+        return size;
+    }
+
+    public void setName(String name) {
+        tableName = name;
+    }
+
+    public void setNestingLevel(int level) {
+        nestLevel = level;
+    }
+
+    public void setParent(SymbolTable newParent) {
+        parent = newParent;
+    }
+    
+
+    /*
+    Every variable has size 1, so size is increased by one each time we make a new row,
+    with 1 being the starting size to save room for the display register value later
+    */
+    public void addRow(String ID, String kind, String type, String returnValues, String inputParameters) {
+
+	//check whether the variable name has been used already or not
+    	Row currentRow;
+        ListIterator<Row> it = items.listIterator();
+
+        while (it.hasNext()) {
+            currentRow = it.next();
+            if (currentRow.getID().equals(ID) || (ID.equals(tableName) && !(kind.equals("retVar")))) {//checks if the variable name exists, or whether you've accidentally replaced the return variable
+                printTableFromHere();
+                System.out.println("Error\nThe identifier " + ID + " already exists in the table " + tableName);
+                System.exit(1);
+            }
+        }
+    	//passed tests, add it
+        Row newRow = new Row(ID, kind, type, size++, 1, returnValues, inputParameters, nestLevel, "");
+        items.add(newRow);
+    }
+    /*
+    * this method is to add a row for function calls and parameter calls, because their size
+    * is different from the size of a variable
+    */
+    public void addFunctionOrParameterRow(String ID, String kind, String type, String returnValues, String inputParameters, int in_size, String paramKinds) {
+
+	//check whether the variable name has been used already or not
+    	Row currentRow;
+        ListIterator<Row> it = items.listIterator();
+
+        while (it.hasNext()) {
+            currentRow = it.next();
+            if (currentRow.getID().equals(ID) || (ID.equals(tableName) && !(kind.equals("retVar")))) {//checks if the variable name exists, or whether you've accidentally replaced the return variable
+                printTableFromHere();
+                System.out.println("Error\nThe identifier " + ID + " already exists in the table " + tableName);
+                System.exit(1);
+            }
+        }
+    	//passed tests, add it
+        Row newRow = new Row(ID, kind, type, size++, in_size, returnValues, inputParameters, nestLevel, paramKinds);
+        items.add(newRow);
+    }
+
+    /*
+    This method will find and return the row for information regarding an ID, following
+    the scope hierarchy. If no row with that particular ID is found, then null is returned
+    */
+    public Row findVariable(String id) {
+
+        Row returnRow;
+        ListIterator<Row> it = items.listIterator();
+
+        while (it.hasNext()) {
+            returnRow = it.next();
+            if (returnRow.getID().equals(id)) {
+                return returnRow;
+            }
+        }
+        //the row we're looking for isn't in our list, we'll check our parent
+        if (parent == null) { //have no parent, so variable doesn't exist
+            return null;
+        } else {
+            return parent.findVariable(id);
+        }
+    }
+
+    public SymbolTable makeNewTable(String name) {
+        SymbolTable newTable = new SymbolTable(this, nestLevel + 1, name);
+        children.add(newTable);
+        return newTable;
+    }
+    
+    /*
+    * Finds all the items of kind "Parameter" and returns the list as a string
+    * This function is used in getting a list of parameter for inserting functions and parameters into the symbol tables
+    */
+    public String getParameters(){
+    	 Row current;
+         ListIterator<Row> myitems = items.listIterator();
+
+         String retString = "";
+         while (myitems.hasNext()) {//prints items of current table
+             current = myitems.next();
+             if(current.getKind().equals("param") || current.getKind().equals("varParam")){
+            	 retString += current.getType() + " ";
+             }
+         }
+         if(retString.length() > 0) retString = retString.substring(0, retString.length() - 1);//This it to get rid of the trailing space
+         
+         return retString;
+    }
+    
+    public String getParameterKinds(){
+   	 Row current;
+     ListIterator<Row> myitems = items.listIterator();
+
+     String retString = "";
+     while (myitems.hasNext()) {//prints items of current table
+         current = myitems.next();
+         if(current.getKind().equals("param") || current.getKind().equals("varParam")){
+        	 retString += current.getKind() + " ";
+         }
+     }
+     if(retString.length() > 0) retString = retString.substring(0, retString.length() - 1);//This it to get rid of the trailing space
+     
+     return retString;
+    }
+
+
+    /*
+    method will print from current table down, including all children, but no parent
+    */
+    public void printTableFromHere() {
+
+        Row current;
+        ListIterator<Row> myitems = items.listIterator();
+        
+        System.out.println("\nTable: " + tableName + " NestingLevel: " + nestLevel + "  ---------------------------------------------------------------------------------");
+        System.out.println("            ID         Kind      Type    Offset  Size    ReturnValues                                  InputParam");
+
+
+        while (myitems.hasNext()) {//prints items of current table
+            current = myitems.next();
+            current.printRow();
+        }
+
+        SymbolTable currentTable;
+        ListIterator<SymbolTable> childs = children.listIterator();
+        while (childs.hasNext()) {//tell the children to print
+
+        	currentTable = childs.next();
+        	currentTable.printTableFromHere();
+        }
+    }
+
+    /*
+    prints entire symbol table tree
+    */
+    public void printTableFromTop() {
+
+        if (parent != null) { //keeps traveling up the tree until we reach root parent
+            parent.printTableFromTop();
+        }
+        
+        else { //we've are at the "root" table
+            
+            Row current;
+            ListIterator<Row> myitems = items.listIterator();
+            
+            System.out.println("\nTable: " + tableName + " NestingLevel: " + nestLevel + "  ---------------------------------------------------------------------------------");
+            System.out.println("            ID         Kind      Type    Offset  Size    ReturnValues                                  InputParam");
+            
+            while (myitems.hasNext()) {//prints items of current table
+                current = myitems.next();
+                current.printRow();
+            }
+
+            SymbolTable currentTable;
+            ListIterator<SymbolTable> childs = children.listIterator();
+            while (childs.hasNext()) {//tell the children to print
+            	currentTable = childs.next();
+            	currentTable.printTableFromHere();
+            }
+        }
+
+    }
+
+    /*
+    prints only this symbol table
+    */
+    public void print() {
+        Row current;
+        ListIterator<Row> myitems = items.listIterator();
+
+        while (myitems.hasNext()) {//prints items of current table
+            current = myitems.next();
+            current.printRow();
+        }
+    }
+    
+    public SymbolTable moveToChild(String name){
+    	SymbolTable current;
+    	ListIterator<SymbolTable> childs = children.listIterator();
+    	while(childs.hasNext()){
+    		current = childs.next();
+    		if(current.getName().equals(name)){
+    			return current;
+    		}
+    	}
+    	return null;
+    }
+
+}
+</code></pre>
 <!-- InstanceEndEditable -->
+
 
 </article>
 </div>

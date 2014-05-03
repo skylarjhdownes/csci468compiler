@@ -75,20 +75,183 @@ Compilers 2014
 <article id="mainContent">
 <!-- InstanceBeginEditable name="Main" -->
 <h1>Semantic Analyzer Commentary</h1>
-<h3 class="centered">By ***Your Name Here without the stars***</h3>
+<h3 class="centered">By Jonathan Koenes</h3>
 <h2>Purpose of the Semantic Analyzer</h2>
-<p>Discuss the purpose of the semantic analyzer</p>
+<p>The purpose of the Semantic Analyzer is to take each parsed token and figure out what the meaning of the token is, in context of the surrounding code and the program design as a whole. Once the meaning is realized, the semantic analyzer can then write appropriate machine language instructions that represent a specific token in whatever context it is in. The semantic analyzer will also dictate what instructions are allowed on what types of variables, as well as how expressions will be evaluated in terms of whether or not typecasting is available.  Ultimately, the semantic analyzer’s main purpose is to work with the parser and create appropriate machine language instructions for the parsed code that is being compiled.</p>
 <h2>Stack-Based Code Generation</h2>
-<p>Discuss how arithmetic is performed in a stack-based approach</p>
+<p>For stack arithmetic, the way that an expression is written changes from how we normally see an expression. Take, for example, the following simple expression: <br><br> 2 + 3 <br><br>In stack arithmetic, it would be represented as:<br><br> 2 3 +<br> <br> with pseudo machine language instructions being:<br><br>PUSH 2<br>PUSH 3<br>ADDSTACK<br><br>Which would push the two onto the stack, push the three onto the stack, then pop the two numbers on the top of the stack and add them together, putting the solution back on the stack. As a more complicated example, let’s use the expression <br><br> x + y * z<br><br>In this example, in order from left to right, and with keeping the order of operations, we get the pseudo instructions<br><br>PUSH x<br>PUSH y<br>PUSH z<br>MULTSTACK<br>ADDSTACK<br><br>This would appropriately multiply z and y, then add that solution to x, leaving the final answer on top of the stack. If the expression were<br><br> (x + y) * z<br><br> then all one would have to do is switch the ADDSTACK and MULTSTACK instructions to appropriate places:<br><br>PUSH x<br>PUSH y<br>ADDSTACK<br>PUSH z<br>MULTSTACK<br><br>which would then add x and y, then multiply that solution with z in order to get the correct answer left on the top of the stack. The only added challenge in writing the analyzer, is making sure types are correct. In the above examples, you could assume that only integers are used. However, there are also floating point numbers, which use different hardware than integers for arithmetic. All that is required to keep values in their correct type and to use the right hardware, is simply to check at the time of compiling, what is on top of the stack, and what is being pushed on next. If an integer is on the stack and a float is going to be pushed, then the integer needs to be caste as a float before the float is pushed on, then the float match hardware needs to be used. The following example shows this.<br><br>float x;<br>integer y;<br><br>y := y + x;<br><br> The example expression would be represented by the pseudo instructions<br><br>PUSH y<br>CASTFLOAT<br>PUSH x<br>ADDSTACKF<br>CASTINT<br>POP y<br><br>This would push the integer y, cast it as a float, so that we can then push x onto the stack, and use the appropriate arithmetic, but with the float hardware rather than the integer hardware, then cast the solution back as an integer, and pop the final value into variable y. We could’ve cast x as an integer and saved an instruction, but that would’ve truncated the value of x, and although some languages may do that, neither microPascal nor any language with accurate math will truncate a float to an integer in the middle of an expression unless specifically told to in the code through a caste or some appropriate instruction.
+
+</p>
 <h2>Runtime Memory Model</h2>
-<p>Discuss the runtiime memory model and activation records</p>
+<p>The runtime memory model is a way to keep variables in their spot on the stack, since the stack is the only thing available for use in microPascal. The way that the memory model is used and kept accurate is through the use of reference variables and offsets, as well as adjustment to the stack pointer so that the stack doesn’t interfere with variable values on accident. Implementation is done simply through the process of storing the old reference that exists in a register, putting an updated value into that register, then adding to the stack pointer so that there exists enough room on the stack for to variables in the call. For example, let’s look at the following code:<br><br>program Example:<br>integer x,y,z;<br>String string;<br>float potatoe;<br><br>The symbol table would look something like this:<br><br>
+
+
+Table: Example   Size: 5
+<table style=”width:400px”>
+<tr>
+		<th>Lexeme</th>
+		<th>Type</th>
+		<th>Kind</th>
+		<th>Offset</th>
+	</tr>
+	<tr>
+		<td>x</td>
+		<td>integer</td>
+		<td>var</td>
+		<td>1</td>
+	</tr>
+<tr>
+		<td>y</td>
+		<td>integer</td>
+		<td>var</td>
+		<td>2</td>
+	</tr>
+<tr>
+		<td>z</td>
+		<td>integer</td>
+		<td>var</td>
+		<td>3</td>
+	</tr>
+<tr>
+		<td>string</td>
+		<td>String</td>
+		<td>var</td>
+		<td>4</td>
+	</tr>
+<tr>
+		<td>potatoe</td>
+		<td>float</td>
+		<td>var</td>
+		<td>5</td>
+	</tr>
+</table>
+
+<br>This example doesn’t show any function calls that would be represented in the symbol table or extra information such size (which is important, but not in this example), input parameters, and parameter types, and room wouldn’t have to be allotted for function calls on the stack anyways, so it’s not important that we include some. From this example, it can easily be seen that the call to program Example needs room for five variables (assuming the size of each is 1 address slot in RAM). So to make the appropriate call, we’ll need to first store the old value of the register we’ll be using, (just in case it has a value, we don’t want to accidentally get rid of that value), store the current stack pointer as the value we will now be pointing at, then add enough to the stack pointer so that we have room for our variables plus an extra if we need to return a value. We will be using register R0 for this example.<br><br>PUSH R0<br>MOV SP R0<br>ADD SP 6 SP<br><br>The first line would save the old value of R0 onto the stack, the second would make R0 point to the current spot that the stack is at, then we add what we need to make  room for our variables. Now we can reference actually memory locations rather than names, using the variable’s offset from R0.  The example code from earlier:<br><br> x + y * z<br><br>can now changed to reflect memory locations rather than names, as represented in the following pseudo-instructions: <br><br>PUSH 1(R0)<br>PUSH 2(R0)<br>PUSH 3(R0) <br>MULTSTACK <br>ADDSTACK<br><br>To reverse the use of the activation record at the end of the call, we simply have to reverse how we made room on the stack. We would first subtract the same amount that we added onto the stack, then pop the old value of R0 back into R0, then return to wherever we were called from<br><br>SUB SP 6 SP <br>POP R0 <br>RETURN<br><br>Now that the activation record has been deconstructed, the program can continue from where it left off of. If the call had a return variable, that would be dealt with at the end, but has little to do with constructing and deconstructing the activation record. Using the tactic described, it’s easy to keep scope using the registers as scope markers, but the scope depth is then limited by the number of registers available. There are tactics to remedy this problem, but they will not be covered here.
+
+</p>
 <h2>Semantic Information</h2>
-<p>Discuss how semantic information is gathered by the parser and passed from the parser to the semantic analyzer</p>
+<p>For our compiler, the information that is needed for the semantic analyzer is collected through a variety of ways. On of the most common ways is seen through local variables in method calls, as will be seen below. This will allow the variable to stay with the recursive call, and be used only when needed, since it won’t be affected by any other calls. The only other way that information is gathered special for the semantic analyzer is a list that is created for the read parameters. The list is simply a list of variables that will be read into, and the semantic analyzer takes that list and makes the appropriate read statements. The only other type of list that is stored is a running string that simply lists the kinds and types of variables and values given in a function or procedure call, so that the semantic analyzer can figure out whether there are enough parameters and the right kind of parameters in order to make the function or procedure call. Other than that, the semantic analyzer keeps track within itself about what the stack is like, whether casting is needed, and whether or not some value is allowed at a certain point. 
+</p>
 <h2>Sample Method for Code Generation</h2>
-<p>Give a section of code from the parser that calls a method in the semantic analyzer along with code for the called method to show how code is generated. Make it clear what code is generated by the call.</p>
-<p></p>
+<p>Here’s an example of the termTail method call.</p>
+
+<pre class="prettyprint" ><code class="language-java">
+
+public static void termTail() {
+    	switch (Lookahead) {
+        	case "MP_PLUS":
+        	case "MP_MINUS":
+        	case "MP_OR":
+       		 System.out.println(" (#83)"); // Rule #83
+            	addingOperator();
+            	Token operator = lastTok;//Store the last match, which will have been the adding operation
+            	term();
+            	semAn.addOp(operator);//adds the operation after the next term has been pushed
+            	termTail();
+            	break;
+        	case "MP_EQUAL":
+        	case "MP_GEQUAL":
+        	case "MP_GTHAN":
+        	case "MP_LEQUAL":
+        	case "MP_LTHAN":
+        	case "MP_NEQUAL":
+        	case "MP_DO":
+        	case "MP_DOWNTO":
+        	case "MP_ELSE":
+        	case "MP_END":
+        	case "MP_THEN":
+        	case "MP_TO":
+        	case "MP_UNTIL":
+        	case "MP_COMMA":
+        	case "MP_RPAREN":
+        	case "MP_SCOLON":
+       		 System.out.println(" (#84)"); // Rule #84
+            	break;
+        	default:
+            	syntaxError();
+            	break;
+    	}
+    	indent--;
+	}
+</code></pre>
+
+<p>As can be seen the adding operation is stored in a local variable called operator. This value is saved until the next term has been pushed onto the stack, which is done in the call to term(). Once this call is finished, and control returns back to this method, then we will be able to tell the semantic analyzer to push the operator on. In the semantic analyzer, the addOp(Token operator) method looks like this:</p>
+
+<pre class="prettyprint" ><code class="language-java">
+	public void addOp(Token operation){
+   	 
+   	 if(topOfStack.equals("integer") || topOfStack.equals("boolean")){
+   		 //boolean operators
+   		 if(topOfStack.equals("boolean") && firstSide.equals("boolean") && operation.getToken().equals("MP_OR")){
+   			 write("ORS");
+   		 }
+   		 else if(topOfStack.equals("boolean") && firstSide.equals("boolean") && operation.getToken().equals("MP_AND")){
+   			 write("ANDS");
+   		 }
+   		 
+   		 else if(operation.getToken().equals("MP_AND")||operation.getToken().equals("MP_OR")){
+   			 error("Can't use operation " + operation.getLexeme() + " on type " + topOfStack + " when first side is " + firstSide + " Line:" + operation.getLineNumber() + " col:" + operation.getColumnNumber());
+   		 }
+   		 else {
+   			 //integer operators
+   			 if(operation.getLexeme().equals("+")){
+   				 write("ADDS");
+   			 }
+   			 else if(operation.getLexeme().equals("-")){
+   				 write("SUBS");
+   			 }
+   			 else if(operation.getToken().equals("MP_DIV")){
+   				 write("DIVS");
+   			 }
+   			 else if(operation.getLexeme().equals("*")){
+   				 write("MULS");
+   			 }
+   			 else if(operation.getLexeme().equals("mod")){
+   				 write("MODS");
+   			 }
+   		 else{
+   			 error("Can't use operation " + operation.getLexeme() + " on type " + topOfStack + " Line:" + operation.getLineNumber() + " col:" + operation.getColumnNumber());
+   		 }
+   		 }
+   		 
+   	 }
+   	 else if(topOfStack.equals("float")){
+   		 if(operation.getLexeme().equals("+")){
+   			 write("ADDSF");
+   		 }
+   		 else if(operation.getLexeme().equals("-")){
+   			 write("SUBSF");
+   		 }
+   		 else if(operation.getLexeme().equals("/")){
+   			 write("DIVSF");
+   		 }
+   		 else if(operation.getToken().equals("MP_DIV")){
+   			 write("DIVSF");
+   			 write("CASTI");
+   		 }
+   		 else if(operation.getLexeme().equals("*")){
+   			 write("MULSF");
+   		 }
+   		 else if(operation.getLexeme().equals("mod")){
+   			 write("MODSF");
+   		 }
+   		 else{
+   			 error("Can't use operation " + operation.getLexeme() + " on type " + topOfStack + " Line:" + operation.getLineNumber() + " col:" + operation.getColumnNumber());
+   		 }
+   	 }
+   	 else{
+   		 error("String operations and concatatenations not implemented at this point Line: " + operation.getLineNumber() + " col:" + operation.getColumnNumber());
+   	 }
+   	 
+    }
+</code></pre>
+
+<p>As can be seen, there is a divide between float operations and integer/boolean operations. Since integers and boolean values are represented the same way in memory, the operations are grouped together. If the top of the stack (i.e. the kind of stack) is boolean because of either a boolean value or a boolean operation done previously, then the stack only looks at boolean operations and throws an error if the operation isn’t a boolean operation. Otherwise, it looks at the integer operators, and if it’s not one of those, then it also throws an error. Lastly, if the top of the stack is of type float, then we look for the same operations, but use the float hardware instructions. If the type of stack isn’t one of those three, then it must be a string, in which case we cannot apply any operations right now. With this setup, the parser just has to know when to tell the semantic analyzer to add an operation (i.e. after both terms are on the stack), and the semantic analyzer does all the working figuring out what instruction was found, which hardware needs to be used, and can we use that operation on whatever is on the stack at all. With this, our pairing of the parser and semantic analyzer works flawlessly
+</p>
+
 
 <!-- InstanceEndEditable -->
+
 
 </article>
 </div>
